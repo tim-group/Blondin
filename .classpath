@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/acceptancetest/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="vendor/lib/webbit-0.4.7-full.jar" sourcepath="vendor/src/webbit-0.4.7-sources.jar"/>
