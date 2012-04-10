@@ -13,9 +13,9 @@ public final class TransparentProxyTest {
     @Test public void
     transparently_redirects_to_target_application() throws Exception {
         final WebServer targetServer = createWebServer(0).add("/some/target/url", TrivialHttpServer.serving("hello, world"));
+        
         final BlondinServer balancer = new BlondinServer("localhost:" + targetServer.getPort());
         
         assertThat(TrivialHttpClient.contentFrom("http://localhost:" + balancer.port() + "/some/target/url"), is("hello, world"));
     }
-
 }
