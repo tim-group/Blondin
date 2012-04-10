@@ -1,17 +1,21 @@
 package com.timgroup.blondin;
 
+import org.webbitserver.WebServer;
+import org.webbitserver.WebServers;
+
 public final class BlondinServer {
 
+    private WebServer server;
+
     public BlondinServer(String targetUrl) {
-        throw new java.lang.UnsupportedOperationException();
+        this(targetUrl, 0);
     }
 
-    public static void main(String[] args) {
-        throw new java.lang.UnsupportedOperationException();
+    public BlondinServer(String targetUrl, int port) {
+        server = WebServers.createWebServer(port);
     }
 
     public int port() {
-        throw new java.lang.UnsupportedOperationException();
+        return server.getPort();
     }
-
 }
