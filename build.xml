@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="blondin" default="snapshot" basedir=".">
+
+    <property name="target.version" value="0.0.1"/>
+    <property name="build.dir"      value="${basedir}/build"/>
+    <tstamp><format property="build.number" pattern="yyyyMMddHHmmss" timezone="GMT"/></tstamp>
+    <tstamp><format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" timezone="GMT"/></tstamp>
+
+    <macrodef name="compile-module">
+        <attribute name="srcdir"/>
+        <attribute name="destdir"/>
+        <attribute name="classpathref"/>
+        <sequential>
+            <mkdir dir="@{destdir}"/>
+            <javac srcdir="@{srcdir}/java" destdir="@{destdir}" includes="**" includeantruntime="false" encoding="utf-8"
+                   source="1.6" target="1.6" debug="true" debuglevel="lines,source">
+                <classpath refid="@{classpathref}"/>
+            </javac>
+        </sequential>
+    </macrodef>
+
+    <target name="-version-for-snapshot" unless="version.label">
+        <property name="version.label" value="${target.version}-SNAPSHOT-${build.number}"/>
+    </target>
+
+    <target name="-version-for-release" unless="version.label">
+        <property name="version.label" value="${target.version}"/>
+    </target>
+
+    <target name="-version" depends="-version-for-snapshot,-version-for-release">
+        <echo message="Building version ${version.label}"/>
+        <property name="main.jar" value="${build.dir}/${ant.project.name}-${version.label}.jar"/>
+        <property name="test.jar" value="${build.dir}/${ant.project.name}-tests-${version.label}.jar"/>
+        <property name="acceptancetest.jar" value="${build.dir}/${ant.project.name}-acceptancetests-${version.label}.jar"/>
+    </target>
+
+    <target name="-manifest" depends="-version">
+        <property name="default.manifest.file" value="${build.dir}/MANIFEST.MF"/>
+        <manifest file="${default.manifest.file}">
+            <attribute name="Built-By" value="${user.name}"/>
+            <attribute name="Implementation-Title" value="${ant.project.name}"/>
+            <attribute name="Implementation-Vendor" value="YouDevise"/>
+            <attribute name="Implementation-Version" value="${version.label}"/>
+            <attribute name="Built-Date" value="${build.timestamp}"/>
+        </manifest>
+    </target>
+
+    <target name="-pack-deps">
+        <zip destfile="${build.dir}/main-compiledeps.jar"><zipgroupfileset dir="${basedir}/vendor/lib" includes="**/*.jar"/></zip>
+        <zip destfile="${build.dir}/test-compiledeps.jar"><zipgroupfileset dir="${basedir}/vendor/buildlib" includes="**/*.jar"/></zip>
+    </target>
+
+    <target name="clean" description="Clean this project">
+        <delete dir="${build.dir}" failonerror="false"/>
+        <mkdir dir="${build.dir}"/>
+    </target>
+
+    <target name="jar" description="Create Jar files" depends="clean,-version,-manifest,-pack-deps">
+        <path id="compile-main.req"><fileset file="${build.dir}/main-compiledeps.jar"/></path>
+        <path id="compile-test.req">
+            <fileset file="${main.jar}"/>
+            <fileset file="${build.dir}/test-compiledeps.jar"/>
+        </path>
+
+        <compile-module srcdir="${basedir}/src/main" destdir="${build.dir}/main" classpathref="compile-main.req"/>
+        <jar destfile="${main.jar}" manifest="${default.manifest.file}">
+            <fileset dir="${build.dir}/main"/>
+            <fileset dir="${basedir}" includes="LICENSE README.md"/>
+            <zipfileset src="${build.dir}/main-compiledeps.jar" excludes="**/META-INF/**"/>
+            <manifest>
+                <attribute name="Main-Class" value="com.timgroup.blondin.BlondinServer"/>
+            </manifest>
+        </jar>
+
+        <compile-module srcdir="${basedir}/src/test" destdir="${build.dir}/test" classpathref="compile-test.req"/>
+        <jar destfile="${test.jar}" manifest="${default.manifest.file}">
+            <fileset dir="${build.dir}/test"/>
+            <zipfileset src="${build.dir}/test-compiledeps.jar" excludes="**/META-INF/**"/>
+        </jar>
+
+        <compile-module srcdir="${basedir}/src/acceptancetest" destdir="${build.dir}/acceptancetest" classpathref="compile-test.req"/>
+        <jar destfile="${acceptancetest.jar}" manifest="${default.manifest.file}">
+            <fileset dir="${build.dir}/acceptancetest"/>
+            <zipfileset src="${build.dir}/test-compiledeps.jar" excludes="**/META-INF/**"/>
+        </jar>
+    </target>
+
+    <target name="test" description="Test this project" depends="jar">
+        <mkdir dir="${build.dir}/testreport"/>
+        <mkdir dir="${build.dir}/tmp"/>
+
+        <junit printsummary="yes" haltonfailure="yes" forkmode="once" tempdir="${build.dir}/tmp">
+            <classpath>
+              <pathelement location="${main.jar}"/>
+              <pathelement location="${test.jar}"/>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="${build.dir}/testreport">
+                <zipfileset src="${test.jar}">
+                    <include name="com/timgroup/blondin/**/*Test.class"/>
+                </zipfileset>
+            </batchtest>
+        </junit>
+
+        <junit printsummary="yes" haltonfailure="yes" forkmode="once" tempdir="${build.dir}/tmp">
+            <classpath>
+              <pathelement location="${main.jar}"/>
+              <pathelement location="${acceptancetest.jar}"/>
+            </classpath>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="${build.dir}/testreport">
+                <zipfileset src="${acceptancetest.jar}">
+                    <include name="com/timgroup/blondin/**/*Test.class"/>
+                </zipfileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="snapshot" description="Create a tested snapshot jar file" depends="test"/>
+    <target name="release" description="Create a tested release jar file" depends="-version-for-release,snapshot"/>
+</project>
