@@ -6,16 +6,31 @@
     <tstamp><format property="build.number" pattern="yyyyMMddHHmmss" timezone="GMT"/></tstamp>
     <tstamp><format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss" timezone="GMT"/></tstamp>
 
-    <macrodef name="compile-module">
-        <attribute name="srcdir"/>
-        <attribute name="destdir"/>
-        <attribute name="classpathref"/>
+    <macrodef name="jar-module">
+        <attribute name="modulename"/>
+        <attribute name="moduleversion"/>
+        <attribute name="depsjar"/>
+        <attribute name="mainclass" default=""/>
         <sequential>
-            <mkdir dir="@{destdir}"/>
-            <javac srcdir="@{srcdir}/java" destdir="@{destdir}" includes="**" includeantruntime="false" encoding="utf-8"
-                   source="1.6" target="1.6" debug="true" debuglevel="lines,source">
-                <classpath refid="@{classpathref}"/>
-            </javac>
+            <mkdir dir="${build.dir}/@{modulename}.classes"/>
+
+            <javac srcdir="${basedir}/src/@{modulename}/java" destdir="${build.dir}/@{modulename}.classes" includes="**"
+                   includeantruntime="false" encoding="utf-8" source="1.6" target="1.6" debug="true" debuglevel="lines,source"
+                   classpath="@{depsjar}:${build.dir}/${ant.project.name}-main-@{moduleversion}.jar"/>
+
+            <jar destfile="${build.dir}/${ant.project.name}-@{modulename}-@{moduleversion}.jar">
+                <fileset dir="${build.dir}/@{modulename}.classes"/>
+                <fileset dir="${basedir}" includes="LICENSE README.md"/>
+                <zipfileset src="@{depsjar}" excludes="**/META-INF/**"/>
+                <manifest>
+                    <attribute name="Main-Class" value="@{mainclass}"/>
+                    <attribute name="Implementation-Title" value="${ant.project.name}"/>
+                    <attribute name="Implementation-Vendor" value="YouDevise"/>
+                    <attribute name="Implementation-Version" value="@{moduleversion}"/>
+                    <attribute name="Built-By" value="${user.name}"/>
+                    <attribute name="Built-Date" value="${build.timestamp}"/>
+                </manifest>
+            </jar>
         </sequential>
     </macrodef>
 
@@ -29,20 +44,6 @@
 
     <target name="-version" depends="-version-for-snapshot,-version-for-release">
         <echo message="Building version ${version.label}"/>
-        <property name="main.jar" value="${build.dir}/${ant.project.name}-${version.label}.jar"/>
-        <property name="test.jar" value="${build.dir}/${ant.project.name}-tests-${version.label}.jar"/>
-        <property name="acceptancetest.jar" value="${build.dir}/${ant.project.name}-acceptancetests-${version.label}.jar"/>
-    </target>
-
-    <target name="-manifest" depends="-version">
-        <property name="default.manifest.file" value="${build.dir}/MANIFEST.MF"/>
-        <manifest file="${default.manifest.file}">
-            <attribute name="Built-By" value="${user.name}"/>
-            <attribute name="Implementation-Title" value="${ant.project.name}"/>
-            <attribute name="Implementation-Vendor" value="YouDevise"/>
-            <attribute name="Implementation-Version" value="${version.label}"/>
-            <attribute name="Built-Date" value="${build.timestamp}"/>
-        </manifest>
     </target>
 
     <target name="-pack-deps">
@@ -55,34 +56,10 @@
         <mkdir dir="${build.dir}"/>
     </target>
 
-    <target name="jar" description="Create Jar files" depends="clean,-version,-manifest,-pack-deps">
-        <path id="compile-main.req"><fileset file="${build.dir}/main-compiledeps.jar"/></path>
-        <path id="compile-test.req">
-            <fileset file="${main.jar}"/>
-            <fileset file="${build.dir}/test-compiledeps.jar"/>
-        </path>
-
-        <compile-module srcdir="${basedir}/src/main" destdir="${build.dir}/main" classpathref="compile-main.req"/>
-        <jar destfile="${main.jar}" manifest="${default.manifest.file}">
-            <fileset dir="${build.dir}/main"/>
-            <fileset dir="${basedir}" includes="LICENSE README.md"/>
-            <zipfileset src="${build.dir}/main-compiledeps.jar" excludes="**/META-INF/**"/>
-            <manifest>
-                <attribute name="Main-Class" value="com.timgroup.blondin.BlondinServer"/>
-            </manifest>
-        </jar>
-
-        <compile-module srcdir="${basedir}/src/test" destdir="${build.dir}/test" classpathref="compile-test.req"/>
-        <jar destfile="${test.jar}" manifest="${default.manifest.file}">
-            <fileset dir="${build.dir}/test"/>
-            <zipfileset src="${build.dir}/test-compiledeps.jar" excludes="**/META-INF/**"/>
-        </jar>
-
-        <compile-module srcdir="${basedir}/src/acceptancetest" destdir="${build.dir}/acceptancetest" classpathref="compile-test.req"/>
-        <jar destfile="${acceptancetest.jar}" manifest="${default.manifest.file}">
-            <fileset dir="${build.dir}/acceptancetest"/>
-            <zipfileset src="${build.dir}/test-compiledeps.jar" excludes="**/META-INF/**"/>
-        </jar>
+    <target name="jar" description="Create Jar files" depends="clean,-version,-pack-deps">
+        <jar-module modulename="main" moduleversion="${version.label}" depsjar="${build.dir}/main-compiledeps.jar" mainclass="com.timgroup.blondin.BlondinServer"/>
+        <jar-module modulename="test" moduleversion="${version.label}" depsjar="${build.dir}/test-compiledeps.jar"/>
+        <jar-module modulename="acceptancetest" moduleversion="${version.label}" depsjar="${build.dir}/test-compiledeps.jar"/>
     </target>
 
     <target name="test" description="Test this project" depends="jar">
@@ -91,12 +68,12 @@
 
         <junit printsummary="yes" haltonfailure="yes" forkmode="once" tempdir="${build.dir}/tmp">
             <classpath>
-              <pathelement location="${main.jar}"/>
-              <pathelement location="${test.jar}"/>
+              <pathelement location="${build.dir}/${ant.project.name}-main-${version.label}.jar"/>
+              <pathelement location="${build.dir}/${ant.project.name}-test-${version.label}.jar"/>
             </classpath>
             <formatter type="plain"/>
             <batchtest fork="yes" todir="${build.dir}/testreport">
-                <zipfileset src="${test.jar}">
+                <zipfileset src="${build.dir}/${ant.project.name}-test-${version.label}.jar">
                     <include name="com/timgroup/blondin/**/*Test.class"/>
                 </zipfileset>
             </batchtest>
@@ -104,12 +81,12 @@
 
         <junit printsummary="yes" haltonfailure="yes" forkmode="once" tempdir="${build.dir}/tmp">
             <classpath>
-              <pathelement location="${main.jar}"/>
-              <pathelement location="${acceptancetest.jar}"/>
+              <pathelement location="${build.dir}/${ant.project.name}-main-${version.label}.jar"/>
+              <pathelement location="${build.dir}/${ant.project.name}-acceptancetest-${version.label}.jar"/>
             </classpath>
             <formatter type="plain"/>
             <batchtest fork="yes" todir="${build.dir}/testreport">
-                <zipfileset src="${acceptancetest.jar}">
+                <zipfileset src="${build.dir}/${ant.project.name}-acceptancetest-${version.label}.jar">
                     <include name="com/timgroup/blondin/**/*Test.class"/>
                 </zipfileset>
             </batchtest>
