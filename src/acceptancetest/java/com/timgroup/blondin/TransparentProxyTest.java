@@ -1,6 +1,7 @@
 package com.timgroup.blondin;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.webbitserver.WebServer;
 
@@ -10,6 +11,7 @@ import static org.webbitserver.WebServers.createWebServer;
 
 public final class TransparentProxyTest {
 
+    @Ignore("Pending implementation")
     @Test public void
     transparently_redirects_to_target_application() throws Exception {
         final WebServer targetServer = createWebServer(0).add("/some/target/url", TrivialHttpServer.serving("hello, world"));
