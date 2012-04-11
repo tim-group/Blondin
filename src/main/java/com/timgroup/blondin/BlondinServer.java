@@ -16,10 +16,6 @@ public final class BlondinServer {
     
     private Supplier<Boolean> available = Suppliers.ofInstance(false);
 
-    public BlondinServer(String targetUrl) {
-        this(targetUrl, 0);
-    }
-
     public BlondinServer(String targetUrl, int port) {
         server = WebServers.createWebServer(port);
         server.add(new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient()));
@@ -29,10 +25,6 @@ public final class BlondinServer {
         };
     }
 
-    public int port() {
-        return server.getPort();
-    }
-    
     public boolean running() {
         return available.get();
     }
