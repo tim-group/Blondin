@@ -19,6 +19,6 @@ public final class TrivialHttpClient {
             responseText.append(inputLine);
         }
         in.close();
-        return inputLine;
+        return responseText.toString();
     }
 }

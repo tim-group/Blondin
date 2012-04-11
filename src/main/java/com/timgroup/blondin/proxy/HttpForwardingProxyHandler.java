@@ -22,8 +22,7 @@ public final class HttpForwardingProxyHandler implements HttpHandler {
 
     @Override
     public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control) throws Exception {
-        final URL requestedUrl = new URL(request.uri());
-        final URL surrogateUrl = new URL(requestedUrl.getProtocol(), targetHost, targetPort, requestedUrl.getFile());
+        final URL surrogateUrl = new URL("http", targetHost, targetPort, request.uri());
         client.handle(request.uri(surrogateUrl.toExternalForm()), response);
     }
 }

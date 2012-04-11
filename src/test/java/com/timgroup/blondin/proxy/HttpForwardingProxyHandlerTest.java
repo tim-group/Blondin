@@ -23,7 +23,7 @@ public final class HttpForwardingProxyHandlerTest {
     
     @Test public void
     forwards_request() throws Exception {
-        final StubHttpRequest request = new StubHttpRequest().uri("http://myserver:3333/some/old/resource.html");
+        final StubHttpRequest request = new StubHttpRequest().uri("/some/old/resource.html");
         final StubHttpResponse response = new StubHttpResponse();
         
         context.checking(new Expectations() {{
