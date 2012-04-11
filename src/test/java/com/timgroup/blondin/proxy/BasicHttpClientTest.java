@@ -79,5 +79,6 @@ public final class BasicHttpClientTest {
         new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
         
         assertThat(response.header("Content-length"), is("9"));
+        assertThat(response.containsHeader(null), is(false));
     }
 }

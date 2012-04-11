@@ -22,8 +22,11 @@ public final class BasicHttpClient implements HttpClient {
             
             response.status(conn.getResponseCode());
             for(Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
-                for (String value : entry.getValue()) {
-                    response.header(entry.getKey(), value);
+                final String headerName = entry.getKey();
+                if (headerName != null) {
+                    for (String value : entry.getValue()) {
+                        response.header(headerName, value);
+                    }
                 }
             }
             
