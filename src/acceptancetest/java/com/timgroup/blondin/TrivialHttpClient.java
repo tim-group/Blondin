@@ -9,10 +9,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public final class TrivialHttpClient {
-    public static String contentFrom(final String balancerUrlString) throws MalformedURLException, IOException {
-        final URL url = new URL(balancerUrlString);
+    public static String contentFrom(final String urlString) throws MalformedURLException, IOException {
+        final URL url = new URL(urlString);
         final URLConnection conn = url.openConnection();
-        waitForSocket(url);
+        waitForSocket(url.getHost(), url.getPort());
         final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         
         final StringBuilder responseText = new StringBuilder();
@@ -24,12 +24,12 @@ public final class TrivialHttpClient {
         return responseText.toString();
     }
 
-    private static void waitForSocket(final URL url) throws IOException {
+    public static void waitForSocket(String host, int port) throws IOException {
         long startTime = System.currentTimeMillis();
         boolean available = false;
         while(!available) {
             try {
-                Socket socket = new Socket(url.getHost(), url.getPort());
+                Socket socket = new Socket(host, port);
                 available = true;
                 socket.close();
             } catch (IOException e) {
@@ -38,5 +38,19 @@ public final class TrivialHttpClient {
                 }
             }
         }
+    }
+    
+    public static boolean isSocketOpen(String host, int port) {
+        try {
+            Socket socket = new Socket(host, port);
+            socket.close();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static void post(String urlString) {
+        throw new UnsupportedOperationException();
     }
 }
