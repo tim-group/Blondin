@@ -15,7 +15,7 @@ public final class BlondinServer {
 
     public BlondinServer(String targetUrl, int port) {
         server = WebServers.createWebServer(port);
-        server.add(new HttpForwardingProxyHandler("", null));
+        server.add(new HttpForwardingProxyHandler(targetUrl, null));
     }
 
     public int port() {
