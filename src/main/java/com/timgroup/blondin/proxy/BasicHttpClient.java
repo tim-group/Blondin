@@ -1,8 +1,11 @@
 package com.timgroup.blondin.proxy;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.webbitserver.HttpRequest;
 import org.webbitserver.HttpResponse;
@@ -15,10 +18,13 @@ public final class BasicHttpClient implements HttpClient {
     public void handle(HttpRequest request, HttpResponse response) {
         try {
             final URL url = new URL(request.uri());
-            final URLConnection conn = url.openConnection();
-            response.header("Content-type", "text/plain");
+            final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             final InputStream inputStream = conn.getInputStream();
+            
+            response.header("Content-type", "text/plain");
+            response.status(conn.getResponseCode());
             response.content(ByteStreams.toByteArray(inputStream));
+            
             inputStream.close();
             response.end();
         }
