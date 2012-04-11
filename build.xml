@@ -78,7 +78,7 @@
     </target>
 
     <target name="jar" description="Create Jar files" depends="clean,-version,-pack-deps">
-        <jar-module modulename="main" moduleversion="${version.label}" depsjar="${build.dir}/main-compiledeps.jar" mainclass="com.timgroup.blondin.BlondinServer"/>
+        <jar-module modulename="main" moduleversion="${version.label}" depsjar="${build.dir}/main-compiledeps.jar" mainclass="com.timgroup.blondin.Blondin"/>
         <jar-module modulename="test" moduleversion="${version.label}" depsjar="${build.dir}/test-compiledeps.jar"/>
         <jar-module modulename="acceptancetest" moduleversion="${version.label}" depsjar="${build.dir}/test-compiledeps.jar"/>
     </target>
