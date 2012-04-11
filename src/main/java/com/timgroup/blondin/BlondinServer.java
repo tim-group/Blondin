@@ -3,7 +3,7 @@ package com.timgroup.blondin;
 import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
 
-import com.timgroup.blondin.proxy.BasicProxyClient;
+import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.HttpForwardingProxyHandler;
 
 public final class BlondinServer {
@@ -16,7 +16,7 @@ public final class BlondinServer {
 
     public BlondinServer(String targetUrl, int port) {
         server = WebServers.createWebServer(port);
-        server.add(new HttpForwardingProxyHandler(targetUrl, new BasicProxyClient()));
+        server.add(new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient()));
         server.start();
     }
 

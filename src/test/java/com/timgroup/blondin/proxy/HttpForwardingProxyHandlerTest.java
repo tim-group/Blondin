@@ -18,7 +18,7 @@ public final class HttpForwardingProxyHandlerTest {
 
     private final Mockery context = new Mockery();
     
-    private final ProxyClient client = context.mock(ProxyClient.class);
+    private final HttpClient client = context.mock(HttpClient.class);
     private final HttpForwardingProxyHandler handler = new HttpForwardingProxyHandler("targetserver:2222", client);
     
     @Test public void

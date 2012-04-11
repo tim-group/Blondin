@@ -15,7 +15,7 @@ import com.sun.net.httpserver.HttpServer;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public final class BasicProxyClientTest {
+public final class BasicHttpClientTest {
 
     @Test public void
     fulfils_simple_request() throws Exception {
@@ -31,7 +31,7 @@ public final class BasicProxyClientTest {
         server.start();
         
         final StubHttpResponse response = new StubHttpResponse();
-        new BasicProxyClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
+        new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
         server.stop(0);
         
         assertThat(response.contentsString(), is("myContent"));

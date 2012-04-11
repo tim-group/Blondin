@@ -9,7 +9,7 @@ import org.webbitserver.HttpResponse;
 
 import com.google.common.io.ByteStreams;
 
-public final class BasicProxyClient implements ProxyClient {
+public final class BasicHttpClient implements HttpClient {
 
     @Override
     public void handle(HttpRequest request, HttpResponse response) {

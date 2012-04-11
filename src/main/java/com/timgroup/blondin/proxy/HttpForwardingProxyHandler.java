@@ -11,9 +11,9 @@ public final class HttpForwardingProxyHandler implements HttpHandler {
 
     private final String targetHost;
     private final int targetPort;
-    private final ProxyClient client;
+    private final HttpClient client;
 
-    public HttpForwardingProxyHandler(String target, ProxyClient client) {
+    public HttpForwardingProxyHandler(String target, HttpClient client) {
         final String[] targetComponents = target.split(":");
         this.targetHost = targetComponents[0];
         this.targetPort = Integer.parseInt(targetComponents[1]);
