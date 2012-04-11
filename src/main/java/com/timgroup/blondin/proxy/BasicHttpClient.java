@@ -3,7 +3,6 @@ package com.timgroup.blondin.proxy;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -21,8 +20,13 @@ public final class BasicHttpClient implements HttpClient {
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             final InputStream inputStream = conn.getInputStream();
             
-            response.header("Content-type", "text/plain");
             response.status(conn.getResponseCode());
+            for(Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+                for (String value : entry.getValue()) {
+                    response.header(entry.getKey(), value);
+                }
+            }
+            
             response.content(ByteStreams.toByteArray(inputStream));
             
             inputStream.close();

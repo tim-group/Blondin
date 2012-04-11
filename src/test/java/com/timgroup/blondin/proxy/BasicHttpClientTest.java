@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.webbitserver.stub.StubHttpRequest;
 import org.webbitserver.stub.StubHttpResponse;
 
+import com.google.common.collect.ImmutableList;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -58,14 +58,12 @@ public final class BasicHttpClientTest {
         assertThat(response.status(), is(HttpURLConnection.HTTP_ACCEPTED));
     }
     
-    @Ignore("Pending Implementation")
     @Test public void
     preseves_response_headers() throws Exception {
         final HttpServer server = HttpServer.create(new InetSocketAddress(30215), 0);
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
                 byte[] response = "myContent".getBytes();
-               // exchange.getRequestHeaders().add("Content-type", "application/json");
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
                 exchange.getResponseBody().write(response);
                 exchange.close();
@@ -77,6 +75,6 @@ public final class BasicHttpClientTest {
         new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
         server.stop(0);
         
-        assertThat(response.header("Content-type"), is("application/json"));
+        assertThat(response.header("Content-length"), is(String.valueOf("myContent".length())));
     }
 }
