@@ -1,25 +1,37 @@
 package com.timgroup.blondin;
 
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 
-public final class TrivialHttpServer implements HttpHandler {
-    private final String responseString;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
-    private TrivialHttpServer(String responseString) {
-        this.responseString = responseString;
+public final class TrivialHttpServer {
+    private final String content;
+    private final String path;
+
+    private TrivialHttpServer(String path, String content) {
+        this.path = path;
+        this.content = content;
     }
 
-    public static HttpHandler serving(String responseString) {
-        return new TrivialHttpServer(responseString);
+    public static TrivialHttpServer serving(String path, String content) {
+        return new TrivialHttpServer(path, content);
     }
-
-    @Override
-    public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control) throws Exception {
-        response.header("Content-type", "text/plain")
-                .content(responseString)
-                .end();
+    
+    public void on(int port) throws Exception {
+        final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        server.createContext(path, new HttpHandler() {
+            @Override public void handle(HttpExchange exchange) throws IOException {
+                byte[] response = content.getBytes();
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.close();
+                server.stop(0);
+            }
+        });
+        server.start();
     }
 }
