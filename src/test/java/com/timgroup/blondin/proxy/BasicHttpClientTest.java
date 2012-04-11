@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.webbitserver.stub.StubHttpRequest;
 import org.webbitserver.stub.StubHttpResponse;
@@ -17,9 +19,20 @@ import static org.junit.Assert.assertThat;
 
 public final class BasicHttpClientTest {
 
+    private HttpServer server;
+    
+    @Before
+    public void startServer() throws Exception {
+        server = HttpServer.create(new InetSocketAddress(30215), 0);
+    }
+    
+    @After
+    public void stopServer() throws Exception {
+        server.stop(0);
+    }
+    
     @Test public void
     fulfils_simple_request() throws Exception {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(30215), 0);
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
                 byte[] response = "myContent".getBytes();
@@ -32,19 +45,15 @@ public final class BasicHttpClientTest {
         
         final StubHttpResponse response = new StubHttpResponse();
         new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
-        server.stop(0);
         
         assertThat(response.contentsString(), is("myContent"));
     }
     
     @Test public void
-    preseves_response_code() throws Exception {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(30215), 0);
+    preseves_response_status_code() throws Exception {
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
-                byte[] response = "myContent".getBytes();
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_ACCEPTED, response.length);
-                exchange.getResponseBody().write(response);
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NO_CONTENT, 0);
                 exchange.close();
             }
         });
@@ -52,19 +61,15 @@ public final class BasicHttpClientTest {
         
         final StubHttpResponse response = new StubHttpResponse();
         new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
-        server.stop(0);
         
-        assertThat(response.status(), is(HttpURLConnection.HTTP_ACCEPTED));
+        assertThat(response.status(), is(HttpURLConnection.HTTP_NO_CONTENT));
     }
     
     @Test public void
     preseves_response_headers() throws Exception {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(30215), 0);
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
-                byte[] response = "myContent".getBytes();
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
-                exchange.getResponseBody().write(response);
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 9);
                 exchange.close();
             }
         });
@@ -72,8 +77,7 @@ public final class BasicHttpClientTest {
         
         final StubHttpResponse response = new StubHttpResponse();
         new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
-        server.stop(0);
         
-        assertThat(response.header("Content-length"), is(String.valueOf("myContent".length())));
+        assertThat(response.header("Content-length"), is("9"));
     }
 }
