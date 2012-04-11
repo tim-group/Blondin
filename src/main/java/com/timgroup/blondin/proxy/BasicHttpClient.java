@@ -11,6 +11,9 @@ import org.webbitserver.HttpResponse;
 
 import com.google.common.io.ByteStreams;
 
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Maps.filterKeys;
+
 public final class BasicHttpClient implements HttpClient {
 
     @Override
@@ -21,12 +24,10 @@ public final class BasicHttpClient implements HttpClient {
             final InputStream inputStream = conn.getInputStream();
             
             response.status(conn.getResponseCode());
-            for(Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
-                final String headerName = entry.getKey();
-                if (headerName != null) {
-                    for (String value : entry.getValue()) {
-                        response.header(headerName, value);
-                    }
+            
+            for(Entry<String, List<String>> entry : filterKeys(conn.getHeaderFields(), notNull()).entrySet()) {
+                for (String value : entry.getValue()) {
+                    response.header(entry.getKey(), value);
                 }
             }
             
