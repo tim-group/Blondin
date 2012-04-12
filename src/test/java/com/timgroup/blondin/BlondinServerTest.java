@@ -7,7 +7,7 @@ import static org.junit.Assert.assertThat;
 
 public final class BlondinServerTest {
 
-    @Test(timeout=100) public void
+    @Test(timeout=1000) public void
     reports_startup_success() {
         final BlondinServer blondin = new BlondinServer("x:21", 31415);
         while(!blondin.running()) { }
