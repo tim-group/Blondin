@@ -2,6 +2,10 @@ package com.timgroup.blondin;
 
 import java.util.concurrent.Future;
 
+import org.webbitserver.HttpControl;
+import org.webbitserver.HttpHandler;
+import org.webbitserver.HttpRequest;
+import org.webbitserver.HttpResponse;
 import org.webbitserver.WebServer;
 import org.webbitserver.WebServers;
 
@@ -18,7 +22,18 @@ public final class BlondinServer {
 
     public BlondinServer(String targetUrl, int port) {
         server = WebServers.createWebServer(port);
+        server.add("/shutdown", new HttpHandler() {
+            @Override public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control) throws Exception {
+                if ("POST".equals(request.method())) {
+                    shutdown();
+                }
+                else {
+                    control.nextHandler();
+                }
+            }
+        });
         server.add(new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient()));
+        
         final Future<?> startup = server.start();
         available = new Supplier<Boolean>() {
             @Override public Boolean get() { return startup.isDone(); }

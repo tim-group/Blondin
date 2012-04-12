@@ -3,13 +3,14 @@ package com.timgroup.blondin;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 
 public final class TrivialHttpClient {
-    public static String contentFrom(final String urlString) throws MalformedURLException, IOException {
+    public static String contentFrom(final String urlString) throws IOException {
         final URL url = new URL(urlString);
         final URLConnection conn = url.openConnection();
         waitForSocket(url.getHost(), url.getPort());
@@ -50,7 +51,19 @@ public final class TrivialHttpClient {
         }
     }
 
-    public static void post(String urlString) {
-        throw new UnsupportedOperationException();
+    public static void post(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
+        httpCon.setDoOutput(true);
+        httpCon.setRequestMethod("POST");
+        httpCon.setRequestProperty("Content-Type", "text/plain");
+        httpCon.setRequestProperty("Content-Length", "0");
+        httpCon.setUseCaches(false);
+        
+        OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
+        out.write("");
+        out.close();
+        
+        httpCon.getContentLength();
     }
 }
