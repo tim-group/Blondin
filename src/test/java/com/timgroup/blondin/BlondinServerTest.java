@@ -13,4 +13,14 @@ public final class BlondinServerTest {
         while(!blondin.running()) { }
         assertThat(blondin.running(), is(true));
     }
+    
+    @Test(timeout=1000) public void
+    reports_shutdown_success() {
+        final BlondinServer blondin = new BlondinServer("x:21", 31415);
+        while(!blondin.running()) { }
+        
+        blondin.shutdown();
+        while(blondin.running()) { }
+        assertThat(blondin.running(), is(false));
+    }
 }

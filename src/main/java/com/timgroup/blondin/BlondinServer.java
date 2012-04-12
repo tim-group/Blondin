@@ -28,4 +28,12 @@ public final class BlondinServer {
     public boolean running() {
         return available.get();
     }
+
+    public void shutdown() {
+        final Supplier<Boolean> underlyingAvailability = this.available;
+        final Future<? extends WebServer> shutdown = server.stop();
+        available = new Supplier<Boolean>() {
+            @Override public Boolean get() { return shutdown.isDone() ? false : underlyingAvailability.get(); }
+        };
+    }
 }
