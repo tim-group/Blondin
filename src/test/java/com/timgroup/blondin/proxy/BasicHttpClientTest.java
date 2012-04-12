@@ -7,6 +7,8 @@ import java.net.InetSocketAddress;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.webbitserver.WebServer;
+import org.webbitserver.WebServers;
 import org.webbitserver.stub.StubHttpRequest;
 import org.webbitserver.stub.StubHttpResponse;
 
@@ -80,5 +82,18 @@ public final class BasicHttpClientTest {
         
         assertThat(response.header("Content-length"), is("9"));
         assertThat(response.containsHeader(null), is(false));
+    }
+    
+    @Test public void
+    handles_a_resource_with_no_content() throws Exception {
+        final StubHttpResponse response = new StubHttpResponse();
+        final WebServer webServer = WebServers.createWebServer(45687).start().get();
+        try {
+            new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:45687/favicon.ico"), response);
+        }
+        finally {
+            webServer.stop().get();
+        }
+        assertThat(response.contentsString(), is(""));
     }
 }

@@ -45,9 +45,15 @@ public final class BasicHttpClient implements HttpClient {
     }
 
     private void defensivelyTransferContent(HttpResponse response, final HttpURLConnection conn) throws IOException {
-        final InputStream inputStream = conn.getInputStream();
-        final byte[] content = ByteStreams.toByteArray(inputStream);
-        inputStream.close();
+        byte[] content;
+        try {
+            final InputStream inputStream = conn.getInputStream();
+            content = ByteStreams.toByteArray(inputStream);
+            inputStream.close();
+        }
+        catch (IOException e) {
+            content = new byte[0];
+        }
         response.content(content);
     }
 }
