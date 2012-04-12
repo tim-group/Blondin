@@ -1,5 +1,6 @@
 package com.timgroup.blondin.proxy;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -21,23 +22,32 @@ public final class BasicHttpClient implements HttpClient {
         try {
             final URL url = new URL(request.uri());
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            final InputStream inputStream = conn.getInputStream();
             
             response.status(conn.getResponseCode());
             
-            for(Entry<String, List<String>> entry : filterKeys(conn.getHeaderFields(), notNull()).entrySet()) {
-                for (String value : entry.getValue()) {
-                    response.header(entry.getKey(), value);
-                }
-            }
+            transferHeaders(response, conn);
+            defensivelyTransferContent(response, conn);
             
-            response.content(ByteStreams.toByteArray(inputStream));
-            
-            inputStream.close();
+            conn.disconnect();
             response.end();
         }
         catch(Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private void transferHeaders(HttpResponse response, final HttpURLConnection conn) {
+        for(Entry<String, List<String>> entry : filterKeys(conn.getHeaderFields(), notNull()).entrySet()) {
+            for (String value : entry.getValue()) {
+                response.header(entry.getKey(), value);
+            }
+        }
+    }
+
+    private void defensivelyTransferContent(HttpResponse response, final HttpURLConnection conn) throws IOException {
+        final InputStream inputStream = conn.getInputStream();
+        final byte[] content = ByteStreams.toByteArray(inputStream);
+        inputStream.close();
+        response.content(content);
     }
 }
