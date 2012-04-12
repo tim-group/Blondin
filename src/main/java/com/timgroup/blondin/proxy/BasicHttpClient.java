@@ -7,8 +7,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
 
 import com.google.common.io.ByteStreams;
 
@@ -18,42 +18,41 @@ import static com.google.common.collect.Maps.filterKeys;
 public final class BasicHttpClient implements HttpClient {
 
     @Override
-    public void handle(HttpRequest request, HttpResponse response) {
+    public void handle(String targetHost, int targetPort, Request request, Response response) {
         try {
-            final URL url = new URL(request.uri());
+            final URL url = new URL("http", targetHost, targetPort, request.getPath().getPath());
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             
-            response.status(conn.getResponseCode());
-            
+            response.setCode(conn.getResponseCode());
+            response.setText(conn.getResponseMessage());
+
             transferHeaders(response, conn);
-            defensivelyTransferContent(response, conn);
+            response.commit();
             
+            defensivelyTransferContent(response, conn);
             conn.disconnect();
-            response.end();
+            response.close();
         }
         catch(Exception e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private void transferHeaders(HttpResponse response, final HttpURLConnection conn) {
+    private void transferHeaders(Response response, final HttpURLConnection conn) {
         for(Entry<String, List<String>> entry : filterKeys(conn.getHeaderFields(), notNull()).entrySet()) {
             for (String value : entry.getValue()) {
-                response.header(entry.getKey(), value);
+                response.add(entry.getKey(), value);
             }
         }
     }
 
-    private void defensivelyTransferContent(HttpResponse response, final HttpURLConnection conn) throws IOException {
-        byte[] content;
+    private void defensivelyTransferContent(Response response, final HttpURLConnection conn) throws IOException {
         try {
             final InputStream inputStream = conn.getInputStream();
-            content = ByteStreams.toByteArray(inputStream);
+            ByteStreams.copy(inputStream, response.getOutputStream());
             inputStream.close();
         }
         catch (IOException e) {
-            content = new byte[0];
         }
-        response.content(content);
     }
 }

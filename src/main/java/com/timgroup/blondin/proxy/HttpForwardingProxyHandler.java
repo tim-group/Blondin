@@ -1,13 +1,9 @@
 package com.timgroup.blondin.proxy;
 
-import java.net.URL;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
 
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-
-public final class HttpForwardingProxyHandler implements HttpHandler {
+public final class HttpForwardingProxyHandler {
 
     private final String targetHost;
     private final int targetPort;
@@ -20,9 +16,7 @@ public final class HttpForwardingProxyHandler implements HttpHandler {
         this.client = client;
     }
 
-    @Override
-    public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control) throws Exception {
-        final URL surrogateUrl = new URL("http", targetHost, targetPort, request.uri());
-        client.handle(request.uri(surrogateUrl.toExternalForm()), response);
+    public void handleHttpRequest(Request request, Response response) throws Exception {
+        client.handle(targetHost, targetPort, request, response);
     }
 }

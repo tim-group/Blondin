@@ -1,10 +1,10 @@
 package com.timgroup.blondin.proxy;
 
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
 
 public interface HttpClient {
 
-    void handle(HttpRequest request, HttpResponse response);
+    void handle(String targetHost, int targetPort, Request request, Response response);
 
 }

@@ -1,54 +1,61 @@
 package com.timgroup.blondin;
 
-import java.util.concurrent.Future;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
-import org.webbitserver.HttpControl;
-import org.webbitserver.HttpHandler;
-import org.webbitserver.HttpRequest;
-import org.webbitserver.HttpResponse;
-import org.webbitserver.WebServer;
-import org.webbitserver.WebServers;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
+import org.simpleframework.transport.connect.Connection;
+import org.simpleframework.transport.connect.SocketConnection;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.HttpForwardingProxyHandler;
 
 public final class BlondinServer {
 
-    private final WebServer server;
-    
-    private Supplier<Boolean> available = Suppliers.ofInstance(false);
+    private volatile boolean available = false;
+    private Connection connection;
 
     public BlondinServer(String targetUrl, int port) {
-        server = WebServers.createWebServer(port);
-        server.add("/shutdown", new HttpHandler() {
-            @Override public void handleHttpRequest(HttpRequest request, HttpResponse response, HttpControl control) throws Exception {
-                if ("POST".equals(request.method())) {
-                    shutdown();
+        final HttpForwardingProxyHandler proxy = new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient());
+        final Container container = new Container() {
+            @Override
+            public void handle(Request request, Response response) {
+                try {
+                    if ("/shutdown".equals(request.getPath().getPath()) && "POST".equals(request.getMethod())) {
+                        response.close();
+                        shutdown();
+                        return;
+                    }
+                    proxy.handleHttpRequest(request, response);
                 }
-                else {
-                    control.nextHandler();
+                catch (Exception e) {
                 }
             }
-        });
-        server.add(new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient()));
-        
-        final Future<?> startup = server.start();
-        available = new Supplier<Boolean>() {
-            @Override public Boolean get() { return startup.isDone(); }
         };
+        try {
+            connection = new SocketConnection(container);
+            SocketAddress address = new InetSocketAddress(port);
+            connection.connect(address);
+        }
+        catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        available = true;
     }
 
     public boolean running() {
-        return available.get();
+        return available;
     }
 
     public void shutdown() {
-        final Supplier<Boolean> underlyingAvailability = this.available;
-        final Future<? extends WebServer> shutdown = server.stop();
-        available = new Supplier<Boolean>() {
-            @Override public Boolean get() { return shutdown.isDone() ? false : underlyingAvailability.get(); }
-        };
+        try {
+            connection.close();
+        }
+        catch (IOException e) {
+        }
+        available = false;
     }
 }

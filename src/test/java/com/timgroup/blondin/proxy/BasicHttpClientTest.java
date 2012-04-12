@@ -1,26 +1,35 @@
 package com.timgroup.blondin.proxy;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.webbitserver.WebServer;
-import org.webbitserver.WebServers;
-import org.webbitserver.stub.StubHttpRequest;
-import org.webbitserver.stub.StubHttpResponse;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.simpleframework.http.parse.PathParser;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public final class BasicHttpClientTest {
 
+    private final Mockery context = new Mockery();
+    
+    private final Request request = context.mock(Request.class);
+    private final Response response = context.mock(Response.class);
+    
     private HttpServer server;
     
     @Before
@@ -45,10 +54,17 @@ public final class BasicHttpClientTest {
         });
         server.start();
         
-        final StubHttpResponse response = new StubHttpResponse();
-        new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        context.checking(new Expectations() {{
+            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            
+            allowing(response).getOutputStream(); will(returnValue(outputStream));
+            ignoring(response);
+        }});
         
-        assertThat(response.contentsString(), is("myContent"));
+        new BasicHttpClient().handle("localhost", 30215, request, response);
+        
+        assertThat(outputStream.toString(), is("myContent"));
     }
     
     @Test public void
@@ -61,10 +77,16 @@ public final class BasicHttpClientTest {
         });
         server.start();
         
-        final StubHttpResponse response = new StubHttpResponse();
-        new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
+        context.checking(new Expectations() {{
+            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            
+            oneOf(response).setCode(HttpURLConnection.HTTP_NO_CONTENT);
+            ignoring(response);
+        }});
         
-        assertThat(response.status(), is(HttpURLConnection.HTTP_NO_CONTENT));
+        new BasicHttpClient().handle("localhost", 30215, request, response);
+        
+        context.assertIsSatisfied();
     }
     
     @Test public void
@@ -77,23 +99,39 @@ public final class BasicHttpClientTest {
         });
         server.start();
         
-        final StubHttpResponse response = new StubHttpResponse();
-        new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:30215/some/path/to/a/resource.txt"), response);
+        context.checking(new Expectations() {{
+            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            
+            oneOf(response).add("Content-length", "9");
+            never(response).add(with(nullValue(String.class)), with(any(String.class)));
+            ignoring(response);
+        }});
         
-        assertThat(response.header("Content-length"), is("9"));
-        assertThat(response.containsHeader(null), is(false));
+        new BasicHttpClient().handle("localhost", 30215, request, response);
+        
+        context.assertIsSatisfied();
     }
     
     @Test public void
     handles_a_resource_with_no_content() throws Exception {
-        final StubHttpResponse response = new StubHttpResponse();
-        final WebServer webServer = WebServers.createWebServer(45687).start().get();
-        try {
-            new BasicHttpClient().handle(new StubHttpRequest().uri("http://localhost:45687/favicon.ico"), response);
-        }
-        finally {
-            webServer.stop().get();
-        }
-        assertThat(response.contentsString(), is(""));
+        server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
+            @Override public void handle(HttpExchange exchange) throws IOException {
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
+                exchange.close();
+            }
+        });
+        server.start();
+        
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        context.checking(new Expectations() {{
+            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            
+            allowing(response).getOutputStream(); will(returnValue(outputStream));
+            ignoring(response);
+        }});
+        
+        new BasicHttpClient().handle("localhost", 30215, request, response);
+        
+        assertThat(outputStream.toString(), is(""));
     }
 }
