@@ -1,7 +1,7 @@
 package com.timgroup.blondin;
 
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.net.URL;
 
 import org.junit.Test;
@@ -41,18 +41,9 @@ public final class BlondinServerTest {
 
     private void postTo(String urlString) throws Exception {
         URL url = new URL(urlString);
-        HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
-        httpCon.setDoOutput(true);
-        httpCon.setRequestMethod("POST");
-        httpCon.setRequestProperty("Content-Type", "text/plain");
-        httpCon.setRequestProperty("Content-Length", "0");
-        httpCon.setUseCaches(false);
-        
-        OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-        out.write("");
-        out.close();
-        
-        httpCon.getContentLength();
-        //httpCon.getResponseCode();
+        Socket client = new Socket(url.getHost(), url.getPort());
+        OutputStream http = client.getOutputStream();
+        http.write(String.format("POST %s HTTP/1.1\r\nHost: www.example.com\r\n\r\n", url.getFile()).getBytes("UTF-8"));
+        http.flush();
     }
 }
