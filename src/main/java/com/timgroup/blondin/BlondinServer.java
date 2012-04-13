@@ -18,7 +18,7 @@ public final class BlondinServer {
     private volatile boolean available = false;
     private Connection connection;
 
-    public BlondinServer(String targetUrl, int port) {
+    public BlondinServer(int blondinPort, String targetUrl) {
         final HttpForwardingProxyHandler proxy = new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient());
         final Container container = new Container() {
             @Override
@@ -37,7 +37,7 @@ public final class BlondinServer {
         };
         try {
             connection = new SocketConnection(container);
-            SocketAddress address = new InetSocketAddress(port);
+            SocketAddress address = new InetSocketAddress(blondinPort);
             connection.connect(address);
         }
         catch (IOException e) {
