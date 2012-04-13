@@ -5,6 +5,6 @@ import org.simpleframework.http.Response;
 
 public interface HttpClient {
 
-    void handle(String targetHost, int targetPort, Request request, Response response);
+    void handle(String host, int port, Request request, Response response);
 
 }
