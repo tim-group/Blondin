@@ -11,7 +11,6 @@ import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
 import com.timgroup.blondin.proxy.BasicHttpClient;
-import com.timgroup.blondin.proxy.HttpForwardingProxyHandler;
 
 public final class BlondinServer {
 
@@ -19,7 +18,11 @@ public final class BlondinServer {
     private Connection connection;
 
     public BlondinServer(int blondinPort, String targetUrl) {
-        final HttpForwardingProxyHandler proxy = new HttpForwardingProxyHandler(targetUrl, new BasicHttpClient());
+        final String[] targetComponents = targetUrl.split(":");
+        final String targetHost = targetComponents[0];
+        final int targetPort = Integer.parseInt(targetComponents[1]);
+        
+        final BasicHttpClient httpClient = new BasicHttpClient();
         final Container container = new Container() {
             @Override
             public void handle(Request request, Response response) {
@@ -29,7 +32,7 @@ public final class BlondinServer {
                         shutdown();
                         return;
                     }
-                    proxy.handleHttpRequest(request, response);
+                    httpClient.handle(targetHost, targetPort, request, response);
                 }
                 catch (Exception e) {
                 }
