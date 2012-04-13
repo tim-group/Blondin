@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -13,8 +14,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
-import org.simpleframework.http.parse.PathParser;
+import org.simpleframework.http.parse.AddressParser;
 
+import com.google.common.collect.Lists;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -56,7 +58,7 @@ public final class BasicHttpClientTest {
         
         final OutputStream outputStream = new ByteArrayOutputStream();
         context.checking(new Expectations() {{
-            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
             allowing(response).getOutputStream(); will(returnValue(outputStream));
             ignoring(response);
@@ -78,7 +80,7 @@ public final class BasicHttpClientTest {
         server.start();
         
         context.checking(new Expectations() {{
-            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
             oneOf(response).setCode(HttpURLConnection.HTTP_NO_CONTENT);
             ignoring(response);
@@ -100,7 +102,7 @@ public final class BasicHttpClientTest {
         server.start();
         
         context.checking(new Expectations() {{
-            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
             oneOf(response).add("Content-length", "9");
             never(response).add(with(nullValue(String.class)), with(any(String.class)));
@@ -110,6 +112,29 @@ public final class BasicHttpClientTest {
         new BasicHttpClient().handle("localhost", 30215, request, response);
         
         context.assertIsSatisfied();
+    }
+    
+    @Test public void
+    preseves_request_query() throws Exception {
+        final ArrayList<String> query = Lists.newArrayList();
+        server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
+            @Override public void handle(HttpExchange exchange) throws IOException {
+                query.add(exchange.getRequestURI().getQuery());
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 9);
+                exchange.close();
+            }
+        });
+        server.start();
+        
+        context.checking(new Expectations() {{
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt?alpha=beta&gamma=delta")));
+            
+            ignoring(response);
+        }});
+        
+        new BasicHttpClient().handle("localhost", 30215, request, response);
+        
+        assertThat(query, is(Lists.newArrayList("alpha=beta&gamma=delta")));
     }
     
     @Test public void
@@ -124,7 +149,7 @@ public final class BasicHttpClientTest {
         
         final OutputStream outputStream = new ByteArrayOutputStream();
         context.checking(new Expectations() {{
-            allowing(request).getPath(); will(returnValue(new PathParser("/some/path/to/a/resource.txt")));
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
             allowing(response).getOutputStream(); will(returnValue(outputStream));
             ignoring(response);

@@ -3,7 +3,6 @@ package com.timgroup.blondin;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.lang.String.format;
@@ -35,7 +34,6 @@ public final class TransparentProxyTest {
         assertThat(TrivialHttpClient.contentFrom(requestUrl), is("hello, world"));
     }
     
-    @Ignore("pending implementation")
     @Test public void
     forwards_query_parameters_with_proxied_get_request() throws Exception {
         final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort);

@@ -20,7 +20,7 @@ public final class BasicHttpClient implements HttpClient {
     @Override
     public void handle(String targetHost, int targetPort, Request request, Response response) {
         try {
-            final URL url = new URL("http", targetHost, targetPort, request.getPath().getPath());
+            final URL url = new URL("http", targetHost, targetPort, request.getAddress().toString());
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             
             response.setCode(conn.getResponseCode());
