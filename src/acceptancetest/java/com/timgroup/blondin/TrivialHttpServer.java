@@ -11,6 +11,8 @@ import com.sun.net.httpserver.HttpServer;
 public final class TrivialHttpServer {
     private final String content;
     private final String path;
+    
+    private String query;
 
     private TrivialHttpServer(String path, String content) {
         this.path = path;
@@ -21,10 +23,12 @@ public final class TrivialHttpServer {
         return new TrivialHttpServer(path, content);
     }
     
-    public void on(int port) throws Exception {
+    public TrivialHttpServer on(int port) throws Exception {
         final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext(path, new HttpHandler() {
+
             @Override public void handle(HttpExchange exchange) throws IOException {
+                query = exchange.getRequestURI().getQuery();
                 byte[] response = content.getBytes();
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
                 exchange.getResponseBody().write(response);
@@ -33,5 +37,10 @@ public final class TrivialHttpServer {
             }
         });
         server.start();
+        return this;
+    }
+    
+    public String query() {
+        return query;
     }
 }

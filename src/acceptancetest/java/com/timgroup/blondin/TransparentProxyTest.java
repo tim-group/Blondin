@@ -3,8 +3,10 @@ package com.timgroup.blondin;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -21,7 +23,7 @@ public final class TransparentProxyTest {
     
     @After
     public void stopBlondin() throws Exception {
-        TrivialHttpClient.post(String.format("http://localhost:%s/shutdown", blondinPort));
+        TrivialHttpClient.post(format("http://localhost:%s/shutdown", blondinPort));
         TrivialHttpClient.waitForNoSocket("localhost", blondinPort);
     }
     
@@ -29,7 +31,17 @@ public final class TransparentProxyTest {
     transparently_redirects_to_target_application() throws Exception {
         TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort);
         
-        final String requestUrl = String.format("http://localhost:%s/some/target/url", blondinPort);
+        final String requestUrl = format("http://localhost:%s/some/target/url", blondinPort);
         assertThat(TrivialHttpClient.contentFrom(requestUrl), is("hello, world"));
+    }
+    
+    @Ignore("pending implementation")
+    @Test public void
+    forwards_query_parameters_with_proxied_get_request() throws Exception {
+        final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort);
+        
+        TrivialHttpClient.contentFrom(format("http://localhost:%s/some/target/url?foo=bar&baz=bob", blondinPort));
+        
+        assertThat(server.query(), is("foo=bar&baz=bob"));
     }
 }
