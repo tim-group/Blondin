@@ -17,11 +17,7 @@ public final class BlondinServer {
     private volatile boolean available = false;
     private Connection connection;
 
-    public BlondinServer(int blondinPort, String targetUrl) {
-        final String[] targetComponents = targetUrl.split(":");
-        final String targetHost = targetComponents[0];
-        final int targetPort = Integer.parseInt(targetComponents[1]);
-        
+    public BlondinServer(final int blondinPort, final String targetHost, final int targetPort) {
         final BasicHttpClient httpClient = new BasicHttpClient();
         final Container container = new Container() {
             @Override

@@ -12,7 +12,7 @@ public final class TransparentProxyTest {
     transparently_redirects_to_target_application() throws Exception {
         TrivialHttpServer.serving("/some/target/url", "hello, world").on(34297);
         
-        new BlondinServer(23453, "localhost:34297");
+        new BlondinServer(23453, "localhost", 34297);
         
         assertThat(TrivialHttpClient.contentFrom("http://localhost:23453/some/target/url"), is("hello, world"));
     }

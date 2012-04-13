@@ -13,14 +13,14 @@ public final class BlondinServerTest {
 
     @Test(timeout=1000) public void
     reports_startup_success() {
-        final BlondinServer blondin = new BlondinServer(31415, "x:21");
+        final BlondinServer blondin = new BlondinServer(31415, "x", -1);
         while(!blondin.running()) { }
         assertThat(blondin.running(), is(true));
     }
     
     @Test(timeout=1000) public void
     reports_shutdown_success() {
-        final BlondinServer blondin = new BlondinServer(31416, "x:21");
+        final BlondinServer blondin = new BlondinServer(31416, "x", -1);
         while(!blondin.running()) { }
         
         blondin.shutdown();
@@ -30,7 +30,7 @@ public final class BlondinServerTest {
     
     @Test(timeout=1000) public void
     shuts_down_in_response_to_shutdown_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(31417, "x:21");
+        final BlondinServer blondin = new BlondinServer(31417, "x", -1);
         while(!blondin.running()) { }
         
         postTo("http://localhost:31417/shutdown");
