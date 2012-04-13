@@ -42,4 +42,13 @@ public final class TransparentProxyTest {
         
         assertThat(server.query(), is("foo=bar&baz=bob"));
     }
+    
+    @Test public void
+    forwards_headers_with_proxied_get_request() throws Exception {
+        final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort);
+        
+        TrivialHttpClient.contentFrom(format("http://localhost:%s/some/target/url?foo=bar&baz=bob", blondinPort), "Cookie", "bob=foo");
+        
+        assertThat(server.header("Cookie"), is("bob=foo"));
+    }
 }

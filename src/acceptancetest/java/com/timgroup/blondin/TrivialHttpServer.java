@@ -3,7 +3,11 @@ package com.timgroup.blondin;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -13,6 +17,7 @@ public final class TrivialHttpServer {
     private final String path;
     
     private String query;
+    private Map<String, List<String>> requestHeaders = Maps.newHashMap();
 
     private TrivialHttpServer(String path, String content) {
         this.path = path;
@@ -29,6 +34,7 @@ public final class TrivialHttpServer {
 
             @Override public void handle(HttpExchange exchange) throws IOException {
                 query = exchange.getRequestURI().getQuery();
+                requestHeaders.putAll(exchange.getRequestHeaders());
                 byte[] response = content.getBytes();
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
                 exchange.getResponseBody().write(response);
@@ -42,5 +48,9 @@ public final class TrivialHttpServer {
     
     public String query() {
         return query;
+    }
+
+    public String header(String argName) {
+        return Joiner.on(",").join(requestHeaders.get(argName));
     }
 }

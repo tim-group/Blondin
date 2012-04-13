@@ -10,9 +10,15 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public final class TrivialHttpClient {
+    
     public static String contentFrom(final String urlString) throws IOException {
+        return contentFrom(urlString, "a", "b");
+    }
+    
+    public static String contentFrom(String urlString, String headerName, String headerValue) throws IOException {
         final URL url = new URL(urlString);
         final URLConnection conn = url.openConnection();
+        conn.setRequestProperty(headerName, headerValue);
         waitForSocket(url.getHost(), url.getPort());
         final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         
@@ -75,4 +81,5 @@ public final class TrivialHttpClient {
         
         httpCon.getContentLength();
     }
+
 }

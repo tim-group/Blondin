@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 
 import static com.google.common.base.Predicates.notNull;
@@ -23,10 +24,12 @@ public final class BasicHttpClient implements HttpClient {
             final URL url = new URL("http", targetHost, targetPort, request.getAddress().toString());
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
             
+            transferRequestHeaders(request, conn);
+            
             response.setCode(conn.getResponseCode());
             response.setText(conn.getResponseMessage());
 
-            transferHeaders(response, conn);
+            transferResponseHeaders(response, conn);
             response.commit();
             
             defensivelyTransferContent(response, conn);
@@ -38,7 +41,14 @@ public final class BasicHttpClient implements HttpClient {
         }
     }
 
-    private void transferHeaders(Response response, final HttpURLConnection conn) {
+    private void transferRequestHeaders(Request request, HttpURLConnection conn) {
+        final Joiner joiner = Joiner.on(",");
+        for (String headerName : request.getNames()) {
+            conn.setRequestProperty(headerName, joiner.join(request.getValues(headerName)));
+        }
+    }
+
+    private void transferResponseHeaders(Response response, final HttpURLConnection conn) {
         for(Entry<String, List<String>> entry : filterKeys(conn.getHeaderFields(), notNull()).entrySet()) {
             for (String value : entry.getValue()) {
                 response.add(entry.getKey(), value);

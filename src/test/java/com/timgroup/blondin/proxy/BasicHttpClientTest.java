@@ -59,8 +59,9 @@ public final class BasicHttpClientTest {
         final OutputStream outputStream = new ByteArrayOutputStream();
         context.checking(new Expectations() {{
             allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
-            
             allowing(response).getOutputStream(); will(returnValue(outputStream));
+
+            ignoring(request);
             ignoring(response);
         }});
         
@@ -83,6 +84,8 @@ public final class BasicHttpClientTest {
             allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
             oneOf(response).setCode(HttpURLConnection.HTTP_NO_CONTENT);
+            
+            ignoring(request);
             ignoring(response);
         }});
         
@@ -106,6 +109,8 @@ public final class BasicHttpClientTest {
             
             oneOf(response).add("Content-length", "9");
             never(response).add(with(nullValue(String.class)), with(any(String.class)));
+            
+            ignoring(request);
             ignoring(response);
         }});
         
@@ -129,6 +134,7 @@ public final class BasicHttpClientTest {
         context.checking(new Expectations() {{
             allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt?alpha=beta&gamma=delta")));
             
+            ignoring(request);
             ignoring(response);
         }});
         
@@ -152,6 +158,8 @@ public final class BasicHttpClientTest {
             allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
             allowing(response).getOutputStream(); will(returnValue(outputStream));
+            
+            ignoring(request);
             ignoring(response);
         }});
         
