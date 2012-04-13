@@ -33,9 +33,12 @@ public final class BlondinServerTest {
         final BlondinServer blondin = new BlondinServer(31417, "x", -1);
         while(!blondin.running()) { }
         
-        postTo("http://localhost:31417/shutdown");
-        
-        while(blondin.running()) { }
+        while(blondin.running()) {
+            try {
+                postTo("http://localhost:31417/shutdown");
+            }
+            catch (Exception e) { }
+        }
         assertThat(blondin.running(), is(false));
     }
 

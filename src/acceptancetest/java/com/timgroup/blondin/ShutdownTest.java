@@ -15,6 +15,7 @@ public final class ShutdownTest {
         
         TrivialHttpClient.post("http://localhost:23454/shutdown");
         
+        TrivialHttpClient.waitForNoSocket("localhost", 23454);
         assertThat(TrivialHttpClient.isSocketOpen("localhost", 23454), is(false));
     }
 }
