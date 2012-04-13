@@ -7,7 +7,10 @@ import org.jmock.Mockery;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.PathParser;
+
+import static org.hamcrest.Matchers.sameInstance;
 
 public final class RequestDispatcherTest {
 
@@ -20,6 +23,38 @@ public final class RequestDispatcherTest {
         dispatcher.handle(requestFor("GET", "/"), responseExpecting(404, "Not Found"));
         context.assertIsSatisfied();
     }
+    
+    @Test public void
+    dispatches_to_registered_handler() {
+        final Container container = context.mock(Container.class);
+        final Response response = context.mock(Response.class);
+        final Request request = requestFor("GET", "/");
+        
+        dispatcher.register("GET", container);
+        
+        context.checking(new Expectations() {{
+            oneOf(container).handle(with(sameInstance(request)), with(sameInstance(response)));
+        }});
+        
+        dispatcher.handle(request, response);
+        
+        context.assertIsSatisfied();
+    }
+    
+    @Test public void
+    ignores_irrelevant_registered_handler() {
+        final Container container = context.mock(Container.class);
+        dispatcher.register("GET", container);
+        
+        context.checking(new Expectations() {{
+            never(container);
+        }});
+        
+        dispatcher.handle(requestFor("POST", "/"), responseExpecting(404, "Not Found"));
+        
+        context.assertIsSatisfied();
+    }
+
 
     private Request requestFor(final String method, final String path) {
         final Request request = context.mock(Request.class);
