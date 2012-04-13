@@ -15,7 +15,7 @@ import static com.google.common.collect.Iterables.find;
 
 public final class RequestDispatcher implements Container {
 
-    private static final Handler DEFAULT_HANDLER = new Handler("", new Container() {
+    private static final Handler DEFAULT_HANDLER = new Handler(null, null, new Container() {
         @Override public void handle(Request request, Response response) {
             try {
                 response.setCode(HttpURLConnection.HTTP_NOT_FOUND);
@@ -26,29 +26,35 @@ public final class RequestDispatcher implements Container {
             }
         }
     });
-    
+
     private final List<Handler> handlers = Lists.newArrayList();
-    
+
     @Override
     public void handle(Request request, Response response) {
         find(handlers, Handler.understanding(request), DEFAULT_HANDLER).handle(request, response);
     }
 
     public void register(String method, Container container) {
-        handlers.add(new Handler(method, container));
+        register(method, null, container);
+    }
+
+    public void register(String method, String path, Container container) {
+        handlers.add(new Handler(method, path, container));
     }
 
     private static final class Handler {
         private final String method;
+        private final String path;
         private final Container container;
 
-        public Handler(String method, Container container) {
+        public Handler(String method, String path, Container container) {
             this.method = method;
+            this.path = path;
             this.container = container;
         }
 
         public boolean canHandle(Request request) {
-            return this.method.equals(request.getMethod());
+            return this.method.equals(request.getMethod()) && (this.path == null || this.path.equals(request.getPath().getPath()));
         }
 
         public void handle(Request request, Response response) {
