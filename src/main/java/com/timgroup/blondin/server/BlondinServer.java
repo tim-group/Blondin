@@ -1,4 +1,4 @@
-package com.timgroup.blondin;
+package com.timgroup.blondin.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,7 +12,6 @@ import org.simpleframework.transport.connect.SocketConnection;
 
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
-import com.timgroup.blondin.server.RequestDispatcher;
 
 public final class BlondinServer {
 

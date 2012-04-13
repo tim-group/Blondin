@@ -3,6 +3,8 @@ package com.timgroup.blondin;
 
 import org.junit.Test;
 
+import com.timgroup.blondin.server.BlondinServer;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 

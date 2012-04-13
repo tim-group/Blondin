@@ -1,10 +1,12 @@
-package com.timgroup.blondin;
+package com.timgroup.blondin.server;
 
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URL;
 
 import org.junit.Test;
+
+import com.timgroup.blondin.server.BlondinServer;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
