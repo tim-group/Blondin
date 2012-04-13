@@ -21,6 +21,7 @@ public final class BlondinServer {
     public BlondinServer(final int blondinPort, final String targetHost, final int targetPort) {
         final RequestDispatcher dispatcher = new RequestDispatcher();
         dispatcher.register("POST", "/shutdown", new ShutdownHandler());
+        dispatcher.register("GET", "/status", new StatusPageHandler());
         dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
         try {
