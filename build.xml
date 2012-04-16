@@ -48,7 +48,7 @@
                 <formatter type="xml"/>
                 <batchtest fork="yes" todir="${build.dir}/@{testmodulename}.testreport">
                     <zipfileset src="${build.dir}/${ant.project.name}-@{testmodulename}-@{moduleversion}.jar">
-                        <include name="com/timgroup/${ant.project.name}/**/*Test.class"/>
+                        <include name="com/timgroup/blondin/**/*Test.class"/>
                     </zipfileset>
                 </batchtest>
             </junit>
