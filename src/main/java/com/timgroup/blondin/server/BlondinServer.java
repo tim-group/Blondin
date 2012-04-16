@@ -29,11 +29,11 @@ public final class BlondinServer {
             connection = new SocketConnection(dispatcher);
             SocketAddress address = new InetSocketAddress(blondinPort);
             connection.connect(address);
+            status = BlondinServerStatus.RUNNING;
         }
         catch (IOException e) {
             throw new IllegalStateException(e);
         }
-        status = BlondinServerStatus.RUNNING;
     }
 
     public boolean running() {
