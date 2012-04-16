@@ -11,8 +11,8 @@ import static org.hamcrest.Matchers.is;
 
 public final class TransparentProxyTest {
 
-    private final int blondinPort = 23453;
-    private final int targetPort = 34297;
+    private static int blondinPort = 23453;
+    private static int targetPort = 34297;
     
     @Before
     public void startBlondin() throws Exception {
@@ -23,7 +23,8 @@ public final class TransparentProxyTest {
     @After
     public void stopBlondin() throws Exception {
         TrivialHttpClient.post(format("http://localhost:%s/shutdown", blondinPort));
-        TrivialHttpClient.waitForNoSocket("localhost", blondinPort);
+        blondinPort++;
+        targetPort++;
     }
     
     @Test public void

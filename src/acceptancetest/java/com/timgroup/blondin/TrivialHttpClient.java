@@ -50,7 +50,7 @@ public final class TrivialHttpClient {
             } catch (IOException e) {
                 currentState = false;
             }
-            if (System.currentTimeMillis() - startTime > 5000L) {
+            if (System.currentTimeMillis() - startTime > 10000L) {
                 throw new IllegalStateException("socket did not " + (desiredState ? "open" : "close"));
             }
         }
