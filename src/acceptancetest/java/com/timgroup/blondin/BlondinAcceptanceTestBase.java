@@ -20,7 +20,7 @@ public class BlondinAcceptanceTestBase {
     
     @After
     public final void stopBlondin() throws Exception {
-        TrivialHttpClient.post(format("http://localhost:%s/shutdown", BlondinTestContext.blondinPort));
+        TrivialHttpClient.post(format("http://localhost:%s/stop", BlondinTestContext.blondinPort));
         BlondinTestContext.blondinPort++;
         BlondinTestContext.targetPort++;
     }

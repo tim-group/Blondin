@@ -20,7 +20,7 @@ public final class BlondinServer {
 
     public BlondinServer(final int blondinPort, final String targetHost, final int targetPort) {
         final RequestDispatcher dispatcher = new RequestDispatcher();
-        dispatcher.register("POST", "/shutdown", new ShutdownHandler());
+        dispatcher.register("POST", "/stop", new StopHandler());
         dispatcher.register("GET", "/status", new StatusPageHandler());
         dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
@@ -39,7 +39,7 @@ public final class BlondinServer {
         return available;
     }
 
-    public void shutdown() {
+    public void stop() {
         try {
             connection.close();
         }
@@ -48,11 +48,11 @@ public final class BlondinServer {
         available = false;
     }
     
-    private final class ShutdownHandler implements Container {
+    private final class StopHandler implements Container {
         @Override public void handle(Request request, Response response) {
             try {
                 response.close();
-                shutdown();
+                stop();
                 return;
             }
             catch (Exception e) { }

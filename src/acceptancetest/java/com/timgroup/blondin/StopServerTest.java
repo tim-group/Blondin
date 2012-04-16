@@ -6,11 +6,11 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public final class ShutdownTest extends BlondinAcceptanceTestBase {
+public final class StopServerTest extends BlondinAcceptanceTestBase {
 
     @Test public void
-    responds_to_a_shutdown_request() throws Exception {
-        TrivialHttpClient.post(blondinUrl() + "/shutdown");
+    responds_to_a_stop_request() throws Exception {
+        TrivialHttpClient.post(blondinUrl() + "/stop");
         
         TrivialHttpClient.waitForNoSocket("localhost", blondinPort());
         assertThat(TrivialHttpClient.isSocketOpen("localhost", blondinPort()), is(false));

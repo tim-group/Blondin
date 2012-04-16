@@ -21,23 +21,23 @@ public final class BlondinServerTest {
     }
     
     @Test(timeout=5000) public void
-    reports_shutdown_success() {
+    reports_stop_success() {
         final BlondinServer blondin = new BlondinServer(31416, "x", -1);
         while(!blondin.running()) { }
         
-        blondin.shutdown();
+        blondin.stop();
         while(blondin.running()) { }
         assertThat(blondin.running(), is(false));
     }
     
     @Test(timeout=5000) public void
-    shuts_down_in_response_to_shutdown_post_request() throws Exception {
+    shuts_down_in_response_to_stop_post_request() throws Exception {
         final BlondinServer blondin = new BlondinServer(31417, "x", -1);
         while(!blondin.running()) { }
         
         while(blondin.running()) {
             try {
-                postTo("http://localhost:31417/shutdown");
+                postTo("http://localhost:31417/stop");
             }
             catch (Exception e) { }
         }

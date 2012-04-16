@@ -59,9 +59,9 @@ public final class RequestDispatcherTest {
     dispatches_to_registered_path_handler() {
         final Container container = context.mock(Container.class);
         final Response response = context.mock(Response.class);
-        final Request request = requestFor("POST", "/shutdown");
+        final Request request = requestFor("POST", "/stop");
         
-        dispatcher.register("POST", "/shutdown", container);
+        dispatcher.register("POST", "/stop", container);
         
         context.checking(new Expectations() {{
             oneOf(container).handle(with(sameInstance(request)), with(sameInstance(response)));
@@ -76,13 +76,13 @@ public final class RequestDispatcherTest {
     ignores_irrelevant_registered_path_handler() {
         final Container container = context.mock(Container.class);
         
-        dispatcher.register("POST", "/shutdown2", container);
+        dispatcher.register("POST", "/stop2", container);
         
         context.checking(new Expectations() {{
             never(container);
         }});
         
-        dispatcher.handle(requestFor("POST", "/shutdown"), responseExpecting(404, "Not Found"));
+        dispatcher.handle(requestFor("POST", "/stop"), responseExpecting(404, "Not Found"));
         
         context.assertIsSatisfied();
     }
