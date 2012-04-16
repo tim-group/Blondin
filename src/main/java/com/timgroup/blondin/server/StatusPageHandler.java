@@ -2,7 +2,6 @@ package com.timgroup.blondin.server;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -16,11 +15,8 @@ public final class StatusPageHandler implements Container {
     
     @Override
     public void handle(Request request, Response response) {
-        response.setCode(HttpURLConnection.HTTP_OK);
-        response.setText("OK");
         response.set("Content-Type", "text/xml+status");
         try {
-            response.commit();
             statusPage.render(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
             response.close();
         } catch (IOException e) {
