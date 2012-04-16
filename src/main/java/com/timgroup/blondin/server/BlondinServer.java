@@ -36,8 +36,8 @@ public final class BlondinServer {
         }
     }
 
-    public boolean running() {
-        return BlondinServerStatus.RUNNING.equals(status);
+    public BlondinServerStatus status() {
+        return status;
     }
 
     public void stop() {
