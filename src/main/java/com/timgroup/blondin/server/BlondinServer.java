@@ -15,8 +15,9 @@ import com.timgroup.blondin.proxy.ProxyingHandler;
 
 public final class BlondinServer {
 
-    private volatile boolean available = false;
-    private Connection connection;
+    private final Connection connection;
+    
+    private volatile BlondinServerStatus status = BlondinServerStatus.STOPPED;
 
     public BlondinServer(final int blondinPort, final String targetHost, final int targetPort) {
         final RequestDispatcher dispatcher = new RequestDispatcher();
@@ -32,11 +33,11 @@ public final class BlondinServer {
         catch (IOException e) {
             throw new IllegalStateException(e);
         }
-        available = true;
+        status = BlondinServerStatus.RUNNING;
     }
 
     public boolean running() {
-        return available;
+        return BlondinServerStatus.RUNNING.equals(status);
     }
 
     public void stop() {
@@ -45,7 +46,7 @@ public final class BlondinServer {
         }
         catch (IOException e) {
         }
-        available = false;
+        status = BlondinServerStatus.STOPPED;
     }
     
     private final class StopHandler implements Container {
