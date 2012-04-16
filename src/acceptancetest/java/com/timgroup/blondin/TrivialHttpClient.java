@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.hamcrest.Matcher;
+
 public final class TrivialHttpClient {
     
     public static String contentFrom(final String urlString) throws IOException {
@@ -80,6 +82,31 @@ public final class TrivialHttpClient {
         out.close();
         
         httpCon.getContentLength();
+    }
+
+    public static void waitForResponseCode(String urlString, Matcher<Integer> codeMatcher) throws IOException {
+        final URL url = new URL(urlString);
+        waitForSocket(url.getHost(), url.getPort());
+        
+        long startTime = System.currentTimeMillis();
+        boolean codeMatched = false;
+        while(!codeMatched) {
+            final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            codeMatched = codeMatcher.matches(conn.getResponseCode());
+            conn.disconnect();
+            
+            if (System.currentTimeMillis() - startTime > 10000L) {
+                throw new IllegalStateException("response code did not reach expected state");
+            }
+        }
+    }
+
+    public static int httpResponseCodeFrom(String urlString) throws IOException {
+        final URL url = new URL(urlString);
+        final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        final int result = conn.getResponseCode();
+        conn.disconnect();
+        return result;
     }
 
 }
