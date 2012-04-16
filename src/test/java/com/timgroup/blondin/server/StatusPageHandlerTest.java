@@ -10,15 +10,20 @@ import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
+import com.google.common.base.Supplier;
+
 import static org.junit.Assert.assertThat;
 
 public final class StatusPageHandlerTest {
 
     private final Mockery context = new Mockery();
     
+    @SuppressWarnings("unchecked")
+    private final Supplier<BlondinServerStatus> statusSupplier = context.mock(Supplier.class);
+    
     @Test public void
     writes_status_page_to_response() throws Exception {
-        final StatusPageHandler handler = new StatusPageHandler(null);
+        final StatusPageHandler handler = new StatusPageHandler(statusSupplier);
         final Request request = context.mock(Request.class);
         final Response response = context.mock(Response.class);
         
