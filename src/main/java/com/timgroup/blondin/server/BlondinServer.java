@@ -10,20 +10,27 @@ import org.simpleframework.http.core.Container;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
+import com.google.common.base.Supplier;
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
 
 public final class BlondinServer {
 
     private final Connection connection;
-    
+
     private volatile BlondinServerStatus status = BlondinServerStatus.STOPPED;
+
+    private final Supplier<BlondinServerStatus> statusSupplier = new Supplier<BlondinServerStatus>() {
+        @Override public BlondinServerStatus get() {
+            return status;
+        }
+    };
 
     public BlondinServer(final int blondinPort, final String targetHost, final int targetPort) {
         final RequestDispatcher dispatcher = new RequestDispatcher();
         dispatcher.register("POST", "/stop", new StopHandler());
         dispatcher.register("POST", "/suspend", new SuspendHandler());
-        dispatcher.register("GET", "/status", new StatusPageHandler());
+        dispatcher.register("GET", "/status", new StatusPageHandler(statusSupplier));
         dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
         try {

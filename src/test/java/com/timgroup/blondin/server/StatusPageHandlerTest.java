@@ -18,7 +18,7 @@ public final class StatusPageHandlerTest {
     
     @Test public void
     writes_status_page_to_response() throws Exception {
-        final StatusPageHandler handler = new StatusPageHandler();
+        final StatusPageHandler handler = new StatusPageHandler(null);
         final Request request = context.mock(Request.class);
         final Response response = context.mock(Response.class);
         

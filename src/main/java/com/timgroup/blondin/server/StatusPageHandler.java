@@ -7,11 +7,16 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
+import com.google.common.base.Supplier;
 import com.timgroup.status.StatusPage;
 
 public final class StatusPageHandler implements Container {
 
     private final StatusPage statusPage = new StatusPage("Blondin");
+    
+    public StatusPageHandler(Supplier<BlondinServerStatus> serverStatus) {
+        
+    }
     
     @Override
     public void handle(Request request, Response response) {
