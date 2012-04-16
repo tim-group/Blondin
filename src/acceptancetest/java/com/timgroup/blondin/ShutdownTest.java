@@ -10,12 +10,12 @@ public final class ShutdownTest {
 
     @Test public void
     responds_to_a_shutdown_request() throws Exception {
-        Blondin.main(new String[] {"23454", "localhost", "80"});
-        TrivialHttpClient.waitForSocket("localhost", 23454);
+        Blondin.main(new String[] {"21454", "localhost", "80"});
+        TrivialHttpClient.waitForSocket("localhost", 21454);
         
-        TrivialHttpClient.post("http://localhost:23454/shutdown");
+        TrivialHttpClient.post("http://localhost:21454/shutdown");
         
-        TrivialHttpClient.waitForNoSocket("localhost", 23454);
-        assertThat(TrivialHttpClient.isSocketOpen("localhost", 23454), is(false));
+        TrivialHttpClient.waitForNoSocket("localhost", 21454);
+        assertThat(TrivialHttpClient.isSocketOpen("localhost", 21454), is(false));
     }
 }
