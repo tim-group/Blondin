@@ -23,6 +23,7 @@ public final class BasicHttpClient implements HttpClient {
         try {
             final URL url = new URL("http", targetHost, targetPort, request.getAddress().toString());
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setInstanceFollowRedirects(false);
             
             transferRequestHeaders(request, conn);
             

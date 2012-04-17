@@ -18,25 +18,34 @@ public final class TrivialHttpServer {
     
     private String query;
     private Map<String, List<String>> requestHeaders = Maps.newHashMap();
+    private final int code;
 
-    private TrivialHttpServer(String path, String content) {
+    private TrivialHttpServer(String path, String content, int code) {
         this.path = path;
         this.content = content;
+        this.code = code;
     }
 
     public static TrivialHttpServer serving(String path, String content) {
-        return new TrivialHttpServer(path, content);
+        return new TrivialHttpServer(path, content, HttpURLConnection.HTTP_OK);
     }
     
-    public TrivialHttpServer on(int port) throws Exception {
+    public static TrivialHttpServer servingRedirect(String path, String content) {
+        return new TrivialHttpServer(path, content, HttpURLConnection.HTTP_MOVED_TEMP);
+    }
+    
+    public TrivialHttpServer on(final int port) throws Exception {
         final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        
         server.createContext(path, new HttpHandler() {
-
             @Override public void handle(HttpExchange exchange) throws IOException {
                 query = exchange.getRequestURI().getQuery();
                 requestHeaders.putAll(exchange.getRequestHeaders());
+                if (code >= 300 && code < 400) {
+                    exchange.getResponseHeaders().add("Location", "http://localhost:"+port+"/redirectionTarget");
+                }
                 byte[] response = content.getBytes();
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
+                exchange.sendResponseHeaders(code, response.length);
                 exchange.getResponseBody().write(response);
                 exchange.close();
                 server.stop(0);

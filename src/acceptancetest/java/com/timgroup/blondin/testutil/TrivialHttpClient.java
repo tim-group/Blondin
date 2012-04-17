@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
-import java.net.URLConnection;
 
 import org.hamcrest.Matcher;
 
@@ -19,7 +18,8 @@ public final class TrivialHttpClient {
     
     public static String contentFrom(String urlString, String headerName, String headerValue) throws IOException {
         final URL url = new URL(urlString);
-        final URLConnection conn = url.openConnection();
+        final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        conn.setInstanceFollowRedirects(false);
         conn.setRequestProperty(headerName, headerValue);
         waitForSocket(url.getHost(), url.getPort());
         final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -71,6 +71,7 @@ public final class TrivialHttpClient {
     public static void post(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
+        httpCon.setInstanceFollowRedirects(false);
         httpCon.setDoOutput(true);
         httpCon.setRequestMethod("POST");
         httpCon.setRequestProperty("Content-Type", "text/plain");
@@ -92,6 +93,7 @@ public final class TrivialHttpClient {
         boolean codeMatched = false;
         while(!codeMatched) {
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setInstanceFollowRedirects(false);
             codeMatched = codeMatcher.matches(conn.getResponseCode());
             conn.disconnect();
             
@@ -104,6 +106,7 @@ public final class TrivialHttpClient {
     public static int httpResponseCodeFrom(String urlString) throws IOException {
         final URL url = new URL(urlString);
         final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        conn.setInstanceFollowRedirects(false);
         final int result = conn.getResponseCode();
         conn.disconnect();
         return result;

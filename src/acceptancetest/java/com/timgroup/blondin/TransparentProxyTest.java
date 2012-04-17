@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.is;
 public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
 
     @Test public void
-    transparently_redirects_to_target_application() throws Exception {
+    transparently_proxies_to_target_application() throws Exception {
         TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
         
         final String requestUrl = blondinUrl() + "/some/target/url";
@@ -36,5 +36,13 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
         TrivialHttpClient.contentFrom(blondinUrl() + "/some/target/url?foo=bar&baz=bob", "Cookie", "bob=foo");
         
         assertThat(server.header("Cookie"), is("bob=foo"));
+    }
+    
+    @Test public void
+    does_not_follow_redirects() throws Exception {
+        TrivialHttpServer.servingRedirect("/some/target/url", "hello, world").on(targetPort());
+        
+        final String requestUrl = blondinUrl() + "/some/target/url";
+        assertThat(TrivialHttpClient.contentFrom(requestUrl), is("hello, world"));
     }
 }
