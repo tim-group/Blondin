@@ -1,7 +1,13 @@
 package com.timgroup.blondin.testutil;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Properties;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 import com.timgroup.blondin.Blondin;
 
@@ -9,6 +15,9 @@ import static java.lang.String.format;
 
 public class BlondinAcceptanceTestBase {
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+    
     private static final class BlondinTestContext {
         private static int blondinPort = 23453;
         private static int targetPort = 34297;
@@ -16,7 +25,17 @@ public class BlondinAcceptanceTestBase {
     
     @Before
     public final void startBlondin() throws Exception {
-        Blondin.main(new String[] {String.valueOf(BlondinTestContext.blondinPort), "localhost", String.valueOf(BlondinTestContext.targetPort)});
+        final String blondinPortString = String.valueOf(BlondinTestContext.blondinPort);
+        final String targetPortString = String.valueOf(BlondinTestContext.targetPort);
+
+        final File config = testFolder.newFile("blondinconf.properties");
+        final Properties prop = new Properties();
+        prop.setProperty("port", blondinPortString);
+        prop.setProperty("targetHost", "localhost");
+        prop.setProperty("targetPort", targetPortString);
+        prop.store(new FileOutputStream(config), null);
+ 
+        Blondin.main(new String[] {config.getAbsolutePath()});
         TrivialHttpClient.waitForSocket("localhost", BlondinTestContext.blondinPort);
     }
     
