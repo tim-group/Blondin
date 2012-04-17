@@ -18,6 +18,6 @@ public final class SuspendServerTest extends BlondinAcceptanceTestBase {
         
         final String statusPageUrl = blondinUrl() + "/status";
         TrivialHttpClient.waitForResponseCode(statusPageUrl, not(200));
-        assertThat(TrivialHttpClient.httpResponseCodeFrom(statusPageUrl), is(203));
+        assertThat(TrivialHttpClient.httpResponseCodeFrom(statusPageUrl), is(503));
     }
 }

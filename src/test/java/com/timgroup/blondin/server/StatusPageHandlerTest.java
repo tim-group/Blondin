@@ -45,10 +45,10 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
-    responds_with_http_status_code_of_203_if_status_is_suspended() throws Exception {
+    responds_with_http_status_code_of_503_if_status_is_suspended() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(response).setCode(203);
-            oneOf(response).setText("Non-Authoritative Information");
+            oneOf(response).setCode(503);
+            oneOf(response).setText("Service Unavailable");
             oneOf(response).close();
             
             allowing(statusSupplier).get(); will(returnValue(SUSPENDED));

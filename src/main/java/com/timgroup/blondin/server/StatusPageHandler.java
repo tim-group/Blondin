@@ -10,7 +10,7 @@ import org.simpleframework.http.core.Container;
 import com.google.common.base.Supplier;
 import com.timgroup.status.StatusPage;
 
-import static java.net.HttpURLConnection.HTTP_NOT_AUTHORITATIVE;
+import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
 public final class StatusPageHandler implements Container {
 
@@ -24,8 +24,8 @@ public final class StatusPageHandler implements Container {
     @Override
     public void handle(Request request, Response response) {
         if (BlondinServerStatus.SUSPENDED.equals(serverStatusSupplier.get())) {
-            response.setCode(HTTP_NOT_AUTHORITATIVE);
-            response.setText("Non-Authoritative Information");
+            response.setCode(HTTP_UNAVAILABLE);
+            response.setText("Service Unavailable");
         }
         
         response.set("Content-Type", "text/xml+status");
