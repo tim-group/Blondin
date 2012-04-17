@@ -5,6 +5,7 @@ import java.io.OutputStream;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.junit.Before;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -26,32 +27,36 @@ public final class StatusPageHandlerTest {
     private final Request request = context.mock(Request.class);
     private final Response response = context.mock(Response.class);
     
+    private final OutputStream responseContent = new ByteArrayOutputStream();
     private final StatusPageHandler handler = new StatusPageHandler(statusSupplier);
+    
+    @Before
+    public void attachResponseContent() throws Exception {
+        context.checking(new Expectations() {{
+            allowing(response).getOutputStream(); will(returnValue(responseContent));
+        }});
+    }
     
     @Test public void
     writes_status_page_to_response() throws Exception {
-        final OutputStream outputStream = new ByteArrayOutputStream();
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/xml+status");
             oneOf(response).close();
             
             allowing(statusSupplier).get(); will(returnValue(RUNNING));
-            allowing(response).getOutputStream(); will(returnValue(outputStream));
         }});
         
         handler.handle(request, response);
         
         context.assertIsSatisfied();
-        assertThat(outputStream.toString(), startsWith("<?xml"));
+        assertThat(responseContent.toString(), startsWith("<?xml"));
     }
     
     @Test public void
     includes_version_information_in_status_page() throws Exception {
         final String currentVersion = StatusPageHandler.class.getPackage().getImplementationVersion();
         
-        final OutputStream outputStream = new ByteArrayOutputStream();
         context.checking(new Expectations() {{
-            allowing(response).getOutputStream(); will(returnValue(outputStream));
             
             ignoring(statusSupplier).get(); will(returnValue(RUNNING));
             ignoring(response);
@@ -59,7 +64,7 @@ public final class StatusPageHandlerTest {
         
         handler.handle(request, response);
         
-        assertThat(outputStream.toString(), containsString("Version: <value>" + currentVersion + "</value>"));
+        assertThat(responseContent.toString(), containsString("Version: <value>" + currentVersion + "</value>"));
     }
     
     @Test public void
@@ -70,7 +75,6 @@ public final class StatusPageHandlerTest {
             oneOf(response).close();
             
             allowing(statusSupplier).get(); will(returnValue(SUSPENDED));
-            allowing(response).getOutputStream(); will(returnValue(new ByteArrayOutputStream()));
             ignoring(response);
         }});
         
