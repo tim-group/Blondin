@@ -3,7 +3,6 @@ package com.timgroup.blondin.server;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
-import org.hamcrest.Matchers;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
@@ -14,6 +13,8 @@ import com.google.common.base.Supplier;
 
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
 public final class StatusPageHandlerTest {
@@ -41,7 +42,24 @@ public final class StatusPageHandlerTest {
         handler.handle(request, response);
         
         context.assertIsSatisfied();
-        assertThat(outputStream.toString(), Matchers.startsWith("<?xml"));
+        assertThat(outputStream.toString(), startsWith("<?xml"));
+    }
+    
+    @Test public void
+    includes_version_information_in_status_page() throws Exception {
+        final String currentVersion = StatusPageHandler.class.getPackage().getImplementationVersion();
+        
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        context.checking(new Expectations() {{
+            allowing(response).getOutputStream(); will(returnValue(outputStream));
+            
+            ignoring(statusSupplier).get(); will(returnValue(RUNNING));
+            ignoring(response);
+        }});
+        
+        handler.handle(request, response);
+        
+        assertThat(outputStream.toString(), containsString("Version: <value>" + currentVersion + "</value>"));
     }
     
     @Test public void

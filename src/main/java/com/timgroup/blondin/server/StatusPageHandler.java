@@ -9,6 +9,7 @@ import org.simpleframework.http.core.Container;
 
 import com.google.common.base.Supplier;
 import com.timgroup.status.StatusPage;
+import com.timgroup.status.VersionComponent;
 
 import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
@@ -19,6 +20,7 @@ public final class StatusPageHandler implements Container {
     
     public StatusPageHandler(Supplier<BlondinServerStatus> serverStatusSupplier) {
         this.serverStatusSupplier = serverStatusSupplier;
+        this.statusPage.addComponent(new VersionComponent(StatusPageHandler.class));
     }
     
     @Override
