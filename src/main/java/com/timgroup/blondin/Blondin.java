@@ -5,7 +5,15 @@ import com.timgroup.blondin.server.BlondinServer;
 public final class Blondin {
 
     public static void main(String[] args) {
-        new BlondinServer(Integer.parseInt(args[0]), args[1], Integer.parseInt(args[2]));
+        final int port = Integer.parseInt(args[0]);
+        
+        String targetHost = "localhost";
+        int targetPort = 80;
+        if (args.length == 3) {
+            targetHost = args[1];
+            targetPort = Integer.parseInt(args[2]);
+        }
+        
+        new BlondinServer(port, targetHost, targetPort);
     }
-
 }
