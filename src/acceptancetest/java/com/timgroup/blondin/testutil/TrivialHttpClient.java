@@ -1,4 +1,4 @@
-package com.timgroup.blondin;
+package com.timgroup.blondin.testutil;
 
 import java.io.BufferedReader;
 import java.io.IOException;

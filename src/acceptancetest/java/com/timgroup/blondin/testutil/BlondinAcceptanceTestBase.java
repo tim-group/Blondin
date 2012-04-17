@@ -1,7 +1,9 @@
-package com.timgroup.blondin;
+package com.timgroup.blondin.testutil;
 
 import org.junit.After;
 import org.junit.Before;
+
+import com.timgroup.blondin.Blondin;
 
 import static java.lang.String.format;
 

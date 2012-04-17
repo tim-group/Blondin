@@ -3,6 +3,10 @@ package com.timgroup.blondin;
 
 import org.junit.Test;
 
+import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
+import com.timgroup.blondin.testutil.TrivialHttpClient;
+import com.timgroup.blondin.testutil.TrivialHttpServer;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
