@@ -12,17 +12,27 @@ import org.hamcrest.Matcher;
 
 public final class TrivialHttpClient {
     
-    public static String contentFrom(final String urlString) throws IOException {
-        return contentFrom(urlString, "a", "b");
+    public static final class TrivialResponse {
+        public final int code;
+        public final String content;
+        public TrivialResponse(int code, String content) {
+            this.code = code;
+            this.content = content;
+        }
     }
     
-    public static String contentFrom(String urlString, String headerName, String headerValue) throws IOException {
+    public static TrivialResponse getFrom(final String urlString) throws IOException {
+        return getFrom(urlString, "a", "b");
+    }
+    
+    public static TrivialResponse getFrom(String urlString, String headerName, String headerValue) throws IOException {
         final URL url = new URL(urlString);
         final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
         conn.setInstanceFollowRedirects(false);
         conn.setRequestProperty(headerName, headerValue);
         waitForSocket(url.getHost(), url.getPort());
         final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        final int responseCode = conn.getResponseCode();
         
         final StringBuilder responseText = new StringBuilder();
         String inputLine;
@@ -30,9 +40,9 @@ public final class TrivialHttpClient {
             responseText.append(inputLine);
         }
         in.close();
-        return responseText.toString();
+        return new TrivialResponse(responseCode, responseText.toString());
     }
-
+    
     public static void waitForSocket(String host, int port) throws IOException {
         waitForSocket(host, port, true);
     }

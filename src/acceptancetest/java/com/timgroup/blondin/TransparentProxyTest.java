@@ -1,10 +1,12 @@
 package com.timgroup.blondin;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
+import com.timgroup.blondin.testutil.TrivialHttpClient.TrivialResponse;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,14 +19,14 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
         TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
         
         final String requestUrl = blondinUrl() + "/some/target/url";
-        assertThat(TrivialHttpClient.contentFrom(requestUrl), is("hello, world"));
+        assertThat(TrivialHttpClient.getFrom(requestUrl).content, is("hello, world"));
     }
     
     @Test public void
     forwards_query_parameters_with_proxied_get_request() throws Exception {
         final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
         
-        TrivialHttpClient.contentFrom(blondinUrl() +"/some/target/url?foo=bar&baz=bob");
+        TrivialHttpClient.getFrom(blondinUrl() +"/some/target/url?foo=bar&baz=bob");
         
         assertThat(server.query(), is("foo=bar&baz=bob"));
     }
@@ -33,7 +35,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     forwards_headers_with_proxied_get_request() throws Exception {
         final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
         
-        TrivialHttpClient.contentFrom(blondinUrl() + "/some/target/url?foo=bar&baz=bob", "Cookie", "bob=foo");
+        TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url?foo=bar&baz=bob", "Cookie", "bob=foo");
         
         assertThat(server.header("Cookie"), is("bob=foo"));
     }
@@ -42,7 +44,18 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     does_not_follow_redirects() throws Exception {
         TrivialHttpServer.servingRedirect("/some/target/url", "hello, world").on(targetPort());
         
-        final String requestUrl = blondinUrl() + "/some/target/url";
-        assertThat(TrivialHttpClient.contentFrom(requestUrl), is("hello, world"));
+        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
+        assertThat(response.code, is(302));
+        assertThat(response.content, is("hello, world"));
+    }
+    
+    @Ignore("pending implementation")
+    @Test public void
+    handles_a_404_transparently() throws Exception {
+        TrivialHttpServer.serving("/some/target/url", "hello, world", 404).on(targetPort());
+        
+        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
+        assertThat(response.code, is(404));
+        assertThat(response.content, is("hello, world"));
     }
 }

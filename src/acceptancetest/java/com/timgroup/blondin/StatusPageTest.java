@@ -5,6 +5,9 @@ import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
+import com.timgroup.blondin.testutil.TrivialHttpClient.TrivialResponse;
+
+import static org.hamcrest.Matchers.is;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -15,9 +18,10 @@ public final class StatusPageTest extends BlondinAcceptanceTestBase {
 
     @Test public void
     serves_a_status_page() throws Exception {
-        final String statusPageContent = TrivialHttpClient.contentFrom(blondinUrl() + "/status");
+        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/status");
         
-        assertThat(statusPageContent, startsWith("<?xml version=\"1.0\" ?>"));
-        assertThat(statusPageContent, containsString("Version: <value>"));
+        assertThat(response.code, is(200));
+        assertThat(response.content, startsWith("<?xml version=\"1.0\" ?>"));
+        assertThat(response.content, containsString("Version: <value>"));
     }
 }

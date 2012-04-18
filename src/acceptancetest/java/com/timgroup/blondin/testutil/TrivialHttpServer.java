@@ -27,11 +27,15 @@ public final class TrivialHttpServer {
     }
 
     public static TrivialHttpServer serving(String path, String content) {
-        return new TrivialHttpServer(path, content, HttpURLConnection.HTTP_OK);
+        return serving(path, content, HttpURLConnection.HTTP_OK);
     }
     
     public static TrivialHttpServer servingRedirect(String path, String content) {
-        return new TrivialHttpServer(path, content, HttpURLConnection.HTTP_MOVED_TEMP);
+        return serving(path, content, HttpURLConnection.HTTP_MOVED_TEMP);
+    }
+    
+    public static TrivialHttpServer serving(String path, String content, int code) {
+        return new TrivialHttpServer(path, content, code);
     }
     
     public TrivialHttpServer on(final int port) throws Exception {
