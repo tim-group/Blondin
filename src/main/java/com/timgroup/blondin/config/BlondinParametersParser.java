@@ -13,7 +13,7 @@ public final class BlondinParametersParser {
         }
 
         String propertiesFilename = args[0];
-        String defaultPort = "0";
+        String defaultPort = null;
         if (args.length > 1 && isInteger(args[0])) {
             defaultPort = args[0];
             propertiesFilename = args[1];
