@@ -33,7 +33,7 @@ public final class BlondinTest {
     @Test public void
     rejects_two_argument_startup_where_first_argument_is_not_an_integer() {
         try {
-            Blondin.main(new String[] {"bad bad"});
+            Blondin.main(new String[] {"bad", "bad"});
             fail("Expected IllegalArgumentException");
         }
         catch (IllegalArgumentException e) {
