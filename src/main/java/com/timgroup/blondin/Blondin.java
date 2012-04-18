@@ -15,6 +15,7 @@ public final class Blondin {
 
     public static void main(String[] args) {
         final BlondinConfiguration config = new BlondinParametersParser().parse(args).or(USAGE_SUPPLIER);
+        System.out.printf("Starting blondin on port %s targetting %s:%s\n", config.blondinPort(), config.targetHost(), config.targetPort());
         new BlondinServer(config.blondinPort(), config.targetHost(), config.targetPort());
     }
 }
