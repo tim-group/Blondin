@@ -35,10 +35,13 @@ public class BlondinAcceptanceTestBase {
         prop.setProperty("targetPort", targetPortString);
         prop.store(new FileOutputStream(config), null);
  
+        beforeBlondinStarts();
         Blondin.main(new String[] {config.getAbsolutePath()});
         TrivialHttpClient.waitForSocket("localhost", BlondinTestContext.blondinPort);
     }
-    
+
+    protected void beforeBlondinStarts() throws Exception { }
+
     @After
     public final void stopBlondin() throws Exception {
         TrivialHttpClient.post(format("http://localhost:%s/stop", BlondinTestContext.blondinPort));
