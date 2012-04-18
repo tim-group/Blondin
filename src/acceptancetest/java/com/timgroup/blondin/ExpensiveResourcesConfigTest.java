@@ -16,7 +16,7 @@ public final class ExpensiveResourcesConfigTest extends BlondinAcceptanceTestBas
 
     @Override
     protected void beforeBlondinStarts() throws Exception {
-        TrivialHttpServer.serving("/my/expensive/resources", "my/{catchy}/res1\nmy/res2").on(targetPort());
+        TrivialHttpServer.serving(expensiveResourcesPath(), "my/{catchy}/res1\nmy/res2").on(targetPort());
     }
     
     @Ignore("pending implementation")
