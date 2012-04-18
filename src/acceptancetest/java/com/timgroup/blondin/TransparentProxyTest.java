@@ -1,7 +1,6 @@
 package com.timgroup.blondin;
 
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -49,7 +48,6 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
         assertThat(response.content, is("hello, world"));
     }
     
-    @Ignore("pending implementation")
     @Test public void
     handles_a_404_transparently() throws Exception {
         TrivialHttpServer.serving("/some/target/url", "hello, world", 404).on(targetPort());

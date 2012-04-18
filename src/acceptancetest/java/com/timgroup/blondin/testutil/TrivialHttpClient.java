@@ -31,7 +31,7 @@ public final class TrivialHttpClient {
         conn.setInstanceFollowRedirects(false);
         conn.setRequestProperty(headerName, headerValue);
         waitForSocket(url.getHost(), url.getPort());
-        final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getResponseCode() >= 400 ? conn.getErrorStream() : conn.getInputStream()));
         final int responseCode = conn.getResponseCode();
         
         final StringBuilder responseText = new StringBuilder();

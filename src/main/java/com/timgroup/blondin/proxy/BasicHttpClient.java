@@ -59,7 +59,7 @@ public final class BasicHttpClient implements HttpClient {
 
     private void defensivelyTransferContent(Response response, final HttpURLConnection conn) throws IOException {
         try {
-            final InputStream inputStream = conn.getInputStream();
+            final InputStream inputStream = conn.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST ? conn.getErrorStream() : conn.getInputStream();
             ByteStreams.copy(inputStream, response.getOutputStream());
             inputStream.close();
         }

@@ -167,4 +167,31 @@ public final class BasicHttpClientTest {
         
         assertThat(outputStream.toString(), is(""));
     }
+    
+    @Test public void
+    handles_a_resource_not_found_with_content() throws Exception {
+        server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
+            @Override public void handle(HttpExchange exchange) throws IOException {
+                byte[] response = "myContent".getBytes();
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length);
+                exchange.getResponseBody().write(response);
+                exchange.close();
+            }
+        });
+        server.start();
+        
+        final OutputStream outputStream = new ByteArrayOutputStream();
+        context.checking(new Expectations() {{
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
+            
+            allowing(response).getOutputStream(); will(returnValue(outputStream));
+            
+            ignoring(request);
+            ignoring(response);
+        }});
+        
+        new BasicHttpClient().handle("localhost", 30215, request, response);
+        
+        assertThat(outputStream.toString(), is("myContent"));
+    }
 }
