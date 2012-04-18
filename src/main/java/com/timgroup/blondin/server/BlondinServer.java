@@ -2,7 +2,6 @@ package com.timgroup.blondin.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -35,8 +34,7 @@ public final class BlondinServer {
         
         try {
             connection = new SocketConnection(dispatcher);
-            SocketAddress address = new InetSocketAddress(blondinPort);
-            connection.connect(address);
+            connection.connect(new InetSocketAddress(blondinPort));
             status = BlondinServerStatus.RUNNING;
         }
         catch (IOException e) {
@@ -56,24 +54,29 @@ public final class BlondinServer {
         }
         status = BlondinServerStatus.STOPPED;
     }
-    
+
+    public void suspend() {
+        status = BlondinServerStatus.SUSPENDED;
+    }
+
     private final class SuspendHandler implements Container {
         @Override public void handle(Request request, Response response) {
-            try {
-                response.close();
-                status = BlondinServerStatus.SUSPENDED;
-            }
-            catch (Exception e) { }
+            closeSafely(response);
+            suspend();
         }
     }
     
     private final class StopHandler implements Container {
         @Override public void handle(Request request, Response response) {
-            try {
-                response.close();
-                stop();
-            }
-            catch (Exception e) { }
+            closeSafely(response);
+            stop();
         }
+    }
+
+    private static void closeSafely(Response response) {
+        try {
+            response.close();
+        }
+        catch (Exception e) { }
     }
 }
