@@ -1,8 +1,8 @@
 package com.timgroup.blondin;
 
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Test;
@@ -29,18 +29,13 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
         TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort())
                                                     .blockingFirst(1, trigger);
         
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
-                }
-                catch (IOException e) { }
-            }
-        }).start();
+        Future<TrivialResponse> response = TrivialHttpClient.getFromInBackground(blondinUrl() + "/some/target/url");
         
         while(server.fulfilling() < 1) { };
-        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
-        assertThat(response.code, is(200));
+        
+        assertThat(TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url").code, is(200));
+        
+        trigger.countDown();
+        assertThat(response.get().code, is(200));
     }
 }

@@ -7,6 +7,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import org.hamcrest.Matcher;
 
@@ -19,6 +22,22 @@ public final class TrivialHttpClient {
             this.code = code;
             this.content = content;
         }
+    }
+    
+    public static Future<TrivialResponse> getFromInBackground(final String urlString) throws IOException {
+        final FutureTask<TrivialResponse> future = new FutureTask<TrivialResponse>(new Callable<TrivialResponse>() {
+            @Override
+            public TrivialResponse call() throws Exception {
+                try {
+                    return TrivialHttpClient.getFrom(urlString);
+                }
+                catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        });
+        new Thread(future).start();
+        return future;
     }
     
     public static TrivialResponse getFrom(final String urlString) throws IOException {
