@@ -1,6 +1,7 @@
 package com.timgroup.blondin;
 
 
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
@@ -26,16 +27,23 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     fulfils_multiple_normal_requests_simultaneously() throws Exception {
+        final int simultaneousRequests = 8;
         TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort())
-                                                    .blockingFirst(1, trigger);
+                                                    .blockingFirst(simultaneousRequests - 1, trigger);
         
-        Future<TrivialResponse> response = TrivialHttpClient.getFromInBackground(blondinUrl() + "/some/target/url");
+        Future<TrivialResponse> lastReseponse = issueBackgroundRequests(simultaneousRequests - 1, blondinUrl() + "/some/target/url");
         
-        while(server.fulfilling() < 1) { };
-        
+        while(server.fulfilling() < simultaneousRequests - 1) { };
         assertThat(TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url").code, is(200));
         
         trigger.countDown();
-        assertThat(response.get().code, is(200));
+        assertThat(lastReseponse.get().code, is(200));
+    }
+
+    private Future<TrivialResponse> issueBackgroundRequests(int count, String url) throws IOException {
+        for (int i = 0; i < count - 1; i++) {
+            TrivialHttpClient.getFromInBackground(url);
+        }
+        return TrivialHttpClient.getFromInBackground(url);
     }
 }
