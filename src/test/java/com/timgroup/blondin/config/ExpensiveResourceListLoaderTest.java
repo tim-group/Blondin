@@ -14,7 +14,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-public final class ExpensiveResourceListDiscovererTest {
+public final class ExpensiveResourceListLoaderTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -31,8 +31,8 @@ public final class ExpensiveResourceListDiscovererTest {
     @Test public void
     reads_blacklist_from_specified_url() throws Exception {
         Files.write("yo\ndawg", blackListFile, UTF_8);
-        final ExpensiveResourceListDiscoverer discoverer = new ExpensiveResourceListDiscoverer(blacklistUrl);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(blacklistUrl);
         
-        assertThat(discoverer.expensiveResources(), contains("yo", "dawg"));
+        assertThat(loader.expensiveResources(), contains("yo", "dawg"));
     }
 }

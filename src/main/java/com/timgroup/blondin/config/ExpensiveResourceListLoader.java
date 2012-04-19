@@ -7,12 +7,12 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 
-public final class ExpensiveResourceListDiscoverer {
+public final class ExpensiveResourceListLoader {
 
     private final URL blackListLocation;
     private Iterable<String> blackList = ImmutableList.of();
 
-    public ExpensiveResourceListDiscoverer(URL blackListLocation) {
+    public ExpensiveResourceListLoader(URL blackListLocation) {
         this.blackListLocation = blackListLocation;
         refresh();
     }
