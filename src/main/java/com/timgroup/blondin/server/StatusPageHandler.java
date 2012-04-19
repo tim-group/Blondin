@@ -16,12 +16,14 @@ import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
 public final class StatusPageHandler implements Container {
 
+    private static final class Anchor {}
+    
     private final StatusPage statusPage = new StatusPage("Blondin");
     private final Supplier<BlondinServerStatus> serverStatusSupplier;
     
     public StatusPageHandler(Supplier<BlondinServerStatus> serverStatusSupplier) {
         this.serverStatusSupplier = serverStatusSupplier;
-        this.statusPage.addComponent(new VersionComponent(StatusPageHandler.class));
+        this.statusPage.addComponent(new VersionComponent(Anchor.class));
     }
     
     @Override
