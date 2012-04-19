@@ -8,10 +8,7 @@ import java.net.UnknownHostException;
 
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
-
 import static com.google.common.base.Charsets.UTF_8;
-
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.STOPPED;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
