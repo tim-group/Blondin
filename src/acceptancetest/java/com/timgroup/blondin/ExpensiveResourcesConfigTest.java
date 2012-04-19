@@ -1,7 +1,6 @@
 package com.timgroup.blondin;
 
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -19,7 +18,6 @@ public final class ExpensiveResourcesConfigTest extends BlondinAcceptanceTestBas
         TrivialHttpServer.serving(expensiveResourcesPath(), "my/{catchy}/res1\nmy/res2").on(targetPort());
     }
     
-    @Ignore("pending implementation")
     @Test public void
     retrieves_list_of_expensive_resources_via_get_request() throws Exception {
         final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/status");

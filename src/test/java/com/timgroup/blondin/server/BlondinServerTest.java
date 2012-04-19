@@ -19,14 +19,14 @@ public final class BlondinServerTest {
 
     @Test(timeout=5000) public void
     reports_startup_success() {
-        final BlondinServer blondin = new BlondinServer(31415, "x", -1);
+        final BlondinServer blondin = new BlondinServer(31415, "x", -1, null);
         while(blondin.status() != RUNNING) { }
         assertThat(blondin.status(), is(RUNNING));
     }
     
     @Test(timeout=5000) public void
     reports_stop_success() {
-        final BlondinServer blondin = new BlondinServer(31416, "x", -1);
+        final BlondinServer blondin = new BlondinServer(31416, "x", -1, null);
         while(blondin.status() != RUNNING) { }
         
         blondin.stop();
@@ -36,7 +36,7 @@ public final class BlondinServerTest {
     
     @Test(timeout=5000) public void
     shuts_down_in_response_to_stop_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(31417, "x", -1);
+        final BlondinServer blondin = new BlondinServer(31417, "x", -1, null);
         while(blondin.status() != RUNNING) { }
         
         while(blondin.status() == RUNNING) {
@@ -47,7 +47,7 @@ public final class BlondinServerTest {
     
     @Test(timeout=5000) public void
     suspends_in_response_to_suspend_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(31417, "x", -1);
+        final BlondinServer blondin = new BlondinServer(31417, "x", -1, null);
         while(blondin.status() != RUNNING) { }
         
         while(blondin.status() == RUNNING) {

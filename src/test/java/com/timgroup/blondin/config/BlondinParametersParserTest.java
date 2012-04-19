@@ -44,7 +44,7 @@ public final class BlondinParametersParserTest {
         assertThat(result.get().blondinPort(), is(1));
         assertThat(result.get().targetHost(), is("sausage"));
         assertThat(result.get().targetPort(), is(2));
-        assertThat(result.get().expensiveResourcesUrl(), is("http://foo/bar"));
+        assertThat(result.get().expensiveResourcesUrl().toExternalForm(), is("http://foo/bar"));
     }
 
     @Test public void
@@ -55,7 +55,7 @@ public final class BlondinParametersParserTest {
         assertThat(result.get().blondinPort(), is(123));
         assertThat(result.get().targetHost(), is("sausage"));
         assertThat(result.get().targetPort(), is(2));
-        assertThat(result.get().expensiveResourcesUrl(), is(""));
+        assertThat(result.get().expensiveResourcesUrl().toExternalForm(), is("file:/./blacklist.txt"));
     }
 
     @Test public void

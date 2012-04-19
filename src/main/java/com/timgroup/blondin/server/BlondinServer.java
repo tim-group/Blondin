@@ -2,6 +2,7 @@ package com.timgroup.blondin.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URL;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -10,8 +11,7 @@ import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
 import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
+import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
 
@@ -27,11 +27,11 @@ public final class BlondinServer {
         }
     };
 
-    public BlondinServer(final int blondinPort, final String targetHost, final int targetPort) {
+    public BlondinServer(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
         final RequestDispatcher dispatcher = new RequestDispatcher();
         dispatcher.register("POST", "/stop", new StopHandler());
         dispatcher.register("POST", "/suspend", new SuspendHandler());
-        dispatcher.register("GET", "/status", new StatusPageHandler(statusSupplier, Suppliers.<Iterable<String>>ofInstance(ImmutableList.<String>of())));
+        dispatcher.register("GET", "/status", new StatusPageHandler(statusSupplier, new ExpensiveResourceListLoader(expensiveResourcesUrl)));
         dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
         try {

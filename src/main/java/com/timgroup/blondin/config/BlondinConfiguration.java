@@ -1,13 +1,15 @@
 package com.timgroup.blondin.config;
 
+import java.net.URL;
+
 public final class BlondinConfiguration {
 
     private final int blondinPort;
     private final String targetHost;
     private final int targetPort;
-    private final String expensiveResourcesUrl;
+    private final URL expensiveResourcesUrl;
     
-    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, String expensiveResourcesUrl) {
+    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
         this.blondinPort = blondinPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
@@ -26,7 +28,7 @@ public final class BlondinConfiguration {
         return targetPort;
     }
     
-    public String expensiveResourcesUrl() {
+    public URL expensiveResourcesUrl() {
         return expensiveResourcesUrl;
     }
 }
