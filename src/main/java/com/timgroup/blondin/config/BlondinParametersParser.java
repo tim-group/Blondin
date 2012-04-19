@@ -1,6 +1,8 @@
 package com.timgroup.blondin.config;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -28,10 +30,14 @@ public final class BlondinParametersParser {
             return Optional.of(new BlondinConfiguration(parseInt(prop.getProperty("port", defaultPortString)),
                                                         prop.getProperty("targetHost").toString(),
                                                         parseInt(prop.getProperty("targetPort")),
-                                                        new URL(prop.getProperty("expensiveResourcesUrl", "file:///./blacklist.txt").toString())));
+                                                        parseUrl(prop.getProperty("expensiveResourcesUrl"))));
         } catch (Exception e) {
             return Optional.absent();
         }
+    }
+
+    private URL parseUrl(String property) throws IOException {
+        return (null == property) ? new File("blacklist.txt").toURI().toURL() : new URL(property);
     }
 
     private static boolean isInteger(String value) {

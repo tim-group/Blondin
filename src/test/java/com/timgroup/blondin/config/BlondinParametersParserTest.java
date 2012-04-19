@@ -11,6 +11,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.google.common.base.Optional;
 
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -55,7 +56,7 @@ public final class BlondinParametersParserTest {
         assertThat(result.get().blondinPort(), is(123));
         assertThat(result.get().targetHost(), is("sausage"));
         assertThat(result.get().targetPort(), is(2));
-        assertThat(result.get().expensiveResourcesUrl().toExternalForm(), is("file:/./blacklist.txt"));
+        assertThat(result.get().expensiveResourcesUrl().toExternalForm(), endsWith("blacklist.txt"));
     }
 
     @Test public void
