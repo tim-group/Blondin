@@ -26,7 +26,8 @@ public final class BlondinParametersParser {
             prop.load(new FileInputStream(propertiesFilename));
             return Optional.of(new BlondinConfiguration(parseInt(prop.getProperty("port", defaultPortString)),
                                                         prop.getProperty("targetHost").toString(),
-                                                        parseInt(prop.getProperty("targetPort"))));
+                                                        parseInt(prop.getProperty("targetPort")),
+                                                        prop.getProperty("expensiveResourcesUrl", "").toString()));
         } catch (Exception e) {
             return Optional.absent();
         }
