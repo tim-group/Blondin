@@ -25,5 +25,12 @@ public final class BlondinStatusTest {
         status.writeTo(responseContent);
         assertThat(responseContent.toString(), containsString("Version: <value>" + currentVersion + "</value>"));
     }
-
+    
+    @Test public void
+    includes_expensive_resource_information_in_status_page() throws Exception {
+        blackList.add("great/big/{yellow}/banana");
+        blackList.add("little/round/{green}/apple");
+        status.writeTo(responseContent);
+        assertThat(responseContent.toString(), containsString("Throttled Resources: <value>great/big/{yellow}/banana;little/round/{green}/apple</value>"));
+    }
 }
