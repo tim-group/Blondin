@@ -8,6 +8,10 @@ import java.net.UnknownHostException;
 
 import org.junit.Test;
 
+import com.google.common.base.Charsets;
+
+import static com.google.common.base.Charsets.UTF_8;
+
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.STOPPED;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
@@ -60,7 +64,7 @@ public final class BlondinServerTest {
             URL url = new URL(urlString);
             Socket client = new Socket(url.getHost(), url.getPort());
             OutputStream http = client.getOutputStream();
-            http.write(String.format("POST %s HTTP/1.1\r\nHost: www.example.com\r\n\r\n", url.getFile()).getBytes("UTF-8"));
+            http.write(String.format("POST %s HTTP/1.1\r\nHost: www.example.com\r\n\r\n", url.getFile()).getBytes(UTF_8.name()));
             http.flush();
         } catch(UnknownHostException e) {
             

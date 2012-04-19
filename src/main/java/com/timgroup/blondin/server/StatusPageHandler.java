@@ -7,6 +7,7 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Supplier;
 import com.timgroup.status.StatusPage;
 import com.timgroup.status.VersionComponent;
@@ -32,7 +33,7 @@ public final class StatusPageHandler implements Container {
         
         response.set("Content-Type", "text/xml+status");
         try {
-            statusPage.render(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
+            statusPage.render(new OutputStreamWriter(response.getOutputStream(), Charsets.UTF_8.name()));
             response.close();
         } catch (IOException e) {
             throw new IllegalStateException(e);
