@@ -1,6 +1,7 @@
 package com.timgroup.blondin;
 
 
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -16,7 +17,7 @@ import static org.hamcrest.Matchers.containsString;
 public final class ExpensiveResourcesConfigTest extends BlondinAcceptanceTestBase {
 
     @Override
-    protected void beforeBlondinStartsUpWith(Properties properties) throws Exception {
+    protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception {
         properties.setProperty("expensiveResourcesUrl", "http://localhost:" + targetPort() + "/my/expensive/resources");
         TrivialHttpServer.serving("/my/expensive/resources", "my/{catchy}/res1\nmy/res2").on(targetPort());
     }
