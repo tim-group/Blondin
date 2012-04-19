@@ -14,7 +14,7 @@ import com.google.common.base.Supplier;
 
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
@@ -53,22 +53,23 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
-    includes_version_information_in_status_page() throws Exception {
-        final String currentVersion = StatusPageHandler.class.getPackage().getImplementationVersion();
-        
+    responds_with_http_status_code_of_200_if_blondin_is_running() throws Exception {
         context.checking(new Expectations() {{
+            never(response).setCode(with(not(200)));
+            never(response).setText(with(not("OK")));
+            oneOf(response).close();
             
-            ignoring(statusSupplier).get(); will(returnValue(RUNNING));
+            allowing(statusSupplier).get(); will(returnValue(RUNNING));
             ignoring(response);
         }});
         
         handler.handle(request, response);
         
-        assertThat(responseContent.toString(), containsString("Version: <value>" + currentVersion + "</value>"));
+        context.assertIsSatisfied();
     }
-    
+
     @Test public void
-    responds_with_http_status_code_of_503_if_status_is_suspended() throws Exception {
+    responds_with_http_status_code_of_503_if_blondin_is_suspended() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).setCode(503);
             oneOf(response).setText("Service Unavailable");
