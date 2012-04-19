@@ -18,7 +18,6 @@ public class BlondinAcceptanceTestBase {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
     
-    private final String expensiveResourcesPath = "/my/expensive/resources/";
     private static final class BlondinTestContext {
         private static int blondinPort = 23453;
         private static int targetPort = 34297;
@@ -34,16 +33,15 @@ public class BlondinAcceptanceTestBase {
         prop.setProperty("port", blondinPortString);
         prop.setProperty("targetHost", "localhost");
         prop.setProperty("targetPort", targetPortString);
-        prop.setProperty("expensiveResourcesUrl", "http://localhost:" + targetPortString + expensiveResourcesPath);
+        prop.setProperty("expensiveResourcesUrl", "file:///.");
         
+        beforeBlondinStartsUpWith(prop);
         prop.store(new FileOutputStream(config), null);
- 
-        beforeBlondinStarts();
         Blondin.main(new String[] {config.getAbsolutePath()});
         TrivialHttpClient.waitForSocket("localhost", BlondinTestContext.blondinPort);
     }
 
-    protected void beforeBlondinStarts() throws Exception { }
+    protected void beforeBlondinStartsUpWith(Properties properties) throws Exception { }
 
     @After
     public final void stopBlondin() throws Exception {
@@ -58,10 +56,6 @@ public class BlondinAcceptanceTestBase {
     
     public final String blondinUrl() {
         return format("http://localhost:" + BlondinTestContext.blondinPort);
-    }
-    
-    public final String expensiveResourcesPath() {
-        return expensiveResourcesPath;
     }
     
     public final int targetPort() {
