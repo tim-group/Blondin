@@ -18,7 +18,7 @@ public class BlondinAcceptanceTestBase {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
     
-    private final String expensiveResourcesUrl = "/my/expensive/resources/";
+    private final String expensiveResourcesPath = "/my/expensive/resources/";
     private static final class BlondinTestContext {
         private static int blondinPort = 23453;
         private static int targetPort = 34297;
@@ -34,7 +34,7 @@ public class BlondinAcceptanceTestBase {
         prop.setProperty("port", blondinPortString);
         prop.setProperty("targetHost", "localhost");
         prop.setProperty("targetPort", targetPortString);
-        prop.setProperty("expensiveResourcesPath", expensiveResourcesUrl);
+        prop.setProperty("expensiveResourcesUrl", "http://localhost:" + targetPortString + expensiveResourcesPath);
         
         prop.store(new FileOutputStream(config), null);
  
@@ -61,7 +61,7 @@ public class BlondinAcceptanceTestBase {
     }
     
     public final String expensiveResourcesPath() {
-        return expensiveResourcesUrl;
+        return expensiveResourcesPath;
     }
     
     public final int targetPort() {
