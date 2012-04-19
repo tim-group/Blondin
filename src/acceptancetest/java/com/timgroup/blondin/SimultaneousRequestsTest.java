@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -22,13 +21,13 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
     
     @After
     public void cleanUp() {
-        trigger.countDown();
+       trigger.countDown();
     }
     
-    @Ignore("pending implementation")
     @Test public void
     fulfils_multiple_normal_requests_simultaneously() throws Exception {
-        TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort()).blockingFirst(1, trigger);
+        TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort())
+                                                    .blockingFirst(1, trigger);
         
         new Thread(new Runnable() {
             @Override
