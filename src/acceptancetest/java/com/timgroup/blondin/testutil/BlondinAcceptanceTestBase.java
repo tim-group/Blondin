@@ -18,7 +18,7 @@ public class BlondinAcceptanceTestBase {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
     
-    private final String expensiveResourcesUrl = "my/expensive/resources/";
+    private final String expensiveResourcesUrl = "/my/expensive/resources/";
     private static final class BlondinTestContext {
         private static int blondinPort = 23453;
         private static int targetPort = 34297;
