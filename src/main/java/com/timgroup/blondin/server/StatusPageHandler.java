@@ -13,11 +13,14 @@ import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
 public final class StatusPageHandler implements Container {
 
-    private final BlondinStatus status = new BlondinStatus();
+    private final BlondinStatus status;
     private final Supplier<BlondinServerStatus> serverStatusSupplier;
 
-    public StatusPageHandler(Supplier<BlondinServerStatus> serverStatusSupplier) {
+    public StatusPageHandler(Supplier<BlondinServerStatus> serverStatusSupplier,
+                             Supplier<Iterable<String>> expensiveResourcesListSupplier)
+    {
         this.serverStatusSupplier = serverStatusSupplier;
+        this.status = new BlondinStatus(expensiveResourcesListSupplier);
     }
 
     @Override

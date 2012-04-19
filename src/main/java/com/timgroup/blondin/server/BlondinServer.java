@@ -10,6 +10,8 @@ import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
 import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
 
@@ -29,7 +31,7 @@ public final class BlondinServer {
         final RequestDispatcher dispatcher = new RequestDispatcher();
         dispatcher.register("POST", "/stop", new StopHandler());
         dispatcher.register("POST", "/suspend", new SuspendHandler());
-        dispatcher.register("GET", "/status", new StatusPageHandler(statusSupplier));
+        dispatcher.register("GET", "/status", new StatusPageHandler(statusSupplier, Suppliers.<Iterable<String>>ofInstance(ImmutableList.<String>of())));
         dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
         try {

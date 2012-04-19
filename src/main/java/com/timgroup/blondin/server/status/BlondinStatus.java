@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Supplier;
 import com.timgroup.status.StatusPage;
 import com.timgroup.status.VersionComponent;
 
@@ -14,7 +15,7 @@ public final class BlondinStatus {
 
     private final StatusPage statusPage = new StatusPage("Blondin");
 
-    public BlondinStatus() {
+    public BlondinStatus(Supplier<Iterable<String>> expensiveResourcesListSupplier) {
         this.statusPage.addComponent(new VersionComponent(Anchor.class));
     }
 

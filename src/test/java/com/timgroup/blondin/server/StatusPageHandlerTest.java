@@ -2,6 +2,7 @@ package com.timgroup.blondin.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -11,6 +12,8 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
 import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.Lists;
 
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
@@ -28,7 +31,9 @@ public final class StatusPageHandlerTest {
     private final Response response = context.mock(Response.class);
     
     private final OutputStream responseContent = new ByteArrayOutputStream();
-    private final StatusPageHandler handler = new StatusPageHandler(statusSupplier);
+
+    private final List<String> blackList = Lists.newArrayList();
+    private final StatusPageHandler handler = new StatusPageHandler(statusSupplier, Suppliers.<Iterable<String>>ofInstance(blackList));
     
     @Before
     public void attachResponseContent() throws Exception {
@@ -60,11 +65,10 @@ public final class StatusPageHandlerTest {
             oneOf(response).close();
             
             allowing(statusSupplier).get(); will(returnValue(RUNNING));
-            ignoring(response);
+            ignoring(response).set(with(any(String.class)), with(any(String.class)));
         }});
         
         handler.handle(request, response);
-        
         context.assertIsSatisfied();
     }
 
@@ -76,7 +80,7 @@ public final class StatusPageHandlerTest {
             oneOf(response).close();
             
             allowing(statusSupplier).get(); will(returnValue(SUSPENDED));
-            ignoring(response);
+            ignoring(response).set(with(any(String.class)), with(any(String.class)));
         }});
         
         handler.handle(request, response);
