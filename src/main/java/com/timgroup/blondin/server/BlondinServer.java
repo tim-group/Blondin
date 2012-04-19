@@ -7,6 +7,7 @@ import java.net.URL;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
@@ -17,6 +18,7 @@ import com.timgroup.blondin.proxy.ProxyingHandler;
 
 public final class BlondinServer {
 
+    private static final int THREAD_COUNT = 100;
     private final Connection connection;
 
     private volatile BlondinServerStatus status = BlondinServerStatus.STOPPED;
@@ -35,7 +37,7 @@ public final class BlondinServer {
         dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
         try {
-            connection = new SocketConnection(dispatcher);
+            connection = new SocketConnection(new ContainerServer(dispatcher, THREAD_COUNT));
             connection.connect(new InetSocketAddress(blondinPort));
             status = BlondinServerStatus.RUNNING;
         }

@@ -27,7 +27,7 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     fulfils_multiple_normal_requests_simultaneously() throws Exception {
-        final int simultaneousRequests = 8;
+        final int simultaneousRequests = 50;
         TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort())
                                                     .blockingFirst(simultaneousRequests - 1, trigger);
         
