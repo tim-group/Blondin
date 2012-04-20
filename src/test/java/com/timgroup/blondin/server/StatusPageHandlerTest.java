@@ -45,7 +45,7 @@ public final class StatusPageHandlerTest {
     @Test public void
     writes_status_page_to_response() throws Exception {
         context.checking(new Expectations() {{
-            oneOf(response).set("Content-Type", "text/xml+status");
+            oneOf(response).set("Content-Type", "text/xml");
             oneOf(response).close();
             
             allowing(statusSupplier).get(); will(returnValue(RUNNING));

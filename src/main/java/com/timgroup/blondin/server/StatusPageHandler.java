@@ -29,7 +29,7 @@ public final class StatusPageHandler implements Container {
             response.setCode(HTTP_UNAVAILABLE);
             response.setText("Service Unavailable");
         }
-        response.set("Content-Type", "text/xml+status");
+        response.set("Content-Type", "text/xml");
         try {
             status.writeTo(response.getOutputStream());
             response.close();
