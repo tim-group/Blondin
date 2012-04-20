@@ -4,11 +4,14 @@ import java.net.URL;
 import java.util.Collections;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.io.Resources;
 
-public final class ExpensiveResourceListLoader implements Supplier<Iterable<String>> {
+public final class ExpensiveResourceListLoader implements Supplier<Iterable<String>>, Predicate<String> {
 
     private final URL blackListLocation;
     private Iterable<String> blackList = ImmutableList.of();
@@ -31,5 +34,10 @@ public final class ExpensiveResourceListLoader implements Supplier<Iterable<Stri
     @Override
     public Iterable<String> get() {
         return expensiveResources();
+    }
+
+    @Override
+    public boolean apply(String path) {
+        return Iterables.any(blackList, Predicates.equalTo(path));
     }
 }
