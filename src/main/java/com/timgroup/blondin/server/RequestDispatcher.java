@@ -11,6 +11,7 @@ import org.simpleframework.http.core.Container;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 
 import static com.google.common.collect.Iterables.find;
 
@@ -55,14 +56,18 @@ public final class RequestDispatcher implements Container {
         }
 
         public Predicate<Request> forPath(String path) {
+            return forPath(Predicates.equalTo(path));
+        }
+
+        public Predicate<Request> forPath(Predicate<String> path) {
             return Predicates.<Request>and(this, requestForPath(path));
         }
     }
 
-    public static Predicate<Request> requestForPath(final String path) {
+    public static Predicate<Request> requestForPath(final Predicate<String> path) {
         return new Predicate<Request>() {
             @Override public boolean apply(Request request) {
-                return  path.equals(request.getPath().getPath());
+                return path.apply(request.getPath().getPath());
             }
         };
     }
