@@ -84,10 +84,6 @@ public final class TrivialHttpServer {
             }
             exchange.getResponseBody().write(response);
             exchange.close();
-            
-            if (fulfilling.decrementAndGet() == 0) {
-                server.stop(0);
-            }
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
