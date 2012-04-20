@@ -24,6 +24,7 @@ public final class TrivialHttpServer {
     private CountDownLatch trigger = new CountDownLatch(0);
     private AtomicInteger numberToBlock = new AtomicInteger(0);
     private AtomicInteger fulfilling = new AtomicInteger(0);
+    private AtomicInteger requestsReceived = new AtomicInteger(0);
 
     private TrivialHttpServer(String path, String content, int code) {
         this.path = path;
@@ -53,7 +54,17 @@ public final class TrivialHttpServer {
         final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext(path, new HttpHandler() {
             @Override public void handle(final HttpExchange exchange) throws IOException {
+                requestsReceived.incrementAndGet();
                 new Thread(new Runnable() { @Override public void run() { fulfilRequest(port, server, exchange); } }).start();
+            }
+        });
+        server.createContext("/default", new HttpHandler() {
+            @Override public void handle(final HttpExchange exchange) throws IOException {
+                requestsReceived.incrementAndGet();
+                final byte[] content = "X".getBytes();
+                exchange.sendResponseHeaders(200, content.length);
+                exchange.getResponseBody().write(content);
+                exchange.close();
             }
         });
         server.start();
@@ -98,5 +109,9 @@ public final class TrivialHttpServer {
 
     public int fulfilling() {
         return this.fulfilling.get();
+    }
+    
+    public int totalRequestsReceived() {
+        return this.requestsReceived.get();
     }
 }
