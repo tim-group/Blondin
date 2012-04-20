@@ -16,7 +16,7 @@ public final class ThrottlingHandler implements Container {
 
     public ThrottlingHandler(Container handler, int bandwidth) {
         this.handler = handler;
-        this.executor = new ThreadPoolExecutor(1, bandwidth, 10, MINUTES, new LinkedBlockingQueue<Runnable>());
+        this.executor = new ThreadPoolExecutor(bandwidth, bandwidth, 10, MINUTES, new LinkedBlockingQueue<Runnable>());
     }
 
     @Override

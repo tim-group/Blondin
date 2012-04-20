@@ -20,7 +20,7 @@ public final class ThrottlingHandlerTest {
 
     private final Request request = context.mock(Request.class);
     private final Response response = context.mock(Response.class);
-    
+
     @Test public void
     delegates_request_handling_to_decorated_handler() {
         final Container delegate = context.mock(Container.class);
@@ -37,7 +37,7 @@ public final class ThrottlingHandlerTest {
     }
 
     @Test public void
-    throttles_simultaneous_requests_to_within_configured_bandwidth() {
+    throttles_simultaneous_requests_to_within_configured_bandwidth_of_one() {
         final BlockingContainer delegate = new BlockingContainer();
         
         final ThrottlingHandler handler = new ThrottlingHandler(delegate, 1);
@@ -53,6 +53,26 @@ public final class ThrottlingHandlerTest {
         waitForCompletionOfTasks(handler, 2);
         
         assertThat(delegate.receivedRequests(), is(2));
+    }
+
+    @Test public void
+    throttles_simultaneous_requests_to_within_configured_bandwidth_of_two() {
+        final BlockingContainer delegate = new BlockingContainer();
+        
+        final ThrottlingHandler handler = new ThrottlingHandler(delegate, 2);
+        
+        handler.handle(null, null);
+        handler.handle(null, null);
+        handler.handle(null, null);
+        
+        waitForReceiptOfTasks(handler, 3);
+        waitForActiveTasks(handler, 2);
+        assertThat(delegate.receivedRequests(), is(2));
+        
+        delegate.unblock();
+        waitForCompletionOfTasks(handler, 3);
+        
+        assertThat(delegate.receivedRequests(), is(3));
     }
 
     private void waitForReceiptOfTasks(ThrottlingHandler handler, int count) {

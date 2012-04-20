@@ -8,7 +8,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -48,7 +47,6 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
         assertThat(lastReseponse.get().code, is(200));
     }
 
-    @Ignore("Pending implementation")
     @Test public void
     throttles_simultaneous_requests_to_expensive_resources() throws Exception {
         TrivialHttpServer server = TrivialHttpServer.serving("/my/expensive/resource", "hello, world").on(targetPort())
