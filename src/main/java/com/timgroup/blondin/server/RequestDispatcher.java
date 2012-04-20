@@ -43,18 +43,17 @@ public final class RequestDispatcher implements Container {
     }
 
     private static final class Handler {
-        private final String method;
-        private final String path;
         private final Container container;
+        private final Predicate<Request> predicate;
 
-        public Handler(String method, String path, Container container) {
-            this.method = method;
-            this.path = path;
+        public Handler(final String method, final String path, Container container) {
+            this.predicate = new Predicate<Request>() {
+                @Override public boolean apply(Request request) {
+                    return method.equals(request.getMethod()) && (path == null || path.equals(request.getPath().getPath()));
+                }
+            };
+            
             this.container = container;
-        }
-
-        public boolean canHandle(Request request) {
-            return this.method.equals(request.getMethod()) && (this.path == null || this.path.equals(request.getPath().getPath()));
         }
 
         public void handle(Request request, Response response) {
@@ -64,7 +63,7 @@ public final class RequestDispatcher implements Container {
         public static Predicate<Handler> understanding(final Request request) {
             return new Predicate<Handler>() {
                 @Override public boolean apply(Handler handler) {
-                    return handler.canHandle(request);
+                    return handler.predicate.apply(request);
                 }
             };
         }
