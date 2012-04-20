@@ -11,7 +11,6 @@ import org.simpleframework.http.core.Container;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 
 import static com.google.common.collect.Iterables.find;
 
