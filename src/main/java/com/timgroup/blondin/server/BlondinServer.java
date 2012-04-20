@@ -24,6 +24,8 @@ import static com.timgroup.blondin.server.RequestDispatcher.POST;
 public final class BlondinServer {
 
     private static final int THREAD_COUNT = 100;
+    private static final int THROTTLE_BANDWIDTH = 16;
+
     private final Connection connection;
 
     private volatile BlondinServerStatus status = BlondinServerStatus.STOPPED;
@@ -43,7 +45,7 @@ public final class BlondinServer {
         dispatcher.register(GET.forPath("/status"), new StatusPageHandler(statusSupplier, expensiveResourcesListSupplier));
         
         final ProxyingHandler proxy = new ProxyingHandler(targetHost, targetPort, new BasicHttpClient());
-        dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, 16));
+        dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         
         try {
@@ -79,7 +81,7 @@ public final class BlondinServer {
             suspend();
         }
     }
-    
+
     private final class StopHandler implements Container {
         @Override public void handle(Request request, Response response) {
             closeSafely(response);
