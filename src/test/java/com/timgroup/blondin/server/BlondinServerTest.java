@@ -44,8 +44,10 @@ public final class BlondinServerTest {
         final BlondinServer blondin = new BlondinServer(21417, "x", -1, null);
         waitForStatus(blondin, equalTo(RUNNING));
         
-        postTo("http://localhost:21417/stop");
-        waitForStatus(blondin, not(RUNNING));
+        while(RUNNING.equals(blondin.status())) {
+            postTo("http://localhost:21417/stop");
+            Thread.sleep(100L);
+        }
         
         assertThat(blondin.status(), is(STOPPED));
     }
@@ -55,8 +57,10 @@ public final class BlondinServerTest {
         final BlondinServer blondin = new BlondinServer(21418, "x", -1, null);
         waitForStatus(blondin, equalTo(RUNNING));
         
-        postTo("http://localhost:21418/suspend");
-        waitForStatus(blondin, not(RUNNING));
+        while(RUNNING.equals(blondin.status())) {
+            postTo("http://localhost:21418/suspend");
+            Thread.sleep(100L);
+        }
         
         assertThat(blondin.status(), is(SUSPENDED));
     }
