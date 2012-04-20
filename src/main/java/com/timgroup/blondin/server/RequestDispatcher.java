@@ -9,13 +9,14 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 import static com.google.common.collect.Iterables.find;
 
 public final class RequestDispatcher implements Container {
 
-    private static final Handler DEFAULT_HANDLER = new Handler(null, null, new Container() {
+    private static final Handler DEFAULT_HANDLER = new Handler(null, new Container() {
         @Override public void handle(Request request, Response response) {
             try {
                 response.setCode(HttpURLConnection.HTTP_NOT_FOUND);
@@ -35,24 +36,39 @@ public final class RequestDispatcher implements Container {
     }
 
     public void register(String method, Container container) {
-        register(method, null, container);
+        register(requestForMethod(method), container);
     }
 
-    public void register(String method, String path, Container container) {
-        handlers.add(new Handler(method, path, container));
+    public void register(final String method, final String path, Container container) {
+        register(Predicates.<Request>and(requestForMethod(method), requestForPath(path)), container);
+    }
+
+    public void register(Predicate<Request> condition, Container container) {
+        handlers.add(new Handler(condition, container));
+    }
+
+    public static Predicate<Request> requestForMethod(final String method) {
+        return new Predicate<Request>() {
+            @Override public boolean apply(Request request) {
+                return method.equals(request.getMethod());
+            }
+        };
+    }
+
+    public static Predicate<Request> requestForPath(final String path) {
+        return new Predicate<Request>() {
+            @Override public boolean apply(Request request) {
+                return  path.equals(request.getPath().getPath());
+            }
+        };
     }
 
     private static final class Handler {
         private final Container container;
         private final Predicate<Request> predicate;
 
-        public Handler(final String method, final String path, Container container) {
-            this.predicate = new Predicate<Request>() {
-                @Override public boolean apply(Request request) {
-                    return method.equals(request.getMethod()) && (path == null || path.equals(request.getPath().getPath()));
-                }
-            };
-            
+        public Handler(Predicate<Request> condition, Container container) {
+            this.predicate = condition;
             this.container = container;
         }
 
