@@ -11,6 +11,7 @@ import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 import com.timgroup.blondin.proxy.BasicHttpClient;
@@ -42,7 +43,7 @@ public final class BlondinServer {
         final RequestDispatcher dispatcher = new RequestDispatcher();
         dispatcher.register(POST.forPath("/stop"), new StopHandler());
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
-        dispatcher.register(GET.forPath("/status"), new StatusPageHandler(statusSupplier, expensiveResourcesListSupplier));
+        dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(statusSupplier, expensiveResourcesListSupplier));
         
         final ProxyingHandler proxy = new ProxyingHandler(targetHost, targetPort, new BasicHttpClient());
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
@@ -94,5 +95,13 @@ public final class BlondinServer {
             response.close();
         }
         catch (Exception e) { }
+    }
+
+    private static final Predicate<String> startingWith(final String pathPrefix) {
+        return new Predicate<String>(){
+            @Override public boolean apply(String path) {
+                return path.startsWith(pathPrefix);
+            }
+        };
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.parse.PathParser;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -48,6 +49,7 @@ public final class StatusPageHandlerTest {
             oneOf(response).set("Content-Type", "text/xml");
             oneOf(response).close();
             
+            allowing(request).getPath(); will(returnValue(new PathParser("/status")));
             allowing(statusSupplier).get(); will(returnValue(RUNNING));
         }});
         
@@ -58,12 +60,28 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
+    responds_to_request_for_status_page_css() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(response).set("Content-Type", "text/css");
+            oneOf(response).close();
+            
+            allowing(request).getPath(); will(returnValue(new PathParser("/status-page.css")));
+        }});
+        
+        handler.handle(request, response);
+        
+        context.assertIsSatisfied();
+        assertThat(responseContent.toString(), startsWith("/* fill me in! */"));
+    }
+    
+    @Test public void
     responds_with_http_status_code_of_200_if_blondin_is_running() throws Exception {
         context.checking(new Expectations() {{
             never(response).setCode(with(not(200)));
             never(response).setText(with(not("OK")));
             oneOf(response).close();
             
+            allowing(request).getPath(); will(returnValue(new PathParser("/status")));
             allowing(statusSupplier).get(); will(returnValue(RUNNING));
             ignoring(response).set(with(any(String.class)), with(any(String.class)));
         }});
@@ -79,6 +97,7 @@ public final class StatusPageHandlerTest {
             oneOf(response).setText("Service Unavailable");
             oneOf(response).close();
             
+            allowing(request).getPath(); will(returnValue(new PathParser("/status")));
             allowing(statusSupplier).get(); will(returnValue(SUSPENDED));
             ignoring(response).set(with(any(String.class)), with(any(String.class)));
         }});
