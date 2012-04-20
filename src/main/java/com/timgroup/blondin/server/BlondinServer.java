@@ -16,6 +16,10 @@ import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
 
+import static com.timgroup.blondin.server.RequestDispatcher.GET;
+
+import static com.timgroup.blondin.server.RequestDispatcher.POST;
+
 public final class BlondinServer {
 
     private static final int THREAD_COUNT = 100;
@@ -31,10 +35,10 @@ public final class BlondinServer {
 
     public BlondinServer(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
         final RequestDispatcher dispatcher = new RequestDispatcher();
-        dispatcher.register("POST", "/stop", new StopHandler());
-        dispatcher.register("POST", "/suspend", new SuspendHandler());
-        dispatcher.register("GET", "/status", new StatusPageHandler(statusSupplier, new ExpensiveResourceListLoader(expensiveResourcesUrl)));
-        dispatcher.register("GET", new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
+        dispatcher.register(POST.forPath("/stop"), new StopHandler());
+        dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
+        dispatcher.register(GET.forPath("/status"), new StatusPageHandler(statusSupplier, new ExpensiveResourceListLoader(expensiveResourcesUrl)));
+        dispatcher.register(GET, new ProxyingHandler(targetHost, targetPort, new BasicHttpClient()));
         
         try {
             connection = new SocketConnection(new ContainerServer(dispatcher, THREAD_COUNT));

@@ -10,6 +10,9 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.PathParser;
 
+import static com.timgroup.blondin.server.RequestDispatcher.POST;
+
+import static com.timgroup.blondin.server.RequestDispatcher.GET;
 import static org.hamcrest.Matchers.sameInstance;
 
 public final class RequestDispatcherTest {
@@ -30,7 +33,7 @@ public final class RequestDispatcherTest {
         final Response response = context.mock(Response.class);
         final Request request = requestFor("GET", "/");
         
-        dispatcher.register("GET", container);
+        dispatcher.register(GET, container);
         
         context.checking(new Expectations() {{
             oneOf(container).handle(with(sameInstance(request)), with(sameInstance(response)));
@@ -44,7 +47,7 @@ public final class RequestDispatcherTest {
     @Test public void
     ignores_irrelevant_registered_method_handler() {
         final Container container = context.mock(Container.class);
-        dispatcher.register("GET", container);
+        dispatcher.register(GET, container);
         
         context.checking(new Expectations() {{
             never(container);
@@ -61,7 +64,7 @@ public final class RequestDispatcherTest {
         final Response response = context.mock(Response.class);
         final Request request = requestFor("POST", "/stop");
         
-        dispatcher.register("POST", "/stop", container);
+        dispatcher.register(POST.forPath("/stop"), container);
         
         context.checking(new Expectations() {{
             oneOf(container).handle(with(sameInstance(request)), with(sameInstance(response)));
@@ -76,7 +79,7 @@ public final class RequestDispatcherTest {
     ignores_irrelevant_registered_path_handler() {
         final Container container = context.mock(Container.class);
         
-        dispatcher.register("POST", "/stop2", container);
+        dispatcher.register(POST.forPath("/stop2"), container);
         
         context.checking(new Expectations() {{
             never(container);

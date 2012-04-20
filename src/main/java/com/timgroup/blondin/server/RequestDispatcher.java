@@ -16,6 +16,9 @@ import static com.google.common.collect.Iterables.find;
 
 public final class RequestDispatcher implements Container {
 
+    public static final RequestPredicate GET = new RequestPredicate("GET");
+    public static final RequestPredicate POST = new RequestPredicate("POST");
+
     private static final Handler DEFAULT_HANDLER = new Handler(null, new Container() {
         @Override public void handle(Request request, Response response) {
             try {
@@ -35,24 +38,25 @@ public final class RequestDispatcher implements Container {
         find(handlers, Handler.understanding(request), DEFAULT_HANDLER).handle(request, response);
     }
 
-    public void register(String method, Container container) {
-        register(requestForMethod(method), container);
-    }
-
-    public void register(final String method, final String path, Container container) {
-        register(Predicates.<Request>and(requestForMethod(method), requestForPath(path)), container);
-    }
-
     public void register(Predicate<Request> condition, Container container) {
         handlers.add(new Handler(condition, container));
     }
 
-    public static Predicate<Request> requestForMethod(final String method) {
-        return new Predicate<Request>() {
-            @Override public boolean apply(Request request) {
-                return method.equals(request.getMethod());
-            }
-        };
+    public static final class RequestPredicate implements Predicate<Request> {
+        private final String method;
+
+        private RequestPredicate(String method) {
+            this.method = method;
+        }
+
+        @Override
+        public boolean apply(Request request) {
+            return this.method.equals(request.getMethod());
+        }
+
+        public Predicate<Request> forPath(String path) {
+            return Predicates.<Request>and(this, requestForPath(path));
+        }
     }
 
     public static Predicate<Request> requestForPath(final String path) {
