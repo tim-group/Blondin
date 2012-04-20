@@ -47,4 +47,12 @@ public final class ExpensiveResourceListLoaderTest {
         assertThat(loader.apply("dawg"), is(true));
         assertThat(loader.apply("yoi"), is(false));
     }
+
+    @Test public void
+    matches_resources_using_templates() throws Exception {
+        Files.write("yo\n/dawg/{token}/kat", blackListFile, UTF_8);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(blacklistUrl);
+        
+        assertThat(loader.apply("/dawg/eats/kat"), is(true));
+    }
 }
