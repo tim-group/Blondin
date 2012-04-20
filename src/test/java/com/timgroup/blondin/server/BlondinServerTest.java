@@ -6,7 +6,12 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.equalTo;
+
+import static org.hamcrest.Matchers.not;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
@@ -18,41 +23,41 @@ import static org.junit.Assert.assertThat;
 public final class BlondinServerTest {
 
     @Test(timeout=5000) public void
-    reports_startup_success() {
-        final BlondinServer blondin = new BlondinServer(31415, "x", -1, null);
-        while(blondin.status() != RUNNING) { }
+    reports_startup_success() throws Exception {
+        final BlondinServer blondin = new BlondinServer(21415, "x", -1, null);
+        waitForStatus(blondin, equalTo(RUNNING));
         assertThat(blondin.status(), is(RUNNING));
     }
     
     @Test(timeout=5000) public void
-    reports_stop_success() {
-        final BlondinServer blondin = new BlondinServer(31416, "x", -1, null);
-        while(blondin.status() != RUNNING) { }
+    reports_stop_success() throws Exception {
+        final BlondinServer blondin = new BlondinServer(21416, "x", -1, null);
+        waitForStatus(blondin, equalTo(RUNNING));
         
         blondin.stop();
-        while(blondin.status() == RUNNING) { }
+        waitForStatus(blondin, not(RUNNING));
         assertThat(blondin.status(), is(STOPPED));
     }
     
     @Test(timeout=5000) public void
     shuts_down_in_response_to_stop_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(31417, "x", -1, null);
-        while(blondin.status() != RUNNING) { }
+        final BlondinServer blondin = new BlondinServer(21417, "x", -1, null);
+        waitForStatus(blondin, equalTo(RUNNING));
         
-        while(blondin.status() == RUNNING) {
-            postTo("http://localhost:31417/stop");
-        }
+        postTo("http://localhost:21417/stop");
+        waitForStatus(blondin, not(RUNNING));
+        
         assertThat(blondin.status(), is(STOPPED));
     }
     
     @Test(timeout=5000) public void
     suspends_in_response_to_suspend_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(31417, "x", -1, null);
-        while(blondin.status() != RUNNING) { }
+        final BlondinServer blondin = new BlondinServer(21418, "x", -1, null);
+        waitForStatus(blondin, equalTo(RUNNING));
         
-        while(blondin.status() == RUNNING) {
-            postTo("http://localhost:31417/suspend");
-        }
+        postTo("http://localhost:21418/suspend");
+        waitForStatus(blondin, not(RUNNING));
+        
         assertThat(blondin.status(), is(SUSPENDED));
     }
 
@@ -67,6 +72,12 @@ public final class BlondinServerTest {
             
         } catch(IOException e) {
             
+        }
+    }
+    
+    private void waitForStatus(BlondinServer blondin, Matcher<BlondinServerStatus> statusMatcher) throws Exception {
+        while(!statusMatcher.matches(blondin.status())) {
+            Thread.sleep(50L);
         }
     }
 }
