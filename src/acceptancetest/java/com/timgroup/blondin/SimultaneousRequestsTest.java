@@ -27,13 +27,13 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     fulfils_multiple_normal_requests_simultaneously() throws Exception {
-        final int simultaneousRequests = 50;
+        final int blockedRequests = 49;
         TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort())
-                                                    .blockingFirst(simultaneousRequests - 1, trigger);
+                                                    .blockingFirst(blockedRequests, trigger);
         
-        Future<TrivialResponse> lastReseponse = issueBackgroundRequests(simultaneousRequests - 1, blondinUrl() + "/some/target/url");
+        Future<TrivialResponse> lastReseponse = issueBackgroundRequests(blockedRequests, blondinUrl() + "/some/target/url");
         
-        while(server.fulfilling() < simultaneousRequests - 1) { };
+        while(server.fulfilling() < blockedRequests) { };
         assertThat(TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url").code, is(200));
         
         trigger.countDown();
