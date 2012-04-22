@@ -41,7 +41,7 @@ public final class BlondinServer {
         }
     };
 
-    public BlondinServer(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
+    public BlondinServer(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) throws IOException {
         final ExpensiveResourceListLoader expensiveResourcesListSupplier = new ExpensiveResourceListLoader(expensiveResourcesUrl);
 
         final RequestDispatcher dispatcher = new RequestDispatcher();
@@ -53,14 +53,9 @@ public final class BlondinServer {
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         
-        try {
-            connection = new SocketConnection(new ContainerServer(dispatcher, THREAD_COUNT));
-            connection.connect(new InetSocketAddress(blondinPort));
-            status = BlondinServerStatus.RUNNING;
-        }
-        catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        connection = new SocketConnection(new ContainerServer(dispatcher, THREAD_COUNT));
+        connection.connect(new InetSocketAddress(blondinPort));
+        status = BlondinServerStatus.RUNNING;
     }
 
     public BlondinServerStatus status() {
