@@ -4,6 +4,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -16,6 +19,8 @@ import static com.google.common.collect.Iterables.transform;
 
 public final class ExpensiveResourceListLoader implements Supplier<Iterable<String>>, Predicate<String> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpensiveResourceListLoader.class);
+
     private final URL blackListLocation;
     private Iterable<String> blackList = ImmutableList.of();
 
@@ -27,7 +32,9 @@ public final class ExpensiveResourceListLoader implements Supplier<Iterable<Stri
     public void refresh() {
         try {
             blackList = Collections.unmodifiableList(Resources.readLines(blackListLocation, Charsets.UTF_8));
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            LOGGER.error("Failed to read expensive resources list from " + blackListLocation, e);
+        }
     }
 
     public Iterable<String> expensiveResources() {

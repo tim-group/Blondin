@@ -10,6 +10,8 @@ import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
@@ -23,6 +25,8 @@ import static com.timgroup.blondin.server.RequestDispatcher.GET;
 import static com.timgroup.blondin.server.RequestDispatcher.POST;
 
 public final class BlondinServer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlondinServer.class);
 
     private static final int THREAD_COUNT = 100;
     private static final int THROTTLE_BANDWIDTH = 16;
@@ -68,6 +72,7 @@ public final class BlondinServer {
             connection.close();
         }
         catch (IOException e) {
+            LOGGER.warn("Failed to stop Blondin server", e);
         }
         status = BlondinServerStatus.STOPPED;
     }
@@ -94,7 +99,9 @@ public final class BlondinServer {
         try {
             response.close();
         }
-        catch (Exception e) { }
+        catch (Exception e) {
+            LOGGER.warn("Failed to close response", e);
+        }
     }
 
     private static final Predicate<String> startingWith(final String pathPrefix) {

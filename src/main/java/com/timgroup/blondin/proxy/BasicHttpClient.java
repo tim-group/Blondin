@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
@@ -17,6 +19,8 @@ import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Maps.filterKeys;
 
 public final class BasicHttpClient implements HttpClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasicHttpClient.class);
 
     @Override
     public void handle(String targetHost, int targetPort, Request request, Response response) {
@@ -38,7 +42,7 @@ public final class BasicHttpClient implements HttpClient {
             response.close();
         }
         catch(Exception e) {
-            throw new IllegalStateException(e);
+            LOGGER.error("Failed to handle request for " + request.getAddress(), e);
         }
     }
 
@@ -64,6 +68,7 @@ public final class BasicHttpClient implements HttpClient {
             inputStream.close();
         }
         catch (IOException e) {
+            LOGGER.error("Failed to transfer content from " + conn.getURL(), e);
         }
     }
 }

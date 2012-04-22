@@ -7,6 +7,8 @@ import java.util.List;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -16,17 +18,20 @@ import static com.google.common.collect.Iterables.find;
 
 public final class RequestDispatcher implements Container {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestDispatcher.class);
+
     public static final RequestPredicate GET = new RequestPredicate("GET");
     public static final RequestPredicate POST = new RequestPredicate("POST");
 
     private static final Handler DEFAULT_HANDLER = new Handler(null, new Container() {
         @Override public void handle(Request request, Response response) {
             try {
+                LOGGER.warn("Received unexpected request for " + request);
                 response.setCode(HttpURLConnection.HTTP_NOT_FOUND);
                 response.setText("Not Found");
                 response.close();
             } catch (IOException e) {
-                
+                LOGGER.warn("Unable to respond with 404", e);
             }
         }
     });
