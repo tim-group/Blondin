@@ -22,7 +22,9 @@ public final class ExpensiveResourceListLoader implements Supplier<Iterable<Stri
     private static final Logger LOGGER = LoggerFactory.getLogger(ExpensiveResourceListLoader.class);
 
     private final URL blackListLocation;
+
     private Iterable<String> blackList = ImmutableList.of();
+    private Iterable<Pattern> blackListPatterns = ImmutableList.of();
 
     public ExpensiveResourceListLoader(URL blackListLocation) {
         this.blackListLocation = blackListLocation;
@@ -32,6 +34,7 @@ public final class ExpensiveResourceListLoader implements Supplier<Iterable<Stri
     public void refresh() {
         try {
             blackList = Collections.unmodifiableList(Resources.readLines(blackListLocation, Charsets.UTF_8));
+            blackListPatterns = ImmutableList.copyOf(transform(blackList, toPatterns()));
         } catch (Exception e) {
             LOGGER.error("Failed to read expensive resources list from " + blackListLocation, e);
         }
@@ -48,7 +51,7 @@ public final class ExpensiveResourceListLoader implements Supplier<Iterable<Stri
 
     @Override
     public boolean apply(String path) {
-        return any(transform(blackList, toPatterns()), matches(path));
+        return any(blackListPatterns, matches(path));
     }
 
     private Predicate<Pattern> matches(final String path) {
