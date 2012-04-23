@@ -1,5 +1,7 @@
 package com.timgroup.blondin.config;
 
+import com.google.common.base.Strings;
+
 public final class BlondingDiagnosticsConfiguration {
 
     private final String logDirectory;
@@ -29,5 +31,9 @@ public final class BlondingDiagnosticsConfiguration {
 
     public int graphitePeriodMinutes() {
         return graphitePeriodMinutes;
+    }
+
+    public boolean loggingEnabled() {
+        return !Strings.isNullOrEmpty(logDirectory);
     }
 }
