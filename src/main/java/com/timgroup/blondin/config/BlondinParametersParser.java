@@ -30,7 +30,11 @@ public final class BlondinParametersParser {
             return Optional.of(new BlondinConfiguration(parseInt(prop.getProperty("port", defaultPortString)),
                                                         prop.getProperty("targetHost").toString(),
                                                         parseInt(prop.getProperty("targetPort")),
-                                                        parseUrl(prop.getProperty("expensiveResourcesUrl"))));
+                                                        parseUrl(prop.getProperty("expensiveResourcesUrl")),
+                                                        new BlondingDiagnosticsConfiguration(prop.getProperty("logDirectory", "").toString(),
+                                                                                             prop.getProperty("graphite.host", "").toString(),
+                                                                                             parseInt(prop.getProperty("graphite.port", "0")),
+                                                                                             parseInt(prop.getProperty("graphite.period", "0")))));
         } catch (Exception e) {
             return Optional.absent();
         }

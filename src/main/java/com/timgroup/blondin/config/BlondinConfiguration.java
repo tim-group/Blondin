@@ -11,11 +11,15 @@ public final class BlondinConfiguration {
     private final BlondingDiagnosticsConfiguration diagnostics;
 
     public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
+        this(blondinPort, targetHost, targetPort, expensiveResourcesUrl, new BlondingDiagnosticsConfiguration(null, null, 1, 1));
+    }
+
+    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl, BlondingDiagnosticsConfiguration diagnostics) {
         this.blondinPort = blondinPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
         this.expensiveResourcesUrl = expensiveResourcesUrl;
-        this.diagnostics = new BlondingDiagnosticsConfiguration(null, null, 1, 1);
+        this.diagnostics = diagnostics;
     }
 
     public int blondinPort() {
