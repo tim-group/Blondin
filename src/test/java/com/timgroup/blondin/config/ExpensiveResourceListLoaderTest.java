@@ -1,6 +1,7 @@
 package com.timgroup.blondin.config;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.junit.Before;
@@ -21,27 +22,25 @@ public final class ExpensiveResourceListLoaderTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
     
-    private File blackListFile;
-    private URL blacklistUrl;
+    private File expensiveListFile;
     
     @Before
     public void setup() throws Exception {
-        blackListFile = testFolder.newFile();
-        blacklistUrl = blackListFile.toURI().toURL();
+        expensiveListFile = testFolder.newFile();
     }
-    
+
     @Test public void
     reads_blacklist_from_specified_url() throws Exception {
-        Files.write("yo\ndawg", blackListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(blacklistUrl);
+        Files.write("yo\ndawg", expensiveListFile, UTF_8);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
         
         assertThat(loader.expensiveResources(), contains("yo", "dawg"));
     }
-    
+
     @Test public void
     calculates_matching_resources() throws Exception {
-        Files.write("yo\ndawg", blackListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(blacklistUrl);
+        Files.write("yo\ndawg", expensiveListFile, UTF_8);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
         
         assertThat(loader.apply("yo"), is(true));
         assertThat(loader.apply("dawg"), is(true));
@@ -50,9 +49,14 @@ public final class ExpensiveResourceListLoaderTest {
 
     @Test public void
     matches_resources_using_templates() throws Exception {
-        Files.write("yo\n/dawg/{token}/kat", blackListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(blacklistUrl);
+        Files.write("yo\n/dawg/{token}/kat", expensiveListFile, UTF_8);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
         
         assertThat(loader.apply("/dawg/eats/kat"), is(true));
     }
+
+    private URL urlFor(File file) throws MalformedURLException {
+        return file.toURI().toURL();
+    }
+
 }
