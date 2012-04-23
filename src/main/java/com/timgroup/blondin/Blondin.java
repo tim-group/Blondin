@@ -8,7 +8,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Supplier;
 import com.timgroup.blondin.config.BlondinConfiguration;
 import com.timgroup.blondin.config.BlondinParametersParser;
+import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
 import com.timgroup.blondin.server.BlondinServer;
+import com.yammer.metrics.reporting.GraphiteReporter;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public final class Blondin {
 
@@ -23,9 +27,14 @@ public final class Blondin {
 
     public static void main(String[] args) {
         final BlondinConfiguration config = new BlondinParametersParser().parse(args).or(USAGE_SUPPLIER);
-        System.out.printf("Starting blondin on port %s targetting %s:%s\n", config.blondinPort(), config.targetHost(), config.targetPort());
+        
+        final BlondingDiagnosticsConfiguration diagnostics = config.diagnostics();
+        if (diagnostics.metricsEnabled()) {
+            GraphiteReporter.enable(diagnostics.graphitePeriodMinutes(), MINUTES, diagnostics.graphiteHost(), diagnostics.graphitePort());
+        }
         
         try {
+            System.out.printf("Starting blondin on port %s targetting %s:%s\n", config.blondinPort(), config.targetHost(), config.targetPort());
             new BlondinServer(config.blondinPort(), config.targetHost(), config.targetPort(), config.expensiveResourcesUrl());
         }
         catch (IOException e) {
