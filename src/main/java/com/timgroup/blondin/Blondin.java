@@ -51,7 +51,6 @@ public final class Blondin {
                 e.printStackTrace();
             }
         }
-        return;
     }
 
     private static void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
