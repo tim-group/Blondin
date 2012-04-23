@@ -28,4 +28,52 @@ public final class BlondingDiagnosticsConfigurationTest {
         assertThat(configuration.loggingEnabled(), is(false));
     }
 
+    @Test public void
+    reports_metrics_enabled_for_valid_graphite_configuration() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, "my.graphite.host", 2003, 10);
+        
+        assertThat(configuration.metricsEnabled(), is(true));
+    }
+
+    @Test public void
+    reports_metrics_disabled_for_blank_graphite_host() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, "", 2003, 10);
+        
+        assertThat(configuration.metricsEnabled(), is(false));
+    }
+
+    @Test public void
+    reports_metrics_disabled_for_null_graphite_host() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, null, 2003, 10);
+        
+        assertThat(configuration.metricsEnabled(), is(false));
+    }
+
+    @Test public void
+    reports_metrics_disabled_for_zero_graphite_port() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, "my.graphite.host", 0, 10);
+        
+        assertThat(configuration.metricsEnabled(), is(false));
+    }
+
+    @Test public void
+    reports_metrics_disabled_for_negative_graphite_port() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, "my.graphite.host", -1, 10);
+        
+        assertThat(configuration.metricsEnabled(), is(false));
+    }
+    
+    @Test public void
+    reports_metrics_disabled_for_zero_graphite_period() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, "my.graphite.host", 2003, 0);
+        
+        assertThat(configuration.metricsEnabled(), is(false));
+    }
+
+    @Test public void
+    reports_metrics_disabled_for_negative_graphite_period() {
+        final BlondingDiagnosticsConfiguration configuration = new BlondingDiagnosticsConfiguration(null, "my.graphite.host", 2003, -1);
+        
+        assertThat(configuration.metricsEnabled(), is(false));
+    }
 }

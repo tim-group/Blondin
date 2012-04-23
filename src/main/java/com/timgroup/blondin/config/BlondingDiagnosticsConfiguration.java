@@ -36,4 +36,8 @@ public final class BlondingDiagnosticsConfiguration {
     public boolean loggingEnabled() {
         return !Strings.isNullOrEmpty(logDirectory);
     }
+
+    public boolean metricsEnabled() {
+        return !(Strings.isNullOrEmpty(graphiteHost)) && graphitePort > 0 && graphitePeriodMinutes > 0;
+    }
 }
