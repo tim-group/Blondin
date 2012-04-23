@@ -27,11 +27,8 @@ public final class Blondin {
 
     public static void main(String[] args) {
         final BlondinConfiguration config = new BlondinParametersParser().parse(args).or(USAGE_SUPPLIER);
-        
-        final BlondingDiagnosticsConfiguration diagnostics = config.diagnostics();
-        if (diagnostics.metricsEnabled()) {
-            GraphiteReporter.enable(diagnostics.graphitePeriodMinutes(), MINUTES, diagnostics.graphiteHost(), diagnostics.graphitePort());
-        }
+        turnOnLogging(config.diagnostics());
+        turnOnMetrics(config.diagnostics());
         
         try {
             System.out.printf("Starting blondin on port %s targetting %s:%s\n", config.blondinPort(), config.targetHost(), config.targetPort());
@@ -40,6 +37,16 @@ public final class Blondin {
         catch (IOException e) {
             LOGGER.error("Failed to start Blondin server", e);
             throw new IllegalStateException(e);
+        }
+    }
+
+    private static void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
+        return;
+    }
+
+    private static void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
+        if (diagnostics.metricsEnabled()) {
+            GraphiteReporter.enable(diagnostics.graphitePeriodMinutes(), MINUTES, diagnostics.graphiteHost(), diagnostics.graphitePort());
         }
     }
 }
