@@ -28,7 +28,7 @@ public final class BlondinStatus {
         statusPage.render(new OutputStreamWriter(outputStream, Charsets.UTF_8.name()));
         outputStream.close();
     }
-    
+
     private static final class ThrottledResourcesListComponent extends Component {
         private final Supplier<Iterable<String>> expensiveResourcesListSupplier;
 
