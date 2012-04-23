@@ -1,6 +1,7 @@
 package com.timgroup.blondin;
 
 import java.io.IOException;
+import java.util.logging.FileHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,15 @@ public final class Blondin {
     }
 
     private static void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
+        if (diagnostics.loggingEnabled()) {
+            final String logFileName = diagnostics.logDirectory() + "/blondin.log";
+            try {
+                java.util.logging.Logger.getLogger("").addHandler(new FileHandler(logFileName));
+            } catch (Exception e) {
+                System.err.println("Unable to configure logging to " + logFileName);
+                e.printStackTrace();
+            }
+        }
         return;
     }
 
