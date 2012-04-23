@@ -55,6 +55,14 @@ public final class ExpensiveResourceListLoaderTest {
         assertThat(loader.apply("/dawg/eats/kat"), is(true));
     }
 
+    @Test public void
+    matches_resources_containing_regex_sensitive_characters() throws Exception {
+        Files.write("/$/{token}/(", expensiveListFile, UTF_8);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
+        
+        assertThat(loader.apply("/$/anything/("), is(true));
+    }
+
     private URL urlFor(File file) throws MalformedURLException {
         return file.toURI().toURL();
     }
