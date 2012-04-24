@@ -13,8 +13,6 @@ import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
 import com.timgroup.blondin.server.BlondinServer;
 import com.yammer.metrics.reporting.GraphiteReporter;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-
 public final class Blondin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Blondin.class);
@@ -55,7 +53,7 @@ public final class Blondin {
 
     private static void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
         if (diagnostics.metricsEnabled()) {
-            GraphiteReporter.enable(diagnostics.graphitePeriodMinutes(), MINUTES, diagnostics.graphiteHost(), diagnostics.graphitePort());
+            GraphiteReporter.enable(diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit(), diagnostics.graphiteHost(), diagnostics.graphitePort());
         }
     }
 }

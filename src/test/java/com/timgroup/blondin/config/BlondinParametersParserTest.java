@@ -95,7 +95,7 @@ public final class BlondinParametersParserTest {
         assertThat(result.get().diagnostics().logDirectory(), is("/my/log/dir"));
         assertThat(result.get().diagnostics().graphiteHost(), is("my.graphite.host"));
         assertThat(result.get().diagnostics().graphitePort(), is(3));
-        assertThat(result.get().diagnostics().graphitePeriodMinutes(), is(12));
+        assertThat(result.get().diagnostics().graphitePeriod(), is(12));
     }
 
     private File setupConfigFile(String blondinPort, String targetHost, String targetPort, String expensiveResourcesUrl) {
