@@ -11,7 +11,7 @@ public final class BlondinConfiguration {
     private final BlondingDiagnosticsConfiguration diagnostics;
 
     public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
-        this(blondinPort, targetHost, targetPort, expensiveResourcesUrl, new BlondingDiagnosticsConfiguration(null, null, 1, 1));
+        this(blondinPort, targetHost, targetPort, expensiveResourcesUrl, new BlondingDiagnosticsConfiguration(null, null, 1, 1, null));
     }
 
     public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl, BlondingDiagnosticsConfiguration diagnostics) {

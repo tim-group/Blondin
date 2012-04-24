@@ -4,7 +4,6 @@ import java.net.ServerSocket;
 import java.util.List;
 import java.util.Properties;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -19,7 +18,6 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         properties.setProperty("graphite.periodunit", "MILLISECONDS");
     }
 
-    @Ignore("pending implementation")
     @Test(timeout=5000) public void
     blondin_connects_to_graphite() throws Exception {
         final ServerSocket graphite = new ServerSocket(22222);

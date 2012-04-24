@@ -13,12 +13,21 @@ public final class BlondingDiagnosticsConfiguration {
     private final int graphitePeriod;
     private final TimeUnit graphitePeriodTimeUnit;
 
-    public BlondingDiagnosticsConfiguration(String logDirectory, String graphiteHost, int graphitePort, int graphitePeriodMinutes) {
+    public BlondingDiagnosticsConfiguration(String logDirectory, String graphiteHost, int graphitePort, int graphitePeriod, String graphitePeriodTimeUnit) {
         this.logDirectory = logDirectory;
         this.graphiteHost = graphiteHost;
         this.graphitePort = graphitePort;
-        this.graphitePeriod = graphitePeriodMinutes;
-        this.graphitePeriodTimeUnit = TimeUnit.MINUTES;
+        this.graphitePeriod = graphitePeriod;
+        this.graphitePeriodTimeUnit = parseTimeUnit(graphitePeriodTimeUnit);
+    }
+
+    private TimeUnit parseTimeUnit(String graphitePeriodTimeUnit) {
+        try {
+            return TimeUnit.valueOf(graphitePeriodTimeUnit);
+        }
+        catch (Exception e) {
+            return TimeUnit.MINUTES;
+        }
     }
 
     public String logDirectory() {

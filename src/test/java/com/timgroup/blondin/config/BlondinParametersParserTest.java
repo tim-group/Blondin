@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,7 +89,7 @@ public final class BlondinParametersParserTest {
     @Test public void
     reads_diagnostics_configuration_from_properties_file() {
         final File configFile = setupConfigFile("1", "sausage", "2", "http://foo/bar");
-        augmentConfigFileWithDiagnostics(configFile, "/my/log/dir", "my.graphite.host", "3", "12");
+        augmentConfigFileWithDiagnostics(configFile, "/my/log/dir", "my.graphite.host", "3", "12", "SECONDS");
         
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {configFile.getAbsolutePath()});
         assertThat(result.isPresent(), is(true));
@@ -96,6 +97,7 @@ public final class BlondinParametersParserTest {
         assertThat(result.get().diagnostics().graphiteHost(), is("my.graphite.host"));
         assertThat(result.get().diagnostics().graphitePort(), is(3));
         assertThat(result.get().diagnostics().graphitePeriod(), is(12));
+        assertThat(result.get().diagnostics().graphitePeriodTimeUnit(), is(TimeUnit.SECONDS));
     }
 
     private File setupConfigFile(String blondinPort, String targetHost, String targetPort, String expensiveResourcesUrl) {
@@ -118,7 +120,7 @@ public final class BlondinParametersParserTest {
         return configFile;
     }
 
-    private void augmentConfigFileWithDiagnostics(File configFile, String logDir, String graphiteHost, String graphitePort, String graphitePeriod) {
+    private void augmentConfigFileWithDiagnostics(File configFile, String logDir, String graphiteHost, String graphitePort, String graphitePeriod, String graphitePeriodUnit) {
         try {
             final Properties prop = new Properties();
             prop.load(new FileInputStream(configFile));
@@ -127,6 +129,7 @@ public final class BlondinParametersParserTest {
             if (null != graphiteHost) { prop.setProperty("graphite.host", graphiteHost); }
             if (null != graphitePort) { prop.setProperty("graphite.port", graphitePort); }
             if (null != graphitePeriod) { prop.setProperty("graphite.period", graphitePeriod); }
+            if (null != graphitePeriod) { prop.setProperty("graphite.periodunit", graphitePeriodUnit); }
             prop.store(new FileOutputStream(configFile), null);
         } catch (Exception e) {
             throw new IllegalStateException(e);

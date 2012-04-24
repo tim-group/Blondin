@@ -34,7 +34,8 @@ public final class BlondinParametersParser {
                                                         new BlondingDiagnosticsConfiguration(prop.getProperty("logDirectory", "").toString(),
                                                                                              prop.getProperty("graphite.host", "").toString(),
                                                                                              parseInt(prop.getProperty("graphite.port", "0")),
-                                                                                             parseInt(prop.getProperty("graphite.period", "0")))));
+                                                                                             parseInt(prop.getProperty("graphite.period", "0")),
+                                                                                             prop.getProperty("graphite.periodunit", "").toString())));
         } catch (Exception e) {
             return Optional.absent();
         }
