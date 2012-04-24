@@ -36,7 +36,8 @@ Colophon
 ========
 Blondin is named after [Charles Blondin][blondin-wiki], a famous tightrope walker, who was unarguably good at balancing.
 
-[![][blondin-img]][blondin-wiki]
+[![][blondin-img]][blondin-wiki][![][blondinhomage-img]]
 
 [blondin-img]: http://upload.wikimedia.org/wikipedia/commons/7/7e/Charles.Blondin.jpg
+[blondinhomage-img]: https://raw.github.com/youdevise/Blondin/master/blondinhomage.jpg
 [blondin-wiki]: http://en.wikipedia.org/wiki/Charles_Blondin
