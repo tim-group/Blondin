@@ -1,5 +1,6 @@
 package com.timgroup.blondin.diagnostics;
 
+import java.io.IOException;
 import java.util.logging.FileHandler;
 
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public final class ExternalRecorder implements Monitor {
     public void plot(String aspect, Integer value) {
     }
 
-    private static void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
+    private void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
         final String logFileName = diagnostics.logDirectory() + "/blondin.log";
         try {
             java.util.logging.Logger.getLogger("").addHandler(new FileHandler(logFileName));
@@ -47,8 +48,13 @@ public final class ExternalRecorder implements Monitor {
         }
     }
 
-    private static void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
-        GraphiteReporter.enable(diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit(), diagnostics.graphiteHost(), diagnostics.graphitePort());
+    private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
+        try {
+            final GraphiteReporter reporter = new GraphiteReporter(diagnostics.graphiteHost(), diagnostics.graphitePort(), null);
+            reporter.printVMMetrics = false;
+            reporter.start(diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
+        } catch (IOException e) {
+            logError(ExternalRecorder.class, "Failed to create graphite reporter", e);
+        }
     }
-
 }
