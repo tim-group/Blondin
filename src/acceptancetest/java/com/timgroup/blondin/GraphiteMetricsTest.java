@@ -15,7 +15,6 @@ import com.timgroup.blondin.testutil.TrivialHttpServer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
