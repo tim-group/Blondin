@@ -13,8 +13,8 @@ import com.timgroup.blondin.testutil.TrivialHttpClient;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
@@ -42,7 +42,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         assertThat(graphite.connected(), is(true));
     }
 
-    @Ignore("Pending Implementation")
+    @Ignore("pending implementation")
     @Test(timeout=5000) public void
     gathers_metrics_for_incoming_connections() throws Exception {
         TrivialHttpServer.serving("/hi", "1").on(targetPort());
@@ -50,7 +50,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         
         graphite.waitForNextConnection();
         
-        assertThat(graphite.messagesReceived(), contains(containsString("/hi")));
+        assertThat(graphite.messagesReceived(), hasItem(containsString("blondin.connections.received 1")));
     }
 
 }
