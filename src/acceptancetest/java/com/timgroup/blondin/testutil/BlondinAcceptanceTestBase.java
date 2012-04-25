@@ -36,16 +36,13 @@ public class BlondinAcceptanceTestBase {
 
     @Before
     public final void startBlondin() throws Exception {
-        final String blondinPortString = String.valueOf(blondinPort);
-        final String targetPortString = String.valueOf(targetPort);
-
         final File expensiveResFile = testFolder.newFile("expensive.txt");
-        
+
         final File config = testFolder.newFile("blondinconf.properties");
         final Properties prop = new Properties();
-        prop.setProperty("port", blondinPortString);
+        prop.setProperty("port", String.valueOf(blondinPort));
         prop.setProperty("targetHost", "localhost");
-        prop.setProperty("targetPort", targetPortString);
+        prop.setProperty("targetPort", String.valueOf(targetPort));
         prop.setProperty("expensiveResourcesUrl", expensiveResFile.toURI().toURL().toExternalForm());
         
         final ArrayList<String> expensiveResources = Lists.newArrayList();
@@ -64,16 +61,20 @@ public class BlondinAcceptanceTestBase {
     public final void stopBlondin() throws Exception {
         TrivialHttpClient.post(format("http://localhost:%s/stop", blondinPort));
     }
-    
+
     public final int blondinPort() {
         return blondinPort;
     }
-    
+
     public final String blondinUrl() {
         return format("http://localhost:" + blondinPort);
     }
-    
+
     public final int targetPort() {
         return targetPort;
+    }
+
+    public final int generatePort() {
+        return PortGuard.get();
     }
 }
