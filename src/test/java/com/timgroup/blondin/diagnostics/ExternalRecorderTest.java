@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-public class ExternalRecorderTest {
+public final class ExternalRecorderTest {
 
     private final DummyRecordingLogHandler handler = new DummyRecordingLogHandler();
     private final BlondingDiagnosticsConfiguration config = new BlondingDiagnosticsConfiguration("", "", 1, 1, "");
