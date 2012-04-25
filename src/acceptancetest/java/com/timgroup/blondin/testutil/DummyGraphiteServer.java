@@ -2,6 +2,7 @@ package com.timgroup.blondin.testutil;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class DummyGraphiteServer {
@@ -47,5 +48,9 @@ public final class DummyGraphiteServer {
 
     public boolean connected() {
         return connected.get();
+    }
+
+    public List<String> messagesReceived() {
+        return null;
     }
 }
