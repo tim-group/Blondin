@@ -1,13 +1,21 @@
 package com.timgroup.blondin.testutil;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 
 public final class DummyGraphiteServer {
 
     private final AtomicInteger connectionsRecorded = new AtomicInteger(0);
+    private final ConcurrentLinkedQueue<String> messagesReceived = new ConcurrentLinkedQueue<String>();
     private final ServerSocket server;
 
     public DummyGraphiteServer(int port) {
@@ -19,15 +27,25 @@ public final class DummyGraphiteServer {
         
         new Thread(new Runnable() {
             @Override public void run() {
-                try {
-                    server.accept();
-                    connectionsRecorded.incrementAndGet();
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
+                while(true) {
+                    handleConnections();
                 }
             }
-
         }).start();
+    }
+    
+    private void handleConnections() {
+        InputStreamReader graphiteStream = null;
+        try {
+            final Socket connection = server.accept();
+            connectionsRecorded.incrementAndGet();
+            graphiteStream = new InputStreamReader( connection.getInputStream(), "UTF-8" );
+            messagesReceived.addAll(CharStreams.readLines(graphiteStream));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            Closeables.closeQuietly(graphiteStream);
+        }
     }
 
     public void shutdown() {
@@ -60,6 +78,6 @@ public final class DummyGraphiteServer {
     }
 
     public List<String> messagesReceived() {
-        return null;
+        return ImmutableList.copyOf(messagesReceived);
     }
 }
