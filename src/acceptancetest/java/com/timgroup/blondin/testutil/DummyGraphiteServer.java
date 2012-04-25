@@ -3,11 +3,11 @@ package com.timgroup.blondin.testutil;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class DummyGraphiteServer {
 
-    private final AtomicBoolean connected = new AtomicBoolean(false);
+    private final AtomicInteger connectionsRecorded = new AtomicInteger(0);
     private final ServerSocket server;
 
     public DummyGraphiteServer(int port) {
@@ -21,7 +21,7 @@ public final class DummyGraphiteServer {
             @Override public void run() {
                 try {
                     server.accept();
-                    connected.set(true);
+                    connectionsRecorded.incrementAndGet();
                 } catch (IOException e) {
                     throw new IllegalStateException(e);
                 }
@@ -46,8 +46,17 @@ public final class DummyGraphiteServer {
         }
     }
 
+    public void waitForNextConnection() {
+        int target = connectionsRecorded.get() + 1;
+        while (connectionsRecorded.get() <= target) {
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException e) { }
+        }
+    }
+
     public boolean connected() {
-        return connected.get();
+        return connectionsRecorded.get() > 0;
     }
 
     public List<String> messagesReceived() {

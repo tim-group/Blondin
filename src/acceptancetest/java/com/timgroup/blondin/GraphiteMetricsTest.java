@@ -47,7 +47,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         TrivialHttpServer.serving("/hi", "1").on(targetPort());
         TrivialHttpClient.getFrom(blondinUrl() + "/hi");
         
-        graphite.waitForFirstConnection();
+        graphite.waitForNextConnection();
         
         assertThat(graphite.messagesReceived(), contains(containsString("/hi")));
     }
