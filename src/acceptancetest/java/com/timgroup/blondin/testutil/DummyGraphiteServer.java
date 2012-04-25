@@ -12,7 +12,7 @@ public final class DummyGraphiteServer {
 
     public DummyGraphiteServer(int port) {
         try {
-            server = new ServerSocket(22222);
+            server = new ServerSocket(port);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
