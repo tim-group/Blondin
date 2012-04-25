@@ -15,6 +15,7 @@ import com.timgroup.blondin.testutil.TrivialHttpServer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
 public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
@@ -50,6 +51,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         
         graphite.waitForNextConnection();
         
+        assertThat(graphite.messagesReceived().size(), is(greaterThan(1)));
         assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(containsString("blondin.connections.received 1")));
     }
 
