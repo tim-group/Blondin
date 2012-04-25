@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -18,7 +19,8 @@ import static org.junit.Assert.assertThat;
 public class ExternalRecorderTest {
 
     private final DummyRecordingLogHandler handler = new DummyRecordingLogHandler();
-    private final ExternalRecorder externalRecorder = new ExternalRecorder();
+    private final BlondingDiagnosticsConfiguration config = new BlondingDiagnosticsConfiguration("", "", 1, 1, "");
+    private final ExternalRecorder externalRecorder = new ExternalRecorder(config);
 
     @Before
     public void addHandler() {

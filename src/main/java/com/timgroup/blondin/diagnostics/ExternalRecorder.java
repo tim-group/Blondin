@@ -1,8 +1,22 @@
 package com.timgroup.blondin.diagnostics;
 
+import java.util.logging.FileHandler;
+
 import org.slf4j.LoggerFactory;
 
+import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
+import com.yammer.metrics.reporting.GraphiteReporter;
+
 public final class ExternalRecorder implements Monitor {
+
+    public ExternalRecorder(BlondingDiagnosticsConfiguration configuration) {
+        if (configuration.loggingEnabled()) {
+            turnOnLogging(configuration);
+        }
+        if (configuration.metricsEnabled()) {
+            turnOnMetrics(configuration);
+        }
+    }
 
     @Override
     public void logError(Class<?> source, String message, Throwable cause) {
@@ -21,6 +35,20 @@ public final class ExternalRecorder implements Monitor {
 
     @Override
     public void plot(String aspect, Integer value) {
+    }
+
+    private static void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
+        final String logFileName = diagnostics.logDirectory() + "/blondin.log";
+        try {
+            java.util.logging.Logger.getLogger("").addHandler(new FileHandler(logFileName));
+        } catch (Exception e) {
+            System.err.println("Unable to configure logging to " + logFileName);
+            e.printStackTrace();
+        }
+    }
+
+    private static void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
+        GraphiteReporter.enable(diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit(), diagnostics.graphiteHost(), diagnostics.graphitePort());
     }
 
 }
