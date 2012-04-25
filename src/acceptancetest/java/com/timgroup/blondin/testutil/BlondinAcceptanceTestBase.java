@@ -23,16 +23,21 @@ public class BlondinAcceptanceTestBase {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-    
-    private static final class BlondinTestContext {
-        private static int blondinPort = 23453;
-        private static int targetPort = 34297;
+
+    private static final class PortGuard {
+        private static int port = 23453;
+        private static int get() {
+            return port++;
+        }
     }
+
+    private final int blondinPort = PortGuard.get();
+    private final int targetPort = PortGuard.get();
 
     @Before
     public final void startBlondin() throws Exception {
-        final String blondinPortString = String.valueOf(BlondinTestContext.blondinPort);
-        final String targetPortString = String.valueOf(BlondinTestContext.targetPort);
+        final String blondinPortString = String.valueOf(blondinPort);
+        final String targetPortString = String.valueOf(targetPort);
 
         final File expensiveResFile = testFolder.newFile("expensive.txt");
         
@@ -50,27 +55,25 @@ public class BlondinAcceptanceTestBase {
         Files.write(Joiner.on("\n").join(expensiveResources), expensiveResFile, Charsets.UTF_8);
         
         Blondin.main(new String[] {config.getAbsolutePath()});
-        TrivialHttpClient.waitForSocket("localhost", BlondinTestContext.blondinPort);
+        TrivialHttpClient.waitForSocket("localhost", blondinPort);
     }
 
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception { }
 
     @After
     public final void stopBlondin() throws Exception {
-        TrivialHttpClient.post(format("http://localhost:%s/stop", BlondinTestContext.blondinPort));
-        BlondinTestContext.blondinPort++;
-        BlondinTestContext.targetPort++;
+        TrivialHttpClient.post(format("http://localhost:%s/stop", blondinPort));
     }
     
     public final int blondinPort() {
-        return BlondinTestContext.blondinPort;
+        return blondinPort;
     }
     
     public final String blondinUrl() {
-        return format("http://localhost:" + BlondinTestContext.blondinPort);
+        return format("http://localhost:" + blondinPort);
     }
     
     public final int targetPort() {
-        return BlondinTestContext.targetPort;
+        return targetPort;
     }
 }
