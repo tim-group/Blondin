@@ -19,12 +19,13 @@ import static org.hamcrest.Matchers.is;
 
 public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
 
-    final DummyGraphiteServer graphite = new DummyGraphiteServer(22222);
+    private final int graphitePort = generatePort();
+    private final DummyGraphiteServer graphite = new DummyGraphiteServer(graphitePort);
 
     @Override
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception {
         properties.setProperty("graphite.host", "localhost");
-        properties.setProperty("graphite.port", "22222");
+        properties.setProperty("graphite.port", String.valueOf(graphitePort));
         properties.setProperty("graphite.period", "1");
         properties.setProperty("graphite.periodunit", "MILLISECONDS");
     }
