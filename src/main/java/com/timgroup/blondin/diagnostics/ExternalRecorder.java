@@ -55,8 +55,7 @@ public final class ExternalRecorder implements Monitor {
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
         final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleWithFixedDelay(new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort()),
-                                        diagnostics.graphitePeriod(), diagnostics.graphitePeriod(),
-                                        diagnostics.graphitePeriodTimeUnit());
+        recorder = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
+        executor.scheduleWithFixedDelay(recorder, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
     }
 }

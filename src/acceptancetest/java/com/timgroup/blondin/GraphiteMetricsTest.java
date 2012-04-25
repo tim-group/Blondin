@@ -5,7 +5,6 @@ import java.util.Properties;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -43,15 +42,14 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         assertThat(graphite.connected(), is(true));
     }
 
-    @Ignore("pending implementation")
-    @Test(timeout=5000) public void
+    @Test public void
     gathers_metrics_for_incoming_connections() throws Exception {
         TrivialHttpServer.serving("/hi", "1").on(targetPort());
         TrivialHttpClient.getFrom(blondinUrl() + "/hi");
         
         graphite.waitForNextConnection();
         
-        assertThat(graphite.messagesReceived().size(), is(greaterThan(1)));
+        assertThat(graphite.messagesReceived().size(), is(greaterThan(0)));
         assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(containsString("blondin.connections.received 1")));
     }
 

@@ -47,7 +47,7 @@ public final class BlondinServer {
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
         dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier));
         
-        final Container proxy = new DefensiveHandler(monitor, new ProxyingHandler(targetHost, targetPort, new BasicHttpClient(monitor)));
+        final Container proxy = new DefensiveHandler(monitor, new MetricRecordingHandler(monitor, new ProxyingHandler(targetHost, targetPort, new BasicHttpClient(monitor))));
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         
