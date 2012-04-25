@@ -4,6 +4,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import com.google.common.collect.Lists;
 
 public final class GraphiteRecorder implements Runnable {
 
@@ -11,6 +15,8 @@ public final class GraphiteRecorder implements Runnable {
     private final String host;
     private final int port;
 
+    private final LinkedBlockingQueue<Record> records = new LinkedBlockingQueue<Record>();
+    
     public GraphiteRecorder(Monitor monitor, String host, int port) {
         this.monitor = monitor;
         this.host = host;
@@ -32,7 +38,11 @@ public final class GraphiteRecorder implements Runnable {
 
     private void report(Socket socket) throws IOException {
         final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        //final long epoch = System.currentTimeMillis() / 1000;
+        final List<Record> payload = Lists.newArrayList();
+        records.drainTo(payload);
+        for (Record record : payload) {
+            writer.append(record.asGraphiteMessage());
+        }
         writer.flush();
     }
 
@@ -42,6 +52,24 @@ public final class GraphiteRecorder implements Runnable {
         }
     }
 
-    public void record(String aspect, Integer value) {
+    public void record(String aspect, int value) {
+        final long epoch = System.currentTimeMillis() / 1000;
+        records.offer(new Record(aspect, value, epoch));
+    }
+    
+    private static final class Record {
+        private final String aspect;
+        private final int value;
+        private final long epoch;
+
+        public Record(String aspect, int value, long epoch) {
+            this.aspect = aspect.replace(' ', '_');
+            this.value = value;
+            this.epoch = epoch;
+        }
+
+        public String asGraphiteMessage() {
+            return String.format("blondin.%s %s %s\n", aspect, value, epoch);
+        }
     }
 }
