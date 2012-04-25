@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.io.Files;
+import com.timgroup.blondin.DummyMonitor;
 
 import static org.hamcrest.Matchers.is;
 
@@ -32,7 +33,7 @@ public final class ExpensiveResourceListLoaderTest {
     @Test public void
     reads_blacklist_from_specified_url() throws Exception {
         Files.write("yo\ndawg", expensiveListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(new DummyMonitor(), urlFor(expensiveListFile));
         
         assertThat(loader.expensiveResources(), contains("yo", "dawg"));
     }
@@ -40,7 +41,7 @@ public final class ExpensiveResourceListLoaderTest {
     @Test public void
     calculates_matching_resources() throws Exception {
         Files.write("yo\ndawg", expensiveListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(new DummyMonitor(), urlFor(expensiveListFile));
         
         assertThat(loader.apply("yo"), is(true));
         assertThat(loader.apply("dawg"), is(true));
@@ -50,7 +51,7 @@ public final class ExpensiveResourceListLoaderTest {
     @Test public void
     matches_resources_using_templates() throws Exception {
         Files.write("yo\n/dawg/{token}/kat", expensiveListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(new DummyMonitor(), urlFor(expensiveListFile));
         
         assertThat(loader.apply("/dawg/eats/kat"), is(true));
     }
@@ -58,7 +59,7 @@ public final class ExpensiveResourceListLoaderTest {
     @Test public void
     matches_resources_containing_regex_sensitive_characters() throws Exception {
         Files.write("/$/{token}/(", expensiveListFile, UTF_8);
-        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(urlFor(expensiveListFile));
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(new DummyMonitor(), urlFor(expensiveListFile));
         
         assertThat(loader.apply("/$/anything/("), is(true));
     }

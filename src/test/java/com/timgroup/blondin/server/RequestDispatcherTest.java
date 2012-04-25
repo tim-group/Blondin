@@ -10,6 +10,8 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.PathParser;
 
+import com.timgroup.blondin.DummyMonitor;
+
 import static com.timgroup.blondin.server.RequestDispatcher.POST;
 
 import static com.timgroup.blondin.server.RequestDispatcher.GET;
@@ -19,7 +21,7 @@ public final class RequestDispatcherTest {
 
     private final Mockery context = new Mockery();
 
-    private final RequestDispatcher dispatcher = new RequestDispatcher();
+    private final RequestDispatcher dispatcher = new RequestDispatcher(new DummyMonitor());
 
     @Test public void
     dispatches_404_by_default() {

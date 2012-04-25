@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -15,6 +12,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
+import com.timgroup.blondin.diagnostics.Monitor;
 
 import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Iterables.transform;
@@ -23,14 +21,14 @@ import static com.google.common.collect.Iterators.transform;
 
 public final class ExpensiveResourceListLoader implements Supplier<Iterable<String>>, Predicate<String> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExpensiveResourceListLoader.class);
-
+    private final Monitor monitor;
     private final URL blackListLocation;
 
     private Iterable<String> blackList = ImmutableList.of();
     private Iterable<Pattern> blackListPatterns = ImmutableList.of();
 
-    public ExpensiveResourceListLoader(URL blackListLocation) {
+    public ExpensiveResourceListLoader(Monitor monitor, URL blackListLocation) {
+        this.monitor = monitor;
         this.blackListLocation = blackListLocation;
         refresh();
     }
@@ -40,7 +38,7 @@ public final class ExpensiveResourceListLoader implements Supplier<Iterable<Stri
             blackList = Collections.unmodifiableList(Resources.readLines(blackListLocation, Charsets.UTF_8));
             blackListPatterns = ImmutableList.copyOf(transform(blackList, toPatterns()));
         } catch (Exception e) {
-            LOGGER.error("Failed to read expensive resources list from " + blackListLocation, e);
+            monitor.logError(ExpensiveResourceListLoader.class, "Failed to read expensive resources list from " + blackListLocation, e);
         }
     }
 

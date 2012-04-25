@@ -10,27 +10,24 @@ import org.simpleframework.http.core.Container;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.timgroup.blondin.config.ExpensiveResourceListLoader;
+import com.timgroup.blondin.diagnostics.Monitor;
 import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
 import com.timgroup.blondin.throttler.ThrottlingHandler;
 
 import static com.timgroup.blondin.server.RequestDispatcher.GET;
-
 import static com.timgroup.blondin.server.RequestDispatcher.POST;
 
 public final class BlondinServer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlondinServer.class);
-
     private static final int THREAD_COUNT = 100;
     private static final int THROTTLE_BANDWIDTH = 16;
 
+    private final Monitor monitor;
     private final Connection connection;
 
     private volatile BlondinServerStatus status = BlondinServerStatus.STOPPED;
@@ -41,15 +38,16 @@ public final class BlondinServer {
         }
     };
 
-    public BlondinServer(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) throws IOException {
-        final ExpensiveResourceListLoader expensiveResourcesListSupplier = new ExpensiveResourceListLoader(expensiveResourcesUrl);
+    public BlondinServer(Monitor monitor, int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) throws IOException {
+        this.monitor = monitor;
+        final ExpensiveResourceListLoader expensiveResourcesListSupplier = new ExpensiveResourceListLoader(monitor, expensiveResourcesUrl);
 
-        final RequestDispatcher dispatcher = new RequestDispatcher();
+        final RequestDispatcher dispatcher = new RequestDispatcher(monitor);
         dispatcher.register(POST.forPath("/stop"), new StopHandler());
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
-        dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(statusSupplier, expensiveResourcesListSupplier));
+        dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier));
         
-        final ProxyingHandler proxy = new ProxyingHandler(targetHost, targetPort, new BasicHttpClient());
+        final ProxyingHandler proxy = new ProxyingHandler(targetHost, targetPort, new BasicHttpClient(monitor));
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         
@@ -67,7 +65,7 @@ public final class BlondinServer {
             connection.close();
         }
         catch (IOException e) {
-            LOGGER.warn("Failed to stop Blondin server", e);
+            monitor.logWarning(BlondinServer.class, "Failed to stop Blondin server", e);
         }
         status = BlondinServerStatus.STOPPED;
     }
@@ -90,12 +88,12 @@ public final class BlondinServer {
         }
     }
 
-    private static void closeSafely(Response response) {
+    private void closeSafely(Response response) {
         try {
             response.close();
         }
         catch (Exception e) {
-            LOGGER.warn("Failed to close response", e);
+            monitor.logWarning(BlondinServer.class, "Failed to close response", e);
         }
     }
 

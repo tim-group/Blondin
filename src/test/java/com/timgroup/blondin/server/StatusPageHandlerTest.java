@@ -15,6 +15,7 @@ import org.simpleframework.http.parse.PathParser;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
+import com.timgroup.blondin.DummyMonitor;
 
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
@@ -34,7 +35,7 @@ public final class StatusPageHandlerTest {
     private final OutputStream responseContent = new ByteArrayOutputStream();
 
     private final List<String> blackList = Lists.newArrayList();
-    private final StatusPageHandler handler = new StatusPageHandler(statusSupplier, Suppliers.<Iterable<String>>ofInstance(blackList));
+    private final StatusPageHandler handler = new StatusPageHandler(new DummyMonitor(), statusSupplier, Suppliers.<Iterable<String>>ofInstance(blackList));
     
     @Before
     public void attachResponseContent() throws Exception {
