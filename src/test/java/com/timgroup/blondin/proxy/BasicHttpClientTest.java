@@ -50,9 +50,9 @@ public final class BasicHttpClientTest {
     fulfils_simple_request() throws Exception {
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
-                byte[] response = "myContent".getBytes();
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
-                exchange.getResponseBody().write(response);
+                byte[] responseContent = "myContent".getBytes();
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, responseContent.length);
+                exchange.getResponseBody().write(responseContent);
                 exchange.close();
             }
         });
