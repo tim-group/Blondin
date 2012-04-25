@@ -13,7 +13,6 @@ import com.timgroup.blondin.testutil.TrivialHttpClient.TrivialResponse;
 
 public final class RobustConnectionManagementTest extends BlondinAcceptanceTestBase {
 
-    @Ignore("pending implementation")
     @Test(timeout=5000) public void
     closes_client_connection_when_proxying_an_uncontactable_server() throws Exception {
         Future<TrivialResponse> response = TrivialHttpClient.getFromInBackground(blondinUrl() + "/some/target/url");
