@@ -3,6 +3,7 @@ package com.timgroup.blondin;
 import java.util.List;
 import java.util.Properties;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         
         graphite.waitForNextConnection();
         
-        assertThat(graphite.messagesReceived(), hasItem(containsString("blondin.connections.received 1")));
+        assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(containsString("blondin.connections.received 1")));
     }
 
 }
