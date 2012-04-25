@@ -1,9 +1,5 @@
 package com.timgroup.blondin.diagnostics;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.FileHandler;
@@ -11,9 +7,10 @@ import java.util.logging.FileHandler;
 import org.slf4j.LoggerFactory;
 
 import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
-import com.yammer.metrics.reporting.GraphiteReporter;
 
 public final class ExternalRecorder implements Monitor {
+
+    private GraphiteRecorder recorder = null;
 
     public ExternalRecorder(BlondingDiagnosticsConfiguration configuration) {
         if (configuration.loggingEnabled()) {
@@ -41,6 +38,9 @@ public final class ExternalRecorder implements Monitor {
 
     @Override
     public void plot(String aspect, Integer value) {
+        if (null != recorder) {
+            recorder.record(aspect, value);
+        }
     }
 
     private void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
@@ -55,34 +55,8 @@ public final class ExternalRecorder implements Monitor {
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
         final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        try {
-            final GraphiteReporter reporter = new GraphiteReporter(diagnostics.graphiteHost(), diagnostics.graphitePort(), null);
-            reporter.printVMMetrics = false;
-            executor.scheduleWithFixedDelay(new Runnable() { @Override public void run() { report(diagnostics.graphiteHost(), diagnostics.graphitePort()); } },
-                                            diagnostics.graphitePeriod(), diagnostics.graphitePeriod(),
-                                            diagnostics.graphitePeriodTimeUnit());
-        } catch (IOException e) {
-            logError(ExternalRecorder.class, "Failed to create graphite reporter", e);
-        }
-    }
-    
-    private void report(String host, int port) {
-        Socket socket = null;
-        try {
-            socket = new Socket(host, port);
-            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            //final long epoch = System.currentTimeMillis() / 1000;
-            writer.flush();
-        } catch (IOException e) {
-            logWarning(ExternalRecorder.class, "Failed to write metrics to graphite");
-        } finally {
-            closeQuietly(socket);
-        }
-    }
-
-    private void closeQuietly(Socket socket) {
-        if (null != socket) {
-            try { socket.close(); } catch (IOException e) { }
-        }
+        executor.scheduleWithFixedDelay(new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort()),
+                                        diagnostics.graphitePeriod(), diagnostics.graphitePeriod(),
+                                        diagnostics.graphitePeriodTimeUnit());
     }
 }
