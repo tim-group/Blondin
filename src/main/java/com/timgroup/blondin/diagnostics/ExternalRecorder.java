@@ -1,6 +1,11 @@
 package com.timgroup.blondin.diagnostics;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.FileHandler;
 
 import org.slf4j.LoggerFactory;
@@ -49,12 +54,35 @@ public final class ExternalRecorder implements Monitor {
     }
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
+        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         try {
             final GraphiteReporter reporter = new GraphiteReporter(diagnostics.graphiteHost(), diagnostics.graphitePort(), null);
             reporter.printVMMetrics = false;
-            reporter.start(diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
+            executor.scheduleWithFixedDelay(new Runnable() { @Override public void run() { report(diagnostics.graphiteHost(), diagnostics.graphitePort()); } },
+                                            diagnostics.graphitePeriod(), diagnostics.graphitePeriod(),
+                                            diagnostics.graphitePeriodTimeUnit());
         } catch (IOException e) {
             logError(ExternalRecorder.class, "Failed to create graphite reporter", e);
+        }
+    }
+    
+    private void report(String host, int port) {
+        Socket socket = null;
+        try {
+            socket = new Socket(host, port);
+            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            //final long epoch = System.currentTimeMillis() / 1000;
+            writer.flush();
+        } catch (IOException e) {
+            logWarning(ExternalRecorder.class, "Failed to write metrics to graphite");
+        } finally {
+            closeQuietly(socket);
+        }
+    }
+
+    private void closeQuietly(Socket socket) {
+        if (null != socket) {
+            try { socket.close(); } catch (IOException e) { }
         }
     }
 }
