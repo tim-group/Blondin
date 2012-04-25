@@ -1,7 +1,7 @@
 package com.timgroup.blondin.diagnostics;
 
 
-public interface Diagnostician {
+public interface Monitor {
 
     // Logging
     void logError(Class<?> source, String message, Throwable cause);
