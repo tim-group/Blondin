@@ -1,13 +1,11 @@
 package com.timgroup.blondin.throttler;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
-
-import static java.util.concurrent.TimeUnit.MINUTES;
 
 public final class ThrottlingHandler implements Container {
 
@@ -16,7 +14,7 @@ public final class ThrottlingHandler implements Container {
 
     public ThrottlingHandler(Container handler, int bandwidth) {
         this.handler = handler;
-        this.executor = new ThreadPoolExecutor(bandwidth, bandwidth, 10, MINUTES, new LinkedBlockingQueue<Runnable>());
+        this.executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(bandwidth);
     }
 
     @Override
