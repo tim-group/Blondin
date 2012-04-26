@@ -17,6 +17,7 @@ import org.simpleframework.http.core.Container;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
+import com.timgroup.blondin.server.DefensiveHandler;
 
 public final class ProxyingHandler implements Container {
 
@@ -24,7 +25,11 @@ public final class ProxyingHandler implements Container {
     private final String targetHost;
     private final int targetPort;
 
-    public ProxyingHandler(Monitor monitor, String targetHost, int targetPort) {
+    public static Container create(Monitor monitor, String targetHost, int targetPort) {
+        return new DefensiveHandler(monitor, new ProxyingHandler(monitor, targetHost, targetPort));
+    }
+    
+    private ProxyingHandler(Monitor monitor, String targetHost, int targetPort) {
         this.monitor = monitor;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
@@ -47,9 +52,8 @@ public final class ProxyingHandler implements Container {
             
             defensivelyTransferContent(response, conn);
             conn.disconnect();
-            response.close();
         }
-        catch(Exception e) {
+        catch(IOException e) {
             monitor.logError(ProxyingHandler.class, "Failed to handle request for " + request.getAddress(), e);
         }
     }

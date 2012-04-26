@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.AddressParser;
 
 import com.google.common.collect.Lists;
@@ -34,7 +35,7 @@ public final class ProxyingHandlerTest {
     private final Response response = context.mock(Response.class);
     
     private HttpServer server;
-    private final ProxyingHandler basicHttpClient = new ProxyingHandler(new DummyMonitor(), "localhost", 30215);
+    private final Container basicHttpClient = ProxyingHandler.create(new DummyMonitor(), "localhost", 30215);
     
     @Before
     public void startServer() throws Exception {
