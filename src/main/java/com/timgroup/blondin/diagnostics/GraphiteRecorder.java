@@ -16,7 +16,7 @@ public final class GraphiteRecorder implements Runnable {
     private final int port;
 
     private final LinkedBlockingQueue<Record> records = new LinkedBlockingQueue<Record>();
-    
+
     public GraphiteRecorder(Monitor monitor, String host, int port) {
         this.monitor = monitor;
         this.host = host;
@@ -43,7 +43,7 @@ public final class GraphiteRecorder implements Runnable {
         for (Record record : payload) {
             writer.append(record.asGraphiteMessage());
         }
-        writer.flush();
+        writer.close();
     }
 
     private void closeQuietly(Socket socket) {
