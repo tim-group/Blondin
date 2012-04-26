@@ -1,5 +1,8 @@
 package com.timgroup.blondin.proxy;
 
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Maps.filterKeys;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -9,24 +12,26 @@ import java.util.Map.Entry;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
 
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Maps.filterKeys;
-
-public final class BasicHttpClient implements HttpClient {
+public final class BasicHttpClient implements Container {
 
     private final Monitor monitor;
+    private final String targetHost;
+    private final int targetPort;
 
-    public BasicHttpClient(Monitor monitor) {
+    public BasicHttpClient(Monitor monitor, String targetHost, int targetPort) {
         this.monitor = monitor;
+        this.targetHost = targetHost;
+        this.targetPort = targetPort;
     }
 
     @Override
-    public void handle(String targetHost, int targetPort, Request request, Response response) {
+    public void handle(Request request, Response response) {
         try {
             final URL url = new URL("http", targetHost, targetPort, request.getAddress().toString());
             final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
@@ -74,4 +79,5 @@ public final class BasicHttpClient implements HttpClient {
             monitor.logError(BasicHttpClient.class, "Failed to transfer content from " + conn.getURL(), e);
         }
     }
+
 }

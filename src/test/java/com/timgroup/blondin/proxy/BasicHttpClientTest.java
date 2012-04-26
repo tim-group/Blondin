@@ -34,7 +34,7 @@ public final class BasicHttpClientTest {
     private final Response response = context.mock(Response.class);
     
     private HttpServer server;
-    private final BasicHttpClient basicHttpClient = new BasicHttpClient(new DummyMonitor());
+    private final BasicHttpClient basicHttpClient = new BasicHttpClient(new DummyMonitor(), "localhost", 30215);
     
     @Before
     public void startServer() throws Exception {
@@ -67,13 +67,13 @@ public final class BasicHttpClientTest {
             ignoring(response);
         }});
         
-        basicHttpClient.handle("localhost", 30215, request, response);
+        basicHttpClient.handle(request, response);
         
         assertThat(outputStream.toString(), is("myContent"));
     }
     
     @Test public void
-    preseves_response_status_code() throws Exception {
+    preserves_response_status_code() throws Exception {
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_NO_CONTENT, 0);
@@ -91,7 +91,7 @@ public final class BasicHttpClientTest {
             ignoring(response);
         }});
         
-        basicHttpClient.handle("localhost", 30215, request, response);
+        basicHttpClient.handle(request, response);
         
         context.assertIsSatisfied();
     }
@@ -117,7 +117,7 @@ public final class BasicHttpClientTest {
         }});
         
 
-        basicHttpClient.handle("localhost", 30215, request, response);
+        basicHttpClient.handle(request, response);
         
         context.assertIsSatisfied();
     }
@@ -141,7 +141,7 @@ public final class BasicHttpClientTest {
             ignoring(response);
         }});
         
-        basicHttpClient.handle("localhost", 30215, request, response);
+        basicHttpClient.handle(request, response);
         
         assertThat(query, is(Lists.newArrayList("alpha=beta&gamma=delta")));
     }
@@ -166,7 +166,7 @@ public final class BasicHttpClientTest {
             ignoring(response);
         }});
         
-        basicHttpClient.handle("localhost", 30215, request, response);
+        basicHttpClient.handle(request, response);
         
         assertThat(outputStream.toString(), is(""));
     }
@@ -193,7 +193,7 @@ public final class BasicHttpClientTest {
             ignoring(response);
         }});
         
-        basicHttpClient.handle("localhost", 30215, request, response);
+        basicHttpClient.handle(request, response);
         
         assertThat(outputStream.toString(), is("myContent"));
     }
