@@ -18,13 +18,13 @@ import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
 
-public final class BasicHttpClient implements Container {
+public final class ProxyingHandler implements Container {
 
     private final Monitor monitor;
     private final String targetHost;
     private final int targetPort;
 
-    public BasicHttpClient(Monitor monitor, String targetHost, int targetPort) {
+    public ProxyingHandler(Monitor monitor, String targetHost, int targetPort) {
         this.monitor = monitor;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
@@ -50,7 +50,7 @@ public final class BasicHttpClient implements Container {
             response.close();
         }
         catch(Exception e) {
-            monitor.logError(BasicHttpClient.class, "Failed to handle request for " + request.getAddress(), e);
+            monitor.logError(ProxyingHandler.class, "Failed to handle request for " + request.getAddress(), e);
         }
     }
 
@@ -76,7 +76,7 @@ public final class BasicHttpClient implements Container {
             inputStream.close();
         }
         catch (IOException e) {
-            monitor.logError(BasicHttpClient.class, "Failed to transfer content from " + conn.getURL(), e);
+            monitor.logError(ProxyingHandler.class, "Failed to transfer content from " + conn.getURL(), e);
         }
     }
 

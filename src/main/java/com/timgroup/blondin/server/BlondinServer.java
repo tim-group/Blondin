@@ -18,7 +18,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 import com.timgroup.blondin.diagnostics.Monitor;
-import com.timgroup.blondin.proxy.BasicHttpClient;
+import com.timgroup.blondin.proxy.ProxyingHandler;
 import com.timgroup.blondin.throttler.ThrottlingHandler;
 
 public final class BlondinServer {
@@ -46,7 +46,7 @@ public final class BlondinServer {
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
         dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier));
         
-        final Container proxy = new DefensiveHandler(monitor, new MetricRecordingHandler(monitor, new BasicHttpClient(monitor, targetHost, targetPort)));
+        final Container proxy = new DefensiveHandler(monitor, new MetricRecordingHandler(monitor, new ProxyingHandler(monitor, targetHost, targetPort)));
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         

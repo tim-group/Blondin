@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-public final class BasicHttpClientTest {
+public final class ProxyingHandlerTest {
 
     private final Mockery context = new Mockery();
     
@@ -34,7 +34,7 @@ public final class BasicHttpClientTest {
     private final Response response = context.mock(Response.class);
     
     private HttpServer server;
-    private final BasicHttpClient basicHttpClient = new BasicHttpClient(new DummyMonitor(), "localhost", 30215);
+    private final ProxyingHandler basicHttpClient = new ProxyingHandler(new DummyMonitor(), "localhost", 30215);
     
     @Before
     public void startServer() throws Exception {
