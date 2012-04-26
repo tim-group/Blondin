@@ -1,5 +1,8 @@
 package com.timgroup.blondin.server;
 
+import static com.timgroup.blondin.server.RequestDispatcher.GET;
+import static com.timgroup.blondin.server.RequestDispatcher.POST;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -15,12 +18,8 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 import com.timgroup.blondin.diagnostics.Monitor;
-import com.timgroup.blondin.proxy.BasicHttpClient;
 import com.timgroup.blondin.proxy.ProxyingHandler;
 import com.timgroup.blondin.throttler.ThrottlingHandler;
-
-import static com.timgroup.blondin.server.RequestDispatcher.GET;
-import static com.timgroup.blondin.server.RequestDispatcher.POST;
 
 public final class BlondinServer {
 
@@ -47,7 +46,7 @@ public final class BlondinServer {
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
         dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier));
         
-        final Container proxy = new DefensiveHandler(monitor, new MetricRecordingHandler(monitor, new ProxyingHandler(targetHost, targetPort, new BasicHttpClient(monitor))));
+        final Container proxy = new DefensiveHandler(monitor, new MetricRecordingHandler(monitor, new ProxyingHandler(monitor, targetHost, targetPort)));
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         
