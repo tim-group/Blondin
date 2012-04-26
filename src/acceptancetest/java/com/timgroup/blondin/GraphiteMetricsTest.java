@@ -12,6 +12,8 @@ import com.timgroup.blondin.testutil.DummyGraphiteServer;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
 
+import static org.hamcrest.Matchers.startsWith;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
@@ -50,7 +52,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         graphite.waitForNextConnection();
         
         assertThat(graphite.messagesReceived().size(), is(greaterThan(0)));
-        assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(containsString("blondin.connections.received 1")));
+        assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(startsWith("blondin.connections.received 1")));
     }
 
 }
