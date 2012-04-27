@@ -25,6 +25,7 @@ public final class TrivialHttpServer {
     private AtomicInteger numberToBlock = new AtomicInteger(0);
     private AtomicInteger fulfilling = new AtomicInteger(0);
     private AtomicInteger requestsReceived = new AtomicInteger(0);
+    private AtomicInteger requestsFulfilled = new AtomicInteger(0);
 
     private TrivialHttpServer(String path, String content, int code) {
         this.path = path;
@@ -84,6 +85,7 @@ public final class TrivialHttpServer {
             }
             exchange.getResponseBody().write(response);
             exchange.close();
+            requestsFulfilled.incrementAndGet();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -110,4 +112,9 @@ public final class TrivialHttpServer {
     public int totalRequestsReceived() {
         return this.requestsReceived.get();
     }
+    
+    public int totalRequestsFulfilled() {
+        return this.requestsFulfilled.get();
+    }
+    
 }
