@@ -15,7 +15,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
-import com.timgroup.blondin.testutil.Sockets;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
 import com.timgroup.blondin.testutil.TrivialHttpClient.TrivialResponse;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
@@ -36,8 +35,6 @@ public final class RobustConnectionManagementTest extends BlondinAcceptanceTestB
     @Test(timeout=5000) public void
     proxies_a_request_that_immediately_closes() throws Exception {
         TrivialHttpServer server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort());
-        Sockets.waitForSocket("localhost", targetPort());
-        
         ClientConnection conn = ClientConnection.makeRequestFor("/my/cheap/resource", blondinPort());
         conn.disconnect();
         waitForRequestsToBeFowardedToServer(server, 1);
@@ -50,7 +47,6 @@ public final class RobustConnectionManagementTest extends BlondinAcceptanceTestB
         final CountDownLatch serverSendResponseTrigger = new CountDownLatch(1);
         TrivialHttpServer server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort())
                                                     .blockingFirst(1, serverSendResponseTrigger);
-        Sockets.waitForSocket("localhost", targetPort());
         
         ClientConnection conn = ClientConnection.makeRequestFor("/my/cheap/resource", blondinPort());
         waitForRequestsToBeFowardedToServer(server, 1);

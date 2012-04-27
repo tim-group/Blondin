@@ -69,6 +69,7 @@ public final class TrivialHttpServer {
             }
         });
         server.start();
+        Sockets.waitForSocket("localhost", port);
         return this;
     }
     
