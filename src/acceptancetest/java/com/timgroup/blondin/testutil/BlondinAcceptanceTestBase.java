@@ -52,7 +52,7 @@ public class BlondinAcceptanceTestBase {
         Files.write(Joiner.on("\n").join(expensiveResources), expensiveResFile, Charsets.UTF_8);
         
         Blondin.main(new String[] {config.getAbsolutePath()});
-        TrivialHttpClient.waitForSocket("localhost", blondinPort);
+        Sockets.waitForSocket("localhost", blondinPort);
     }
 
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception { }

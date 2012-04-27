@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -49,7 +48,7 @@ public final class TrivialHttpClient {
         final HttpURLConnection conn = (HttpURLConnection)url.openConnection();
         conn.setInstanceFollowRedirects(false);
         conn.setRequestProperty(headerName, headerValue);
-        waitForSocket(url.getHost(), url.getPort());
+        Sockets.waitForSocket(url.getHost(), url.getPort());
         final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getResponseCode() >= 400 ? conn.getErrorStream() : conn.getInputStream()));
         final int responseCode = conn.getResponseCode();
         
@@ -62,41 +61,6 @@ public final class TrivialHttpClient {
         return new TrivialResponse(responseCode, responseText.toString());
     }
     
-    public static void waitForSocket(String host, int port) throws IOException {
-        waitForSocket(host, port, true);
-    }
-    
-    public static void waitForNoSocket(String host, int port) throws IOException {
-        waitForSocket(host, port, false);
-    }
-    
-    public static void waitForSocket(String host, int port, boolean desiredState) throws IOException {
-        long startTime = System.currentTimeMillis();
-        boolean currentState = !desiredState;
-        while(currentState != desiredState) {
-            try {
-                Socket socket = new Socket(host, port);
-                currentState = true;
-                socket.close();
-            } catch (IOException e) {
-                currentState = false;
-            }
-            if (System.currentTimeMillis() - startTime > 10000L) {
-                throw new IllegalStateException("socket did not " + (desiredState ? "open" : "close"));
-            }
-        }
-    }
-    
-    public static boolean isSocketOpen(String host, int port) {
-        try {
-            Socket socket = new Socket(host, port);
-            socket.close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
     public static void post(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection httpCon = (HttpURLConnection)url.openConnection();
@@ -116,7 +80,7 @@ public final class TrivialHttpClient {
 
     public static void waitForResponseCode(String urlString, Matcher<Integer> codeMatcher) throws IOException {
         final URL url = new URL(urlString);
-        waitForSocket(url.getHost(), url.getPort());
+        Sockets.waitForSocket(url.getHost(), url.getPort());
         
         long startTime = System.currentTimeMillis();
         boolean codeMatched = false;

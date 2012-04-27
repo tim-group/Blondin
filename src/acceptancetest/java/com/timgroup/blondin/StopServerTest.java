@@ -4,6 +4,7 @@ package com.timgroup.blondin;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
+import com.timgroup.blondin.testutil.Sockets;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,7 +16,7 @@ public final class StopServerTest extends BlondinAcceptanceTestBase {
     responds_to_a_stop_request() throws Exception {
         TrivialHttpClient.post(blondinUrl() + "/stop");
         
-        TrivialHttpClient.waitForNoSocket("localhost", blondinPort());
-        assertThat(TrivialHttpClient.isSocketOpen("localhost", blondinPort()), is(false));
+        Sockets.waitForNoSocket("localhost", blondinPort());
+        assertThat(Sockets.isSocketOpen("localhost", blondinPort()), is(false));
     }
 }
