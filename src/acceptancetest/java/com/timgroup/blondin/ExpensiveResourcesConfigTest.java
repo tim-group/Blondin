@@ -19,14 +19,14 @@ public final class ExpensiveResourcesConfigTest extends BlondinAcceptanceTestBas
     @Override
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception {
         properties.setProperty("expensiveResourcesUrl", "http://localhost:" + targetPort() + "/my/expensive/resources");
-        TrivialHttpServer.serving("/my/expensive/resources", "my/{catchy}/res1\nmy/res2").on(targetPort());
+        TrivialHttpServer.serving("/my/expensive/resources", "/my/{catchy}/res1\n/my/res2").on(targetPort());
     }
     
     @Test public void
     retrieves_list_of_expensive_resources_via_get_request() throws Exception {
         final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/status");
         
-        assertThat(response.content, containsString("my/{catchy}/res1"));
-        assertThat(response.content, containsString("my/res2"));
+        assertThat(response.content, containsString("/my/{catchy}/res1"));
+        assertThat(response.content, containsString("/my/res2"));
     }
 }
