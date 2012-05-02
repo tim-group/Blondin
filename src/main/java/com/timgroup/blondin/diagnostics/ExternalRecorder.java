@@ -37,6 +37,11 @@ public final class ExternalRecorder implements Monitor {
     }
 
     @Override
+    public void logInfo(Class<?> source, String message) {
+        LoggerFactory.getLogger(source).info(message);
+    }
+
+    @Override
     public void plot(String aspect, Integer value) {
         if (null != recorder) {
             recorder.record(aspect, value);

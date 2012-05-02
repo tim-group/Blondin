@@ -18,6 +18,7 @@ public final class MetricRecordingHandler implements Container {
 
     @Override
     public void handle(Request req, Response resp) {
+        monitor.logInfo(MetricRecordingHandler.class, req.getPath().getPath());
         monitor.plot("connections.received", 1);
         delegate.handle(req, resp);
     }

@@ -17,6 +17,10 @@ public final class DummyMonitor implements Monitor {
     }
 
     @Override
+    public void logInfo(Class<?> source, String message) {
+    }
+
+    @Override
     public void plot(String aspect, Integer value) {
     }
 
