@@ -21,14 +21,21 @@ public final class Blondin {
     public static void main(String[] args) {
         final BlondinConfiguration config = new BlondinParametersParser().parse(args).or(USAGE_SUPPLIER);
         final Monitor monitor = new ExternalRecorder(config.diagnostics());
+        final BlondinServer blondinServer;
         
         try {
             System.out.printf("Starting blondin on port %s targetting %s:%s\n", config.blondinPort(), config.targetHost(), config.targetPort());
-            new BlondinServer(monitor, config.blondinPort(), config.targetHost(), config.targetPort(), config.expensiveResourcesUrl());
+            blondinServer = new BlondinServer(monitor, config.blondinPort(), config.targetHost(), config.targetPort(), config.expensiveResourcesUrl());
         }
         catch (IOException e) {
             monitor.logError(Blondin.class, "Failed to start Blondin server", e);
             throw new IllegalStateException(e);
         }
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override public void run() {
+                blondinServer.stop();
+            }
+        }));
     }
 }
