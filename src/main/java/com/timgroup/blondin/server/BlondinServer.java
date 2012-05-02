@@ -50,7 +50,7 @@ public final class BlondinServer {
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
         dispatcher.register(GET, proxy);
         
-        connection = new SocketConnection(new ContainerServer(dispatcher, THREAD_COUNT));
+        connection = new SocketConnection(new ContainerServer(new LoggingHandler(monitor, dispatcher), THREAD_COUNT));
         connection.connect(new InetSocketAddress(blondinPort));
         status = BlondinServerStatus.RUNNING;
     }
