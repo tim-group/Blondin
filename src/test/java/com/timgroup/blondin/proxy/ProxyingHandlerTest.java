@@ -14,6 +14,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -78,6 +79,7 @@ public final class ProxyingHandlerTest {
         assertThat(outputStream.toString(), is("myContent"));
     }
     
+    @Ignore("Pending Implementation")
     @Test public void
     preserves_request_headers() throws Exception {
         final Map<String, List<String>> receivedHeaders = Maps.newHashMap();
