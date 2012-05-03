@@ -25,6 +25,10 @@ public final class ProxyingHandler implements Container {
     private final String targetHost;
     private final int targetPort;
 
+    static {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+    }
+
     public static Container create(Monitor monitor, String targetHost, int targetPort) {
         return new DefensiveHandler(monitor, new ProxyingHandler(monitor, targetHost, targetPort));
     }
