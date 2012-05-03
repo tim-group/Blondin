@@ -37,7 +37,8 @@ public final class BlondinServer {
         }
     };
 
-    public BlondinServer(Monitor monitor, int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) throws IOException {
+    public BlondinServer(Monitor monitor, int blondinPort, String targetHost, int targetPort,
+                         URL expensiveResourcesUrl, int throttleSize) throws IOException {
         this.monitor = monitor;
         final ExpensiveResourceListLoader expensiveResourcesListSupplier = new ExpensiveResourceListLoader(monitor, expensiveResourcesUrl);
 

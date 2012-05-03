@@ -26,14 +26,14 @@ public final class BlondinServerTest {
 
     @Test(timeout=5000) public void
     reports_startup_success() throws Exception {
-        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21415, "x", -1, null);
+        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21415, "x", -1, null, 1);
         waitForStatus(blondin, equalTo(RUNNING));
         assertThat(blondin.status(), is(RUNNING));
     }
     
     @Test(timeout=5000) public void
     reports_stop_success() throws Exception {
-        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21416, "x", -1, null);
+        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21416, "x", -1, null, 1);
         waitForStatus(blondin, equalTo(RUNNING));
         
         blondin.stop();
@@ -43,7 +43,7 @@ public final class BlondinServerTest {
     
     @Test(timeout=5000) public void
     shuts_down_in_response_to_stop_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21417, "x", -1, null);
+        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21417, "x", -1, null, 1);
         waitForStatus(blondin, equalTo(RUNNING));
         
         while(RUNNING.equals(blondin.status())) {
@@ -56,7 +56,7 @@ public final class BlondinServerTest {
     
     @Test(timeout=5000) public void
     suspends_in_response_to_suspend_post_request() throws Exception {
-        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21418, "x", -1, null);
+        final BlondinServer blondin = new BlondinServer(new DummyMonitor(), 21418, "x", -1, null, 1);
         waitForStatus(blondin, equalTo(RUNNING));
         
         while(RUNNING.equals(blondin.status())) {
