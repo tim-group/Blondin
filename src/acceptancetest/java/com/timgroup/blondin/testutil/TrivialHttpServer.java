@@ -20,6 +20,7 @@ public final class TrivialHttpServer {
     private final int code;
     
     private String query;
+    private String requestUrl;
     private Map<String, List<String>> requestHeaders = Maps.newHashMap();
     private CountDownLatch trigger = new CountDownLatch(0);
     private AtomicInteger numberToBlock = new AtomicInteger(0);
@@ -77,6 +78,7 @@ public final class TrivialHttpServer {
         try {
             fulfilling.incrementAndGet();
             query = exchange.getRequestURI().getQuery();
+            requestUrl = "http://" + exchange.getRequestHeaders().getFirst("Host") + exchange.getRequestURI();
             requestHeaders.putAll(exchange.getRequestHeaders());
             addRedirectLocationHeader("http://localhost:"+port+"/redirectionTarget", exchange);
             byte[] response = content.getBytes();
@@ -104,6 +106,10 @@ public final class TrivialHttpServer {
 
     public String header(String argName) {
         return Joiner.on(",").join(requestHeaders.get(argName));
+    }
+
+    public String requestUrl() {
+        return requestUrl;
     }
 
     public int fulfilling() {

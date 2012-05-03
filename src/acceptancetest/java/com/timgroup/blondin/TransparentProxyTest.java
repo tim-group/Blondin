@@ -34,9 +34,19 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     forwards_headers_with_proxied_get_request() throws Exception {
         final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
         
-        TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url?foo=bar&baz=bob", "Cookie", "bob=foo");
+        TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url", "Cookie", "bob=foo");
         
         assertThat(server.header("Cookie"), is("bob=foo"));
+    }
+    
+    @Test public void
+    preserves_host_with_proxied_get_request() throws Exception {
+        final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
+        
+        final String requestUrl = "http://127.0.0.1:" + blondinPort() + "/some/target/url";
+        TrivialHttpClient.getFrom(requestUrl);
+        
+        assertThat(server.requestUrl(), is(requestUrl));
     }
     
     @Test public void
