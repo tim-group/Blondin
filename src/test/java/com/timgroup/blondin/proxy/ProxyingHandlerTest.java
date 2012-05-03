@@ -79,7 +79,6 @@ public final class ProxyingHandlerTest {
         assertThat(outputStream.toString(), is("myContent"));
     }
     
-    @Ignore("Pending Implementation")
     @Test public void
     preserves_request_headers() throws Exception {
         final Map<String, List<String>> receivedHeaders = Maps.newHashMap();

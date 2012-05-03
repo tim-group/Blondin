@@ -1,8 +1,5 @@
 package com.timgroup.blondin.proxy;
 
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Maps.filterKeys;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -19,6 +16,9 @@ import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
 import com.timgroup.blondin.server.DefensiveHandler;
 
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Maps.filterKeys;
+
 public final class ProxyingHandler implements Container {
 
     private final Monitor monitor;
@@ -33,6 +33,7 @@ public final class ProxyingHandler implements Container {
         this.monitor = monitor;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
     }
 
     @Override
