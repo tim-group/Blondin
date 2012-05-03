@@ -24,7 +24,6 @@ import com.timgroup.blondin.throttler.ThrottlingHandler;
 public final class BlondinServer {
 
     private static final int THREAD_COUNT = 100;
-    private static final int THROTTLE_BANDWIDTH = 16;
 
     private final Monitor monitor;
     private final Connection connection;
@@ -48,7 +47,7 @@ public final class BlondinServer {
         dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier));
         
         final Container proxy = new MetricRecordingHandler(monitor, ProxyingHandler.create(monitor, targetHost, targetPort));
-        dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, THROTTLE_BANDWIDTH));
+        dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, throttleSize));
         dispatcher.register(GET, proxy);
         
         connection = new SocketConnection(new ContainerServer(new LoggingHandler(monitor, dispatcher), THREAD_COUNT));
