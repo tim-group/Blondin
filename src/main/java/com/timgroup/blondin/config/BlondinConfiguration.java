@@ -4,6 +4,8 @@ import java.net.URL;
 
 public final class BlondinConfiguration {
 
+    private static final int DEFAULT_THROTTLE_BANDWIDTH = 16;
+    
     private final int blondinPort;
     private final String targetHost;
     private final int targetPort;
@@ -40,5 +42,9 @@ public final class BlondinConfiguration {
 
     public BlondingDiagnosticsConfiguration diagnostics() {
         return diagnostics;
+    }
+
+    public int throttleSize() {
+        return DEFAULT_THROTTLE_BANDWIDTH;
     }
 }

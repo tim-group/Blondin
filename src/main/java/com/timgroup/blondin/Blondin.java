@@ -11,8 +11,6 @@ import com.timgroup.blondin.server.BlondinServer;
 
 public final class Blondin {
 
-    private static final int THROTTLE_BANDWIDTH = 16;
-
     private static final Supplier<BlondinConfiguration> USAGE_SUPPLIER = new Supplier<BlondinConfiguration>() {
         @Override
         public BlondinConfiguration get() {
@@ -28,7 +26,7 @@ public final class Blondin {
         try {
             System.out.printf("Starting blondin on port %s targetting %s:%s\n", config.blondinPort(), config.targetHost(), config.targetPort());
             blondinServer = new BlondinServer(monitor, config.blondinPort(), config.targetHost(), config.targetPort(),
-                                              config.expensiveResourcesUrl(), THROTTLE_BANDWIDTH);
+                                              config.expensiveResourcesUrl(), config.throttleSize());
         }
         catch (IOException e) {
             monitor.logError(Blondin.class, "Failed to start Blondin server", e);
