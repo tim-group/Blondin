@@ -36,6 +36,10 @@ public final class BlondinServer {
         }
     };
 
+    static {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+    }
+
     public BlondinServer(Monitor monitor, int blondinPort, String targetHost, int targetPort,
                          URL expensiveResourcesUrl, int throttleSize) throws IOException {
         this.monitor = monitor;

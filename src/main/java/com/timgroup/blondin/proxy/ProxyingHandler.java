@@ -33,7 +33,6 @@ public final class ProxyingHandler implements Container {
         this.monitor = monitor;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
-        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
     }
 
     @Override
