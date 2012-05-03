@@ -63,10 +63,8 @@ public final class ProxyingHandler implements Container {
         final Joiner joiner = Joiner.on(",");
         for (String headerName : request.getNames()) {
             conn.setRequestProperty(headerName, joiner.join(request.getValues(headerName)));
-            if ("Host".equals(headerName)) {
-                monitor.logInfo(ProxyingHandler.class, headerName + ":" + joiner.join(request.getValues(headerName)));
-                monitor.logInfo(ProxyingHandler.class, request.getAddress().getDomain());
-                monitor.logInfo(ProxyingHandler.class, ""+request.getAddress().getPort());
+            if ("X-Forwarded-Host".equals(headerName)) {
+                conn.setRequestProperty("Host", joiner.join(request.getValues(headerName)));
             }
         }
     }
