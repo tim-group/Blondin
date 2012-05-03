@@ -98,7 +98,7 @@ public final class ProxyingHandlerTest {
     }
     
     @Test public void
-    preseves_response_headers() throws Exception {
+    preserves_response_headers() throws Exception {
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 9);
@@ -124,7 +124,7 @@ public final class ProxyingHandlerTest {
     }
     
     @Test public void
-    preseves_request_query() throws Exception {
+    preserves_request_query() throws Exception {
         final ArrayList<String> query = Lists.newArrayList();
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
