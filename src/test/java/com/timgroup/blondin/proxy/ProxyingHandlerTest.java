@@ -6,7 +6,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.hamcrest.Matchers;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.After;
@@ -17,7 +20,9 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.AddressParser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -74,6 +79,35 @@ public final class ProxyingHandlerTest {
     }
     
     @Test public void
+    preserves_request_headers() throws Exception {
+        final Map<String, List<String>> receivedHeaders = Maps.newHashMap();
+        server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
+            @Override public void handle(HttpExchange exchange) throws IOException {
+                receivedHeaders.putAll(exchange.getRequestHeaders());
+                exchange.close();
+            }
+        });
+        server.start();
+        
+        context.checking(new Expectations() {{
+            allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
+            allowing(request).getNames(); will(returnValue(ImmutableList.of("Accept", "Cookie", "Host")));
+            allowing(request).getValues("Accept"); will(returnValue(ImmutableList.of("text/plain")));
+            allowing(request).getValues("Cookie"); will(returnValue(ImmutableList.of("$Version=1", "Skin=new")));
+            allowing(request).getValues("Host"); will(returnValue(ImmutableList.of("com.sausage")));
+            
+            ignoring(request);
+            ignoring(response);
+        }});
+
+        basicHttpClient.handle(request, response);
+        
+        assertThat(receivedHeaders.get("Accept"), Matchers.<List<String>>is(ImmutableList.of("text/plain")));
+        assertThat(receivedHeaders.get("Cookie"), Matchers.<List<String>>is(ImmutableList.of("$Version=1,Skin=new")));
+        assertThat(receivedHeaders.get("Host"), Matchers.<List<String>>is(ImmutableList.of("com.sausage")));
+    }
+    
+    @Test public void
     preserves_response_status_code() throws Exception {
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
@@ -116,7 +150,6 @@ public final class ProxyingHandlerTest {
             ignoring(request);
             ignoring(response);
         }});
-        
 
         basicHttpClient.handle(request, response);
         
