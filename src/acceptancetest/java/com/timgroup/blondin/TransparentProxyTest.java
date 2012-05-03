@@ -40,6 +40,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
         assertThat(server.header("Cookie"), is("bob=foo"));
     }
     
+    @Ignore("Pending Implementation")
     @Test public void
     preserves_host_with_proxied_get_request() throws Exception {
         final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
