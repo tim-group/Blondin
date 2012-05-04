@@ -91,12 +91,13 @@ public final class ProxyingHandlerTest {
         
         context.checking(new Expectations() {{
             allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
-            allowing(request).getNames(); will(returnValue(ImmutableList.of("Accept", "Cookie", "Host")));
+            allowing(request).getNames(); will(returnValue(ImmutableList.of("Accept", "Cookie", "Host", "X-Forwarded-Host", "X-Forwarded-Proto")));
             allowing(request).getValues("Accept"); will(returnValue(ImmutableList.of("text/plain")));
             allowing(request).getValues("Cookie"); will(returnValue(ImmutableList.of("$Version=1", "Skin=new")));
-            allowing(request).getValues("Host"); will(returnValue(ImmutableList.of("com.sausage")));
+            allowing(request).getValues("Host"); will(returnValue(ImmutableList.of("sausage.com")));
+            allowing(request).getValues("X-Forwarded-Host"); will(returnValue(ImmutableList.of("ketchup.org:8080")));
+            allowing(request).getValues("X-Forwarded-Proto"); will(returnValue(ImmutableList.of("https")));
             
-            ignoring(request);
             ignoring(response);
         }});
 
@@ -104,7 +105,9 @@ public final class ProxyingHandlerTest {
         
         assertThat(receivedHeaders.get("Accept"), Matchers.<List<String>>is(ImmutableList.of("text/plain")));
         assertThat(receivedHeaders.get("Cookie"), Matchers.<List<String>>is(ImmutableList.of("$Version=1,Skin=new")));
-        assertThat(receivedHeaders.get("Host"), Matchers.<List<String>>is(ImmutableList.of("com.sausage")));
+        assertThat(receivedHeaders.get("Host"), Matchers.<List<String>>is(ImmutableList.of("sausage.com")));
+        assertThat(receivedHeaders.get("X-forwarded-host"), Matchers.<List<String>>is(ImmutableList.of("ketchup.org:8080")));
+        assertThat(receivedHeaders.get("X-forwarded-proto"), Matchers.<List<String>>is(ImmutableList.of("https")));
     }
     
     @Test public void
