@@ -25,6 +25,10 @@ public final class BlondinServer {
 
     private static final int THREAD_COUNT = 100;
 
+    static {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+    }
+
     private final Monitor monitor;
     private final Connection connection;
 
