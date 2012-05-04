@@ -67,6 +67,9 @@ public final class ProxyingHandler implements Container {
         for (String headerName : request.getNames()) {
             final String headerValue = joiner.join(request.getValues(headerName));
             conn.setRequestProperty(headerName, headerValue);
+            if ("X-Forwarded-Host".equals(headerName) && "hipmirror.youdevise.com".equals(headerValue)) {
+                conn.setRequestProperty("X-Forwarded-Proto", "https");
+            }
         }
     }
 
