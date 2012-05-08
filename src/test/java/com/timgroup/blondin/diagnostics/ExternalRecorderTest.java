@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 public final class ExternalRecorderTest {
 
     private final DummyRecordingLogHandler handler = new DummyRecordingLogHandler();
-    private final BlondingDiagnosticsConfiguration config = new BlondingDiagnosticsConfiguration("", "", 1, 1, "");
+    private final BlondingDiagnosticsConfiguration config = BlondingDiagnosticsConfiguration.NO_OP;
     private final ExternalRecorder externalRecorder = new ExternalRecorder(config);
 
     @Before

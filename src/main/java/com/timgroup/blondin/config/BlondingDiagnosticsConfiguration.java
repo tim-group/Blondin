@@ -6,6 +6,8 @@ import com.google.common.base.Strings;
 
 public final class BlondingDiagnosticsConfiguration {
 
+    public static final BlondingDiagnosticsConfiguration NO_OP = new BlondingDiagnosticsConfiguration(null, null, 1, 1, null);
+    
     private final String logDirectory;
 
     private final String graphiteHost;
