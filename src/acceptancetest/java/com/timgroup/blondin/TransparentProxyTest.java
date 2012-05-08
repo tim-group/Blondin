@@ -15,7 +15,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
 
     @Test public void
     transparently_proxies_to_target_application() throws Exception {
-        TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
+        TrivialHttpServer.on(targetPort()).serving("/some/target/url", "hello, world");
         
         final String requestUrl = blondinUrl() + "/some/target/url";
         assertThat(TrivialHttpClient.getFrom(requestUrl).content, is("hello, world"));
@@ -23,7 +23,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     forwards_query_parameters_with_proxied_get_request() throws Exception {
-        final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
+        final TrivialHttpServer server = TrivialHttpServer.on(targetPort()).serving("/some/target/url", "hello, world");
         
         TrivialHttpClient.getFrom(blondinUrl() +"/some/target/url?foo=bar&baz=bob");
         
@@ -32,7 +32,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     forwards_headers_with_proxied_get_request() throws Exception {
-        final TrivialHttpServer server = TrivialHttpServer.serving("/some/target/url", "hello, world").on(targetPort());
+        final TrivialHttpServer server = TrivialHttpServer.on(targetPort()).serving("/some/target/url", "hello, world");
         
         TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url", "Cookie", "bob=foo");
         
@@ -41,7 +41,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     does_not_follow_redirects() throws Exception {
-        TrivialHttpServer.servingRedirect("/some/target/url", "hello, world").on(targetPort());
+        TrivialHttpServer.on(targetPort()).servingRedirect("/some/target/url", "hello, world");
         
         final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
         assertThat(response.code, is(302));
@@ -50,7 +50,7 @@ public final class TransparentProxyTest extends BlondinAcceptanceTestBase {
     
     @Test public void
     handles_a_404_transparently() throws Exception {
-        TrivialHttpServer.serving("/some/target/url", "hello, world", 404).on(targetPort());
+        TrivialHttpServer.on(targetPort()).serving("/some/target/url", "hello, world", 404);
         
         final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
         assertThat(response.code, is(404));

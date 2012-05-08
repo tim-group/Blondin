@@ -44,7 +44,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
 
     @Test public void
     gathers_metrics_for_incoming_connections() throws Exception {
-        TrivialHttpServer.serving("/hi", "1").on(targetPort());
+        TrivialHttpServer.on(targetPort()).serving("/hi", "1");
         TrivialHttpClient.getFrom(blondinUrl() + "/hi");
         
         graphite.waitForNextConnection();

@@ -15,39 +15,53 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public final class TrivialHttpServer {
+    private final HttpServer server;
+    private final int port;
+
     private final Map<String, List<String>> requestHeaders = Maps.newHashMap();
     private final AtomicInteger numberToBlock = new AtomicInteger(0);
     private final CountDownLatch trigger = new CountDownLatch(1);
-
     private final AtomicInteger fulfilling = new AtomicInteger(0);
     private final AtomicInteger requestsReceived = new AtomicInteger(0);
     private final AtomicInteger requestsFulfilled = new AtomicInteger(0);
-    
-    private final String content;
-    private final String path;
-    private final int code;
-    
-    private String query;
-    private String requestUrl;
-    
-    private TrivialHttpServer(String path, String content, int code) {
-        this.path = path;
-        this.content = content;
-        this.code = code;
+
+    private String lastRequestedQuery;
+    private String lastRequestedUrl;
+
+    private TrivialHttpServer(int port) throws IOException {
+        this.port = port;
+        server = HttpServer.create(new InetSocketAddress(port), 0);
+        server.start();
+        Sockets.waitForSocket("localhost", port);
     }
 
-    public static TrivialHttpServer serving(String path, String content) {
+    public TrivialHttpServer serving(String path, String content) {
         return serving(path, content, HttpURLConnection.HTTP_OK);
     }
-    
-    public static TrivialHttpServer servingRedirect(String path, String content) {
+
+    public TrivialHttpServer servingRedirect(String path, String content) {
         return serving(path, content, HttpURLConnection.HTTP_MOVED_TEMP);
     }
-    
-    public static TrivialHttpServer serving(String path, String content, int code) {
-        return new TrivialHttpServer(path, content, code);
+
+    public TrivialHttpServer serving(final String path, final String content, final int code) {
+        return serving(path, content, code, true);
     }
 
+    public TrivialHttpServer servingUnblockably(final String path, final String content, final int code) {
+        return serving(path, content, code, false);
+    }
+
+    private TrivialHttpServer serving(final String path, final String content, final int code, final boolean blockable) {
+        server.createContext(path, new HttpHandler() {
+            @Override public void handle(final HttpExchange exchange) throws IOException {
+                requestsReceived.incrementAndGet();
+                new Thread(new Runnable() { @Override public void run() {
+                fulfilRequest(port, server, content, code, exchange, blockable); } }).start();
+            }
+        });
+        return this;
+    }
+    
     public TrivialHttpServer blockingAll() {
         return blockingFirst(Integer.MAX_VALUE);
     }
@@ -57,38 +71,20 @@ public final class TrivialHttpServer {
         return this;
     }
     
-    public TrivialHttpServer on(final int port) throws Exception {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext(path, new HttpHandler() {
-            @Override public void handle(final HttpExchange exchange) throws IOException {
-                requestsReceived.incrementAndGet();
-                new Thread(new Runnable() { @Override public void run() { fulfilRequest(port, server, exchange); } }).start();
-            }
-        });
-        server.createContext("/default", new HttpHandler() {
-            @Override public void handle(final HttpExchange exchange) throws IOException {
-                requestsReceived.incrementAndGet();
-                final byte[] content = "X".getBytes();
-                exchange.sendResponseHeaders(200, content.length);
-                exchange.getResponseBody().write(content);
-                exchange.close();
-            }
-        });
-        server.start();
-        Sockets.waitForSocket("localhost", port);
-        return this;
+    public static TrivialHttpServer on(final int port) throws Exception {
+        return new TrivialHttpServer(port);
     }
-    
-    private void fulfilRequest(final int port, final HttpServer server, final HttpExchange exchange) {
+
+    private void fulfilRequest(final int port, final HttpServer server, String content, int code, final HttpExchange exchange, boolean blockable) {
         try {
             fulfilling.incrementAndGet();
-            query = exchange.getRequestURI().getQuery();
-            requestUrl = "http://" + exchange.getRequestHeaders().getFirst("Host") + exchange.getRequestURI();
+            lastRequestedQuery = exchange.getRequestURI().getQuery();
+            lastRequestedUrl = "http://" + exchange.getRequestHeaders().getFirst("Host") + exchange.getRequestURI();
             requestHeaders.putAll(exchange.getRequestHeaders());
-            addRedirectLocationHeader("http://localhost:"+port+"/redirectionTarget", exchange);
+            addRedirectLocationHeader("http://localhost:"+port+"/redirectionTarget", code, exchange);
             byte[] response = content.getBytes();
             exchange.sendResponseHeaders(code, response.length);
-            if (fulfilling.get() <= numberToBlock.get()) {
+            if (fulfilling.get() <= numberToBlock.get() && blockable) {
                 trigger.await();
             }
             exchange.getResponseBody().write(response);
@@ -99,14 +95,14 @@ public final class TrivialHttpServer {
         }
     }
 
-    private void addRedirectLocationHeader(final String location, final HttpExchange exchange) {
+    private void addRedirectLocationHeader(final String location, int code, final HttpExchange exchange) {
         if (code >= 300 && code < 400) {
             exchange.getResponseHeaders().add("Location", location);
         }
     }
     
     public String query() {
-        return query;
+        return lastRequestedQuery;
     }
 
     public String header(String argName) {
@@ -114,7 +110,7 @@ public final class TrivialHttpServer {
     }
 
     public String requestUrl() {
-        return requestUrl;
+        return lastRequestedUrl;
     }
 
     public int fulfilling() {

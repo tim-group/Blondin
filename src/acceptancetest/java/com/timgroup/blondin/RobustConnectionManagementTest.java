@@ -25,7 +25,7 @@ public final class RobustConnectionManagementTest extends BlondinAcceptanceTestB
     @Ignore("pending acceptance test until we investigate why simple web isn't forwaring the request")
     @Test(timeout=5000) public void
     proxies_a_request_that_immediately_closes() throws Exception {
-        TrivialHttpServer server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort());
+        TrivialHttpServer server = TrivialHttpServer.on(targetPort()).serving("/my/cheap/resource", "hello, world");
         ClientConnection conn = ClientConnection.makeRequestFor("/my/cheap/resource", blondinPort());
         conn.disconnect();
         waitForRequestsToBeFowardedToServer(server, 1);
@@ -35,7 +35,7 @@ public final class RobustConnectionManagementTest extends BlondinAcceptanceTestB
             "it thinks no problems have happened")
     @Test(timeout=5000) public void
     closes_server_connection_when_a_client_connection_breaks_midway_through_response_delivery() throws Exception {
-        TrivialHttpServer server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort())
+        TrivialHttpServer server = TrivialHttpServer.on(targetPort()).serving("/my/cheap/resource", "hello, world")
                                                     .blockingAll();
         
         ClientConnection conn = ClientConnection.makeRequestFor("/my/cheap/resource", blondinPort());

@@ -36,7 +36,7 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
     @Test public void
     fulfils_multiple_normal_requests_simultaneously() throws Exception {
         final int blockedRequests = 49;
-        server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort())
+        server = TrivialHttpServer.on(targetPort()).serving("/my/cheap/resource", "hello, world")
                                   .blockingFirst(blockedRequests);
         
         Future<TrivialResponse> lastReseponse = issueBackgroundRequests(blockedRequests, blondinUrl() + "/my/cheap/resource");
@@ -50,13 +50,14 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
 
     @Test public void
     throttles_simultaneous_requests_to_expensive_resources() throws Exception {
-        server = TrivialHttpServer.serving("/my/expensive/resource", "hello, world").on(targetPort()).blockingAll();
+        server = TrivialHttpServer.on(targetPort()).serving("/my/expensive/resource", "hello, world").blockingAll()
+                                                   .servingUnblockably("/my/cheap/resource", "cheap", 200);
         
         issueBackgroundRequests(16, blondinUrl() + "/my/expensive/resource");
         while(server.fulfilling() < 16) { };
         
         Future<TrivialResponse> throttledRequest = TrivialHttpClient.getFromInBackground(blondinUrl() + "/my/expensive/resource");
-        assertThat(TrivialHttpClient.getFrom(blondinUrl() + "/default").code, is(200));
+        assertThat(TrivialHttpClient.getFrom(blondinUrl() + "/my/cheap/resource").code, is(200));
         assertThat(server.totalRequestsReceived(), is(17));
         
         server.unblock();
