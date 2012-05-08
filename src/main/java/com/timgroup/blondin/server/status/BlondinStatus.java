@@ -17,14 +17,14 @@ public final class BlondinStatus {
 
     private static final class Anchor {}
 
-    private final StatusPageGenerator statusPage = new StatusPageGenerator("Blondin", new JarVersionComponent(Anchor.class));
+    private final StatusPageGenerator statusPageGenerator = new StatusPageGenerator("Blondin", new JarVersionComponent(Anchor.class));
 
     public BlondinStatus(Supplier<Iterable<String>> expensiveResourcesListSupplier) {
-        this.statusPage.addComponent(new ThrottledResourcesListComponent(expensiveResourcesListSupplier));
+        this.statusPageGenerator.addComponent(new ThrottledResourcesListComponent(expensiveResourcesListSupplier));
     }
 
     public void writeTo(OutputStream outputStream) throws IOException {
-        statusPage.getApplicationReport().render(new OutputStreamWriter(outputStream, Charsets.UTF_8.name()));
+        statusPageGenerator.getApplicationReport().render(new OutputStreamWriter(outputStream, Charsets.UTF_8.name()));
         outputStream.close();
     }
 
@@ -40,5 +40,9 @@ public final class BlondinStatus {
         public Report getReport() {
             return new Report(Status.INFO, Joiner.on(";").join(expensiveResourcesListSupplier.get()));
         }
+    }
+
+    public StatusPageGenerator generator() {
+        return statusPageGenerator;
     }
 }

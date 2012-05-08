@@ -48,7 +48,10 @@ public final class BlondinServer {
         final RequestDispatcher dispatcher = new RequestDispatcher(monitor);
         dispatcher.register(POST.forPath("/stop"), new StopHandler());
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
-        dispatcher.register(GET.forPath(startingWith("/status")), new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier));
+        
+        final StatusPageHandler appInfoHandler = new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier);
+        dispatcher.register(GET.forPath(startingWith("/info")), appInfoHandler);
+        dispatcher.register(GET.forPath(startingWith("/status")), appInfoHandler);
         
         final Container proxy = new MetricRecordingHandler(monitor, ProxyingHandler.create(monitor, targetHost, targetPort));
         dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, throttleSize));

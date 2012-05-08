@@ -3,6 +3,7 @@ package com.timgroup.blondin.server;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -12,15 +13,16 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.parse.PathParser;
 
+import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.timgroup.blondin.DummyMonitor;
 
-import static org.hamcrest.Matchers.containsString;
-
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
@@ -34,7 +36,10 @@ public final class StatusPageHandlerTest {
     private final Request request = context.mock(Request.class);
     private final Response response = context.mock(Response.class);
     
-    private final OutputStream responseContent = new ByteArrayOutputStream();
+    private final AtomicBoolean outputStreamClosed = new AtomicBoolean(false);
+    private final OutputStream responseContent = new ByteArrayOutputStream() {
+        public void close() throws java.io.IOException { outputStreamClosed.set(true); super.close(); };
+    };
 
     private final List<String> blackList = Lists.newArrayList();
     private final StatusPageHandler handler = new StatusPageHandler(new DummyMonitor(), statusSupplier, Suppliers.<Iterable<String>>ofInstance(blackList));
@@ -47,7 +52,26 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
-    writes_status_page_to_response() throws Exception {
+    responds_to_request_for_version() throws Exception {
+        final String expectedVersion = Strings.nullToEmpty(StatusPageHandler.class.getPackage().getImplementationVersion());
+        
+        context.checking(new Expectations() {{
+            oneOf(response).set("Content-Type", "text/plain");
+            oneOf(response).add("Content-Type", "charset=UTF-8");
+            
+            allowing(request).getPath(); will(returnValue(new PathParser("/info/version")));
+        }});
+        
+        handler.handle(request, response);
+        
+        context.assertIsSatisfied();
+        
+        assertThat(outputStreamClosed.get(), is(true));
+        assertThat(responseContent.toString(), is(expectedVersion));
+    }
+    
+    @Test public void
+    responds_to_obsolete_request_for_status_page() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/xml");
             oneOf(response).close();
@@ -63,7 +87,7 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
-    responds_to_request_for_status_page_css() throws Exception {
+    responds_to_obsolete_request_for_status_page_css() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/css");
             oneOf(response).close();
@@ -78,7 +102,7 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
-    responds_with_http_status_code_of_200_if_blondin_is_running() throws Exception {
+    responds_to_obsolete_request_for_status_with_http_status_code_of_200_if_blondin_is_running() throws Exception {
         context.checking(new Expectations() {{
             never(response).setCode(with(not(200)));
             never(response).setText(with(not("OK")));
@@ -94,7 +118,7 @@ public final class StatusPageHandlerTest {
     }
 
     @Test public void
-    responds_with_http_status_code_of_503_if_blondin_is_suspended() throws Exception {
+    responds_to_obsolete_request_for_status_with_http_status_code_of_503_if_blondin_is_suspended() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).setCode(503);
             oneOf(response).setText("Service Unavailable");

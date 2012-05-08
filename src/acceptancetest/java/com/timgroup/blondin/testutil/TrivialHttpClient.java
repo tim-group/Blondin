@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -13,16 +16,27 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.hamcrest.Matcher;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 public final class TrivialHttpClient {
     
     public static final class TrivialResponse {
         public final int code;
         public final String content;
-        public final String contentType;
-        public TrivialResponse(int code, String contentType, String content) {
+        private final Map<String, List<String>> headers;
+        public TrivialResponse(int code, Map<String, List<String>> headerFields, String content) {
             this.code = code;
-            this.contentType = contentType;
+            this.headers = Maps.newHashMap(headerFields);
             this.content = content;
+        }
+        public Iterable<String> header(String headerName) {
+            final List<String> values = headers.containsKey(headerName)
+                                      ? Lists.newArrayList(headers.get(headerName))
+                                      : Lists.<String>newArrayList();
+            Collections.sort(values);
+            return ImmutableList.copyOf(values);
         }
     }
     
@@ -118,8 +132,8 @@ public final class TrivialHttpClient {
                 conn.setRequestProperty(headerName, headerValue);
                 Sockets.waitForSocket(url.getHost(), url.getPort());
                 final int responseCode = conn.getResponseCode();
+                final Map<String, List<String>> headerFields = conn.getHeaderFields();
                 final BufferedReader in = new BufferedReader(new InputStreamReader(responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream()));
-                final String responceContentType = conn.getHeaderField("ContentType");
                 
                 final StringBuilder responseText = new StringBuilder();
                 String inputLine;
@@ -127,7 +141,7 @@ public final class TrivialHttpClient {
                     responseText.append(inputLine);
                 }
                 in.close();
-                return new TrivialResponse(responseCode, responceContentType, responseText.toString());
+                return new TrivialResponse(responseCode, headerFields, responseText.toString());
             }
             catch (IOException e) {
                 throw new IllegalStateException(e);
