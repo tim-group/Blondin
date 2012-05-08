@@ -1,7 +1,6 @@
 package com.timgroup.blondin;
 
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Strings;
@@ -26,17 +25,15 @@ public final class DeploymentContractTest extends BlondinAcceptanceTestBase {
         assertThat(response.content, is(expectedVersion));
     }
 
-    @Ignore("Pending Implementation")
     @Test public void
     serves_application_health() throws Exception {
         final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/info/health");
         
         assertThat(response.code, is(200));
         assertThat(response.header("Content-Type"), contains("charset=UTF-8", "text/plain"));
-        assertThat(response.content, is("healty"));
+        assertThat(response.content, is("healthy"));
     }
 
-    @Ignore("Pending Implementation")
     @Test public void
     serves_application_stoppability() throws Exception {
         final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/info/stoppable");

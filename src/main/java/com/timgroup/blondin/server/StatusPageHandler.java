@@ -21,6 +21,8 @@ import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
 public final class StatusPageHandler implements Container {
 
+    private static final String INFO_PATH = "/info";
+    
     private final Monitor monitor;
     private final BlondinStatus status;
     private final Supplier<BlondinServerStatus> serverStatusSupplier;
@@ -40,8 +42,8 @@ public final class StatusPageHandler implements Container {
     public void handle(Request request, Response response) {
         try {
             final String path = request.getPath().getPath();
-            if (path.equals("/info/version")) {
-                handler.handle(path.substring(5), new ResponseWrapper("/info", response));
+            if (path.startsWith(INFO_PATH)) {
+                handler.handle(path.substring(INFO_PATH.length()), new ResponseWrapper(INFO_PATH, response));
                 return;
             }
             

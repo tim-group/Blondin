@@ -71,6 +71,40 @@ public final class StatusPageHandlerTest {
     }
     
     @Test public void
+    responds_to_request_for_health() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(response).set("Content-Type", "text/plain");
+            oneOf(response).add("Content-Type", "charset=UTF-8");
+            
+            allowing(request).getPath(); will(returnValue(new PathParser("/info/health")));
+        }});
+        
+        handler.handle(request, response);
+        
+        context.assertIsSatisfied();
+        
+        assertThat(outputStreamClosed.get(), is(true));
+        assertThat(responseContent.toString(), is("healthy"));
+    }
+    
+    @Test public void
+    responds_to_request_for_stoppability() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(response).set("Content-Type", "text/plain");
+            oneOf(response).add("Content-Type", "charset=UTF-8");
+            
+            allowing(request).getPath(); will(returnValue(new PathParser("/info/stoppable")));
+        }});
+        
+        handler.handle(request, response);
+        
+        context.assertIsSatisfied();
+        
+        assertThat(outputStreamClosed.get(), is(true));
+        assertThat(responseContent.toString(), is("safe"));
+    }
+    
+    @Test public void
     responds_to_obsolete_request_for_status_page() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/xml");
