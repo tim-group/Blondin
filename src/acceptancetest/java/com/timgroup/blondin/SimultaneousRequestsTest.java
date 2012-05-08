@@ -37,7 +37,7 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
     fulfils_multiple_normal_requests_simultaneously() throws Exception {
         final int blockedRequests = 49;
         server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort())
-                                                    .blockingFirst(blockedRequests);
+                                  .blockingFirst(blockedRequests);
         
         Future<TrivialResponse> lastReseponse = issueBackgroundRequests(blockedRequests, blondinUrl() + "/my/cheap/resource");
         
@@ -50,8 +50,7 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
 
     @Test public void
     throttles_simultaneous_requests_to_expensive_resources() throws Exception {
-        server = TrivialHttpServer.serving("/my/expensive/resource", "hello, world").on(targetPort())
-                                                    .blockingFirst(100);
+        server = TrivialHttpServer.serving("/my/expensive/resource", "hello, world").on(targetPort()).blockingAll();
         
         issueBackgroundRequests(16, blondinUrl() + "/my/expensive/resource");
         while(server.fulfilling() < 16) { };

@@ -36,7 +36,7 @@ public final class RobustConnectionManagementTest extends BlondinAcceptanceTestB
     @Test(timeout=5000) public void
     closes_server_connection_when_a_client_connection_breaks_midway_through_response_delivery() throws Exception {
         TrivialHttpServer server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort())
-                                                    .blockingFirst(1);
+                                                    .blockingAll();
         
         ClientConnection conn = ClientConnection.makeRequestFor("/my/cheap/resource", blondinPort());
         waitForRequestsToBeFowardedToServer(server, 1);

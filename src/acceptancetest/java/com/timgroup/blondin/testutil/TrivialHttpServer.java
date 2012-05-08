@@ -47,7 +47,11 @@ public final class TrivialHttpServer {
     public static TrivialHttpServer serving(String path, String content, int code) {
         return new TrivialHttpServer(path, content, code);
     }
-    
+
+    public TrivialHttpServer blockingAll() {
+        return blockingFirst(Integer.MAX_VALUE);
+    }
+
     public TrivialHttpServer blockingFirst(int requestCount) {
         this.numberToBlock.set(requestCount);
         return this;
