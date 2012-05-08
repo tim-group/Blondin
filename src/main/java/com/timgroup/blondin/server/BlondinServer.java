@@ -49,7 +49,7 @@ public final class BlondinServer {
         dispatcher.register(POST.forPath("/stop"), new StopHandler());
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
         
-        final StatusPageHandler appInfoHandler = new StatusPageHandler(monitor, statusSupplier, expensiveResourcesListSupplier);
+        final AppInfoHandler appInfoHandler = new AppInfoHandler(monitor, statusSupplier, expensiveResourcesListSupplier);
         dispatcher.register(GET.forPath(startingWith("/info")), appInfoHandler);
         dispatcher.register(GET.forPath(startingWith("/status")), appInfoHandler);
         

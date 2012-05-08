@@ -10,16 +10,14 @@ import org.simpleframework.http.Status;
 import org.simpleframework.http.core.Container;
 
 import com.google.common.base.Supplier;
-import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
 import com.timgroup.blondin.server.status.BlondinStatus;
 import com.timgroup.tucker.info.ApplicationInformationHandler;
 import com.timgroup.tucker.info.servlet.WebResponse;
-import com.timgroup.tucker.info.status.StatusPage;
 
 import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
-public final class StatusPageHandler implements Container {
+public final class AppInfoHandler implements Container {
 
     private static final String INFO_PATH = "/info";
     
@@ -28,9 +26,9 @@ public final class StatusPageHandler implements Container {
     private final Supplier<BlondinServerStatus> serverStatusSupplier;
     private final ApplicationInformationHandler handler;
     
-    public StatusPageHandler(Monitor monitor,
-                             Supplier<BlondinServerStatus> serverStatusSupplier,
-                             Supplier<Iterable<String>> expensiveResourcesListSupplier)
+    public AppInfoHandler(Monitor monitor,
+                          Supplier<BlondinServerStatus> serverStatusSupplier,
+                          Supplier<Iterable<String>> expensiveResourcesListSupplier)
     {
         this.monitor = monitor;
         this.serverStatusSupplier = serverStatusSupplier;
@@ -46,34 +44,30 @@ public final class StatusPageHandler implements Container {
                 handler.handle(path.substring(INFO_PATH.length()), new ResponseWrapper(INFO_PATH, response));
                 return;
             }
-            
-            if (path.equals("/status-page.css")) {
-                writeStatusPageCssTo(response);
-                return;
+            handleObsoleteStatusRequests(response, path);
+        } catch (IOException e) {
+            monitor.logError(AppInfoHandler.class, "Failed to respond to status page request", e);
+        } finally {
+            try {
+                response.close();
+            } catch (IOException e) {
+                monitor.logError(AppInfoHandler.class, "Failed to close status page request", e);
             }
-            
+        }
+    }
+
+    private void handleObsoleteStatusRequests(Response response, final String path) throws IOException {
+        if (path.equals("/status")) {
             if (BlondinServerStatus.SUSPENDED.equals(serverStatusSupplier.get())) {
                 response.setCode(HTTP_UNAVAILABLE);
                 response.setText("Service Unavailable");
             }
-            response.set("Content-Type", "text/xml");
-            status.writeTo(response.getOutputStream());
-            response.close();
-        } catch (IOException e) {
-            monitor.logError(StatusPageHandler.class, "Failed to respond to status page request", e);
+            handler.handle("/status", new ResponseWrapper(INFO_PATH, response));
+        } else if (path.startsWith("/status")) {
+            handler.handle(path, new ResponseWrapper("", response));
         }
     }
 
-    private void writeStatusPageCssTo(Response response) {
-        try {
-            response.set("Content-Type", "text/css");
-            ByteStreams.copy(StatusPage.class.getResourceAsStream("status-page.css"), response.getOutputStream());
-            response.close();
-        } catch (IOException e) {
-            monitor.logError(StatusPageHandler.class, "Failed to respond to status page css request", e);
-        }
-    }
-    
     private static final class ResponseWrapper implements WebResponse {
 
         private final String path;

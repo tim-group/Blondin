@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-public final class StatusPageHandlerTest {
+public final class AppInfoHandlerTest {
 
     private final Mockery context = new Mockery();
     
@@ -42,18 +42,19 @@ public final class StatusPageHandlerTest {
     };
 
     private final List<String> blackList = Lists.newArrayList();
-    private final StatusPageHandler handler = new StatusPageHandler(new DummyMonitor(), statusSupplier, Suppliers.<Iterable<String>>ofInstance(blackList));
+    private final AppInfoHandler handler = new AppInfoHandler(new DummyMonitor(), statusSupplier, Suppliers.<Iterable<String>>ofInstance(blackList));
     
     @Before
     public void attachResponseContent() throws Exception {
         context.checking(new Expectations() {{
             allowing(response).getOutputStream(); will(returnValue(responseContent));
+            atLeast(1).of(response).close();
         }});
     }
     
     @Test public void
     responds_to_request_for_version() throws Exception {
-        final String expectedVersion = Strings.nullToEmpty(StatusPageHandler.class.getPackage().getImplementationVersion());
+        final String expectedVersion = Strings.nullToEmpty(AppInfoHandler.class.getPackage().getImplementationVersion());
         
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/plain");
@@ -108,7 +109,7 @@ public final class StatusPageHandlerTest {
     responds_to_obsolete_request_for_status_page() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/xml");
-            oneOf(response).close();
+            oneOf(response).add("Content-Type", "charset=UTF-8");
             
             allowing(request).getPath(); will(returnValue(new PathParser("/status")));
             allowing(statusSupplier).get(); will(returnValue(RUNNING));
@@ -124,7 +125,7 @@ public final class StatusPageHandlerTest {
     responds_to_obsolete_request_for_status_page_css() throws Exception {
         context.checking(new Expectations() {{
             oneOf(response).set("Content-Type", "text/css");
-            oneOf(response).close();
+            oneOf(response).add("Content-Type", "charset=UTF-8");
             
             allowing(request).getPath(); will(returnValue(new PathParser("/status-page.css")));
         }});
@@ -132,6 +133,7 @@ public final class StatusPageHandlerTest {
         handler.handle(request, response);
         
         context.assertIsSatisfied();
+        assertThat(outputStreamClosed.get(), is(true));
         assertThat(responseContent.toString(), containsString("font-family:"));
     }
     
@@ -140,7 +142,7 @@ public final class StatusPageHandlerTest {
         context.checking(new Expectations() {{
             never(response).setCode(with(not(200)));
             never(response).setText(with(not("OK")));
-            oneOf(response).close();
+            oneOf(response).add("Content-Type", "charset=UTF-8");
             
             allowing(request).getPath(); will(returnValue(new PathParser("/status")));
             allowing(statusSupplier).get(); will(returnValue(RUNNING));
@@ -156,7 +158,7 @@ public final class StatusPageHandlerTest {
         context.checking(new Expectations() {{
             oneOf(response).setCode(503);
             oneOf(response).setText("Service Unavailable");
-            oneOf(response).close();
+            oneOf(response).add("Content-Type", "charset=UTF-8");
             
             allowing(request).getPath(); will(returnValue(new PathParser("/status")));
             allowing(statusSupplier).get(); will(returnValue(SUSPENDED));

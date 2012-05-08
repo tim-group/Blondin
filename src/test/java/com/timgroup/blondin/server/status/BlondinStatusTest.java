@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
-import com.timgroup.blondin.server.StatusPageHandler;
+import com.timgroup.blondin.server.AppInfoHandler;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -21,7 +21,7 @@ public final class BlondinStatusTest {
     
     @Test public void
     includes_version_information_in_status_page() throws Exception {
-        final String currentVersion = StatusPageHandler.class.getPackage().getImplementationVersion();
+        final String currentVersion = AppInfoHandler.class.getPackage().getImplementationVersion();
         final String expectedVersionString = (null == currentVersion) ? "" : ": <value>" + currentVersion + "</value>";
 
         status.writeTo(responseContent);
