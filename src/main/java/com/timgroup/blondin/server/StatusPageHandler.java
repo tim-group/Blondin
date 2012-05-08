@@ -10,7 +10,7 @@ import com.google.common.base.Supplier;
 import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
 import com.timgroup.blondin.server.status.BlondinStatus;
-import com.timgroup.status.Status;
+import com.timgroup.tucker.info.status.StatusPage;
 
 import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
@@ -52,7 +52,7 @@ public final class StatusPageHandler implements Container {
     private void writeStatusPageCssTo(Response response) {
         try {
             response.set("Content-Type", "text/css");
-            ByteStreams.copy(Status.class.getResourceAsStream("status-page.css"), response.getOutputStream());
+            ByteStreams.copy(StatusPage.class.getResourceAsStream("status-page.css"), response.getOutputStream());
             response.close();
         } catch (IOException e) {
             monitor.logError(StatusPageHandler.class, "Failed to respond to status page css request", e);

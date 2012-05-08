@@ -7,25 +7,24 @@ import java.io.OutputStreamWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
-import com.timgroup.status.Component;
-import com.timgroup.status.Report;
-import com.timgroup.status.Status;
-import com.timgroup.status.StatusPage;
-import com.timgroup.status.VersionComponent;
+import com.timgroup.tucker.info.Component;
+import com.timgroup.tucker.info.Report;
+import com.timgroup.tucker.info.Status;
+import com.timgroup.tucker.info.component.JarVersionComponent;
+import com.timgroup.tucker.info.status.StatusPageGenerator;
 
 public final class BlondinStatus {
 
     private static final class Anchor {}
 
-    private final StatusPage statusPage = new StatusPage("Blondin");
+    private final StatusPageGenerator statusPage = new StatusPageGenerator("Blondin", new JarVersionComponent(Anchor.class));
 
     public BlondinStatus(Supplier<Iterable<String>> expensiveResourcesListSupplier) {
-        this.statusPage.addComponent(new VersionComponent(Anchor.class));
         this.statusPage.addComponent(new ThrottledResourcesListComponent(expensiveResourcesListSupplier));
     }
 
     public void writeTo(OutputStream outputStream) throws IOException {
-        statusPage.render(new OutputStreamWriter(outputStream, Charsets.UTF_8.name()));
+        statusPage.getApplicationReport().render(new OutputStreamWriter(outputStream, Charsets.UTF_8.name()));
         outputStream.close();
     }
 

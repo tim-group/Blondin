@@ -17,6 +17,8 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.timgroup.blondin.DummyMonitor;
 
+import static org.hamcrest.Matchers.containsString;
+
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;
 import static org.hamcrest.Matchers.not;
@@ -72,7 +74,7 @@ public final class StatusPageHandlerTest {
         handler.handle(request, response);
         
         context.assertIsSatisfied();
-        assertThat(responseContent.toString(), startsWith("/* fill me in! */"));
+        assertThat(responseContent.toString(), containsString("font-family:"));
     }
     
     @Test public void

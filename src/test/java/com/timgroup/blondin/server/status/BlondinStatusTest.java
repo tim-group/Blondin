@@ -22,8 +22,10 @@ public final class BlondinStatusTest {
     @Test public void
     includes_version_information_in_status_page() throws Exception {
         final String currentVersion = StatusPageHandler.class.getPackage().getImplementationVersion();
+        final String expectedVersionString = (null == currentVersion) ? "" : ": <value>" + currentVersion + "</value>";
+
         status.writeTo(responseContent);
-        assertThat(responseContent.toString(), containsString("Version: <value>" + currentVersion + "</value>"));
+        assertThat(responseContent.toString(), containsString("Version" + expectedVersionString));
     }
     
     @Test public void
