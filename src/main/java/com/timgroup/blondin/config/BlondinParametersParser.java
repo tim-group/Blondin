@@ -12,6 +12,9 @@ import static java.lang.Integer.parseInt;
 
 public final class BlondinParametersParser {
 
+    private static final String DEFAULT_THROTTLE_BANDWIDTH = "16";
+    private static final String DEFAULT_EXPENSIVE_RESOURCES_FILE = "blacklist.txt";
+    
     public Optional<BlondinConfiguration> parse(String[] args) {
         if (args.length == 0) {
             return Optional.absent();
@@ -31,6 +34,7 @@ public final class BlondinParametersParser {
                                                         prop.getProperty("targetHost").toString(),
                                                         parseInt(prop.getProperty("targetPort")),
                                                         parseUrl(prop.getProperty("expensiveResourcesUrl")),
+                                                        parseInt(prop.getProperty("throttleSize", DEFAULT_THROTTLE_BANDWIDTH)),
                                                         new BlondingDiagnosticsConfiguration(prop.getProperty("logDirectory", "").toString(),
                                                                                              prop.getProperty("graphite.host", "").toString(),
                                                                                              parseInt(prop.getProperty("graphite.port", "0")),
@@ -42,7 +46,7 @@ public final class BlondinParametersParser {
     }
 
     private URL parseUrl(String property) throws IOException {
-        return (null == property) ? new File("blacklist.txt").toURI().toURL() : new URL(property);
+        return (null == property) ? new File(DEFAULT_EXPENSIVE_RESOURCES_FILE).toURI().toURL() : new URL(property);
     }
 
     private static boolean isInteger(String value) {

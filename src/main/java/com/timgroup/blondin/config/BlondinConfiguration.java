@@ -4,23 +4,23 @@ import java.net.URL;
 
 public final class BlondinConfiguration {
 
-    private static final int DEFAULT_THROTTLE_BANDWIDTH = 16;
-    
     private final int blondinPort;
     private final String targetHost;
     private final int targetPort;
     private final URL expensiveResourcesUrl;
+    private final int throttleSize;
     private final BlondingDiagnosticsConfiguration diagnostics;
 
-    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl) {
-        this(blondinPort, targetHost, targetPort, expensiveResourcesUrl, BlondingDiagnosticsConfiguration.NO_OP);
+    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl, int throttleSize) {
+        this(blondinPort, targetHost, targetPort, expensiveResourcesUrl, throttleSize, BlondingDiagnosticsConfiguration.NO_OP);
     }
 
-    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl, BlondingDiagnosticsConfiguration diagnostics) {
+    public BlondinConfiguration(int blondinPort, String targetHost, int targetPort, URL expensiveResourcesUrl, int throttleSize, BlondingDiagnosticsConfiguration diagnostics) {
         this.blondinPort = blondinPort;
         this.targetHost = targetHost;
         this.targetPort = targetPort;
         this.expensiveResourcesUrl = expensiveResourcesUrl;
+        this.throttleSize = throttleSize;
         this.diagnostics = diagnostics;
     }
 
@@ -45,6 +45,6 @@ public final class BlondinConfiguration {
     }
 
     public int throttleSize() {
-        return DEFAULT_THROTTLE_BANDWIDTH;
+        return this.throttleSize;
     }
 }

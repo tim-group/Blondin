@@ -41,54 +41,83 @@ public final class BlondinParametersParserTest {
 
     @Test public void
     accepts_single_argument_when_it_is_a_properties_file() {
-        final File configFile = setupConfigFile("1", "sausage", "2", "http://foo/bar");
+        final File configFile = setupConfigFile("1", "sausage", "2", "http://foo/bar", "10");
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {configFile.getAbsolutePath()});
         assertThat(result.isPresent(), is(true));
         assertThat(result.get().blondinPort(), is(1));
         assertThat(result.get().targetHost(), is("sausage"));
         assertThat(result.get().targetPort(), is(2));
         assertThat(result.get().expensiveResourcesUrl().toExternalForm(), is("http://foo/bar"));
+        assertThat(result.get().throttleSize(), is(10));
     }
 
     @Test public void
     accepts_two_arguments_when_they_are_a_port_followed_by_a_properties_file() {
-        final File configFile = setupConfigFile(null, "sausage", "2", null);
+        final File configFile = setupConfigFile(null, "sausage", "2", null, "16");
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {"123", configFile.getAbsolutePath()});
         assertThat(result.isPresent(), is(true));
         assertThat(result.get().blondinPort(), is(123));
         assertThat(result.get().targetHost(), is("sausage"));
         assertThat(result.get().targetPort(), is(2));
         assertThat(result.get().expensiveResourcesUrl().toExternalForm(), endsWith("blacklist.txt"));
+        assertThat(result.get().throttleSize(), is(16));
     }
 
     @Test public void
     port_in_properties_file_overrides_port_argument() {
-        final File configFile = setupConfigFile("1", "sausage", "2", null);
+        final File configFile = setupConfigFile("1", "sausage", "2", null, "5");
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {"123", configFile.getAbsolutePath()});
         assertThat(result.isPresent(), is(true));
         assertThat(result.get().blondinPort(), is(1));
-        assertThat(result.get().targetHost(), is("sausage"));
-        assertThat(result.get().targetPort(), is(2));
     }
 
     @Test public void
-    rejects_invalid_properties_file() {
-        final File configFile1 = setupConfigFile("x", "sausage", "2", null);
-        assertThat(parser.parse(new String[] {configFile1.getAbsolutePath()}).isPresent(), is(false));
-        
-        final File configFile2 = setupConfigFile("1", "sausage", "y", null);
-        assertThat(parser.parse(new String[] {configFile2.getAbsolutePath()}).isPresent(), is(false));
-        
-        final File configFile3 = setupConfigFile("1", null, "2", null);
-        assertThat(parser.parse(new String[] {configFile3.getAbsolutePath()}).isPresent(), is(false));
+    defaults_throttle_size_when_unspecified_in_properties_file() {
+        final File configFile = setupConfigFile("1", "sausage", "2", null, null);
+        final Optional<BlondinConfiguration> result = parser.parse(new String[] {configFile.getAbsolutePath()});
+        assertThat(result.isPresent(), is(true));
+        assertThat(result.get().throttleSize(), is(16));
+    }
 
-        final File configFile4 = setupConfigFile(null, "sausage", "2", null);
-        assertThat(parser.parse(new String[] {configFile4.getAbsolutePath()}).isPresent(), is(false));
+    @Test public void
+    rejects_invalid_blondin_port_in_properties_file() {
+        final File configFile = setupConfigFile("x", "sausage", "2", null, "1");
+        assertThat(parser.parse(new String[] {configFile.getAbsolutePath()}).isPresent(), is(false));
+    }
+
+    @Test public void
+    rejects_unspecified_blondin_port_in_both_command_line_and_properties_file() {
+        final File configFile = setupConfigFile(null, "sausage", "2", null, "1");
+        assertThat(parser.parse(new String[] {configFile.getAbsolutePath()}).isPresent(), is(false));
+    }
+
+    @Test public void
+    rejects_invalid_target_port_in_properties_file() {
+        final File configFile = setupConfigFile("1", "sausage", "y", null, "1");
+        assertThat(parser.parse(new String[] {configFile.getAbsolutePath()}).isPresent(), is(false));
+    }
+
+    @Test public void
+    rejects_invalid_target_host_in_properties_file() {
+        final File configFile = setupConfigFile("1", null, "2", null, "1");
+        assertThat(parser.parse(new String[] {configFile.getAbsolutePath()}).isPresent(), is(false));
+    }
+
+    @Test public void
+    rejects_invalid_expensive_resources_url_in_properties_file() {
+        final File configFile = setupConfigFile("1", "sausage", "2", "sdg:sdghjwe::sdgx23", "1");
+        assertThat(parser.parse(new String[] {configFile.getAbsolutePath()}).isPresent(), is(false));
+    }
+
+    @Test public void
+    rejects_invalid_throttle_size_in_properties_file() {
+        final File configFile = setupConfigFile("1", "sausage", "2", null, "c");
+        assertThat(parser.parse(new String[] {configFile.getAbsolutePath()}).isPresent(), is(false));
     }
 
     @Test public void
     reads_diagnostics_configuration_from_properties_file() {
-        final File configFile = setupConfigFile("1", "sausage", "2", "http://foo/bar");
+        final File configFile = setupConfigFile("1", "sausage", "2", "http://foo/bar", "1");
         augmentConfigFileWithDiagnostics(configFile, "/my/log/dir", "my.graphite.host", "3", "12", "SECONDS");
         
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {configFile.getAbsolutePath()});
@@ -100,7 +129,7 @@ public final class BlondinParametersParserTest {
         assertThat(result.get().diagnostics().graphitePeriodTimeUnit(), is(TimeUnit.SECONDS));
     }
 
-    private File setupConfigFile(String blondinPort, String targetHost, String targetPort, String expensiveResourcesUrl) {
+    private File setupConfigFile(String blondinPort, String targetHost, String targetPort, String expensiveResourcesUrl, String throttleSize) {
         final File configFile;
         try {
             configFile = testFolder.newFile("blondinconf.properties");
@@ -112,6 +141,7 @@ public final class BlondinParametersParserTest {
         if (null != targetHost) { prop.setProperty("targetHost", targetHost); }
         if (null != targetPort) { prop.setProperty("targetPort", targetPort); }
         if (null != expensiveResourcesUrl) { prop.setProperty("expensiveResourcesUrl", expensiveResourcesUrl); }
+        if (null != throttleSize) { prop.setProperty("throttleSize", throttleSize); }
         try {
             prop.store(new FileOutputStream(configFile), null);
         } catch (Exception e) {
