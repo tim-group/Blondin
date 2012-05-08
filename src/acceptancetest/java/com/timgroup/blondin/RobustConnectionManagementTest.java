@@ -1,34 +1,26 @@
 package com.timgroup.blondin;
 
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
-import com.timgroup.blondin.testutil.TrivialHttpClient.TrivialResponse;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public final class RobustConnectionManagementTest extends BlondinAcceptanceTestBase {
 
     @Test(timeout=5000) public void
     closes_client_connection_when_proxying_an_uncontactable_server() throws Exception {
-        Future<TrivialResponse> response = TrivialHttpClient.getFromInBackground(blondinUrl() + "/some/target/url");
-        waitForAClosedResponse(response);
-    }
-
-    private void waitForAClosedResponse(Future<TrivialResponse> response) throws InterruptedException, ExecutionException {
-        response.get();
+        TrivialHttpClient.getFrom(blondinUrl() + "/some/target/url");
     }
 
     @Ignore("pending acceptance test until we investigate why simple web isn't forwaring the request")
