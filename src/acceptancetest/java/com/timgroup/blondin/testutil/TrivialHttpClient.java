@@ -18,8 +18,10 @@ public final class TrivialHttpClient {
     public static final class TrivialResponse {
         public final int code;
         public final String content;
-        public TrivialResponse(int code, String content) {
+        public final String contentType;
+        public TrivialResponse(int code, String contentType, String content) {
             this.code = code;
+            this.contentType = contentType;
             this.content = content;
         }
     }
@@ -115,8 +117,9 @@ public final class TrivialHttpClient {
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestProperty(headerName, headerValue);
                 Sockets.waitForSocket(url.getHost(), url.getPort());
-                final BufferedReader in = new BufferedReader(new InputStreamReader(conn.getResponseCode() >= 400 ? conn.getErrorStream() : conn.getInputStream()));
                 final int responseCode = conn.getResponseCode();
+                final BufferedReader in = new BufferedReader(new InputStreamReader(responseCode >= 400 ? conn.getErrorStream() : conn.getInputStream()));
+                final String responceContentType = conn.getHeaderField("ContentType");
                 
                 final StringBuilder responseText = new StringBuilder();
                 String inputLine;
@@ -124,7 +127,7 @@ public final class TrivialHttpClient {
                     responseText.append(inputLine);
                 }
                 in.close();
-                return new TrivialResponse(responseCode, responseText.toString());
+                return new TrivialResponse(responseCode, responceContentType, responseText.toString());
             }
             catch (IOException e) {
                 throw new IllegalStateException(e);
