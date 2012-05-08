@@ -15,19 +15,21 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public final class TrivialHttpServer {
+    private final Map<String, List<String>> requestHeaders = Maps.newHashMap();
+    private final AtomicInteger numberToBlock = new AtomicInteger(0);
+    private final CountDownLatch trigger = new CountDownLatch(1);
+
+    private final AtomicInteger fulfilling = new AtomicInteger(0);
+    private final AtomicInteger requestsReceived = new AtomicInteger(0);
+    private final AtomicInteger requestsFulfilled = new AtomicInteger(0);
+    
     private final String content;
     private final String path;
     private final int code;
     
     private String query;
     private String requestUrl;
-    private Map<String, List<String>> requestHeaders = Maps.newHashMap();
-    private CountDownLatch trigger = new CountDownLatch(0);
-    private AtomicInteger numberToBlock = new AtomicInteger(0);
-    private AtomicInteger fulfilling = new AtomicInteger(0);
-    private AtomicInteger requestsReceived = new AtomicInteger(0);
-    private AtomicInteger requestsFulfilled = new AtomicInteger(0);
-
+    
     private TrivialHttpServer(String path, String content, int code) {
         this.path = path;
         this.content = content;
@@ -46,9 +48,8 @@ public final class TrivialHttpServer {
         return new TrivialHttpServer(path, content, code);
     }
     
-    public TrivialHttpServer blockingFirst(int requestCount, CountDownLatch trigger) {
-        this.numberToBlock = new AtomicInteger(requestCount);
-        this.trigger = trigger;
+    public TrivialHttpServer blockingFirst(int requestCount) {
+        this.numberToBlock.set(requestCount);
         return this;
     }
     
@@ -124,4 +125,7 @@ public final class TrivialHttpServer {
         return this.requestsFulfilled.get();
     }
     
+    public void unblock() {
+        this.trigger.countDown();
+    }
 }

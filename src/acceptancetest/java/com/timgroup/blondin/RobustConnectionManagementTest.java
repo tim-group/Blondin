@@ -4,7 +4,6 @@ package com.timgroup.blondin;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,15 +35,14 @@ public final class RobustConnectionManagementTest extends BlondinAcceptanceTestB
             "it thinks no problems have happened")
     @Test(timeout=5000) public void
     closes_server_connection_when_a_client_connection_breaks_midway_through_response_delivery() throws Exception {
-        final CountDownLatch serverSendResponseTrigger = new CountDownLatch(1);
         TrivialHttpServer server = TrivialHttpServer.serving("/my/cheap/resource", "hello, world").on(targetPort())
-                                                    .blockingFirst(1, serverSendResponseTrigger);
+                                                    .blockingFirst(1);
         
         ClientConnection conn = ClientConnection.makeRequestFor("/my/cheap/resource", blondinPort());
         waitForRequestsToBeFowardedToServer(server, 1);
         conn.disconnect();
         
-        serverSendResponseTrigger.countDown();
+        server.unblock();
         waitForServerToFinishDeliveringRequests(server, 1);
     }
 
