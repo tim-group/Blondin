@@ -16,7 +16,8 @@ Configuration is achieved with the use of a properties file:
     port=9999
     targetHost=localhost
     targetPort=8080
-    expensiveResourcesUrl=file:///~/expensive.txt
+    throttleSize=16
+    expensiveResourcesUrl=http://some/expensive/resources/list
 
     # Logging
     logDirectory=/var/log/blondin
@@ -24,7 +25,8 @@ Configuration is achieved with the use of a properties file:
     # Graphite Metrics
     graphite.host=metrics
     graphite.port=2013
-    graphite.period=10
+    graphite.period=1
+    graphite.periodunit=MINUTES
 
 Blondin utilises a handful of special HTTP requests to allow remote control:
 
