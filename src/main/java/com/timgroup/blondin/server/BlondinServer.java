@@ -34,7 +34,6 @@ public final class BlondinServer {
 
     private final Monitor monitor;
     private final Connection connection;
-
     private volatile BlondinServerStatus status = BlondinServerStatus.STOPPED;
 
     private final Supplier<BlondinServerStatus> statusSupplier = new Supplier<BlondinServerStatus>() {
@@ -44,20 +43,21 @@ public final class BlondinServer {
     };
 
     public BlondinServer(Monitor monitor, int blondinPort, String targetHost, int targetPort,
-                         URL expensiveResourcesUrl, int throttleSize) throws IOException {
+                         URL expensiveResourcesUrl, int throttleSize) throws IOException
+    {
         this.monitor = monitor;
-        final ExpensiveResourceListLoader expensiveResourcesListSupplier = new ExpensiveResourceListLoader(monitor, expensiveResourcesUrl);
 
         final RequestDispatcher dispatcher = new RequestDispatcher(monitor);
         dispatcher.register(POST.forPath("/stop"), new StopHandler());
         dispatcher.register(POST.forPath("/suspend"), new SuspendHandler());
         
-        final AppInfoHandler appInfoHandler = new AppInfoHandler(monitor, statusSupplier, expensiveResourcesListSupplier);
+        final ExpensiveResourceListLoader throttleListSupplier = new ExpensiveResourceListLoader(monitor, expensiveResourcesUrl);
+        final AppInfoHandler appInfoHandler = new AppInfoHandler(monitor, statusSupplier, throttleListSupplier);
         dispatcher.register(GET.forPath(startingWith("/info")), appInfoHandler);
         dispatcher.register(GET.forPath(startingWith("/status")), appInfoHandler);
         
         final Container proxy = new MetricRecordingHandler(monitor, ProxyingHandler.create(monitor, targetHost, targetPort));
-        dispatcher.register(GET.forPath(expensiveResourcesListSupplier), new ThrottlingHandler(proxy, throttleSize));
+        dispatcher.register(GET.forPath(throttleListSupplier), new ThrottlingHandler(proxy, throttleSize));
         dispatcher.register(GET, proxy);
         
         connection = new SocketConnection(new ContainerServer(new LoggingHandler(monitor, dispatcher), THREAD_COUNT));
