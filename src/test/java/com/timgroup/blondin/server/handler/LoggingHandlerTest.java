@@ -1,4 +1,4 @@
-package com.timgroup.blondin.server;
+package com.timgroup.blondin.server.handler;
 
 import java.io.IOException;
 
@@ -11,6 +11,7 @@ import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.PathParser;
 
 import com.timgroup.blondin.diagnostics.Monitor;
+import com.timgroup.blondin.server.handler.LoggingHandler;
 
 import static org.hamcrest.Matchers.sameInstance;
 

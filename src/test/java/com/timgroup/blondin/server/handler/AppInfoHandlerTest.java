@@ -1,4 +1,4 @@
-package com.timgroup.blondin.server;
+package com.timgroup.blondin.server.handler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -18,6 +18,8 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.timgroup.blondin.DummyMonitor;
+import com.timgroup.blondin.server.BlondinServerStatus;
+import com.timgroup.blondin.server.handler.AppInfoHandler;
 
 import static com.timgroup.blondin.server.BlondinServerStatus.RUNNING;
 import static com.timgroup.blondin.server.BlondinServerStatus.SUSPENDED;

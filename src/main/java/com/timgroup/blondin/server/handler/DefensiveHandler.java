@@ -1,4 +1,4 @@
-package com.timgroup.blondin.server;
+package com.timgroup.blondin.server.handler;
 
 import java.io.IOException;
 

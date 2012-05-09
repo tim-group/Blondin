@@ -1,4 +1,4 @@
-package com.timgroup.blondin.server;
+package com.timgroup.blondin.server.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,6 +11,7 @@ import org.simpleframework.http.core.Container;
 
 import com.google.common.base.Supplier;
 import com.timgroup.blondin.diagnostics.Monitor;
+import com.timgroup.blondin.server.BlondinServerStatus;
 import com.timgroup.blondin.server.status.BlondinStatus;
 import com.timgroup.tucker.info.ApplicationInformationHandler;
 import com.timgroup.tucker.info.servlet.WebResponse;

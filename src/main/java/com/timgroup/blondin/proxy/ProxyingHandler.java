@@ -14,7 +14,7 @@ import org.simpleframework.http.core.Container;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import com.timgroup.blondin.diagnostics.Monitor;
-import com.timgroup.blondin.server.DefensiveHandler;
+import com.timgroup.blondin.server.handler.DefensiveHandler;
 
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Maps.filterKeys;

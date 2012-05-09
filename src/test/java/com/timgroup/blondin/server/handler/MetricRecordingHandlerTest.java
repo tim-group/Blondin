@@ -1,4 +1,4 @@
-package com.timgroup.blondin.server;
+package com.timgroup.blondin.server.handler;
 
 import java.io.IOException;
 
@@ -10,6 +10,7 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
 import com.timgroup.blondin.diagnostics.Monitor;
+import com.timgroup.blondin.server.handler.MetricRecordingHandler;
 
 import static org.hamcrest.Matchers.sameInstance;
 

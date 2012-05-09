@@ -19,6 +19,9 @@ import com.google.common.base.Supplier;
 import com.timgroup.blondin.config.ExpensiveResourceListLoader;
 import com.timgroup.blondin.diagnostics.Monitor;
 import com.timgroup.blondin.proxy.ProxyingHandler;
+import com.timgroup.blondin.server.handler.AppInfoHandler;
+import com.timgroup.blondin.server.handler.LoggingHandler;
+import com.timgroup.blondin.server.handler.MetricRecordingHandler;
 import com.timgroup.blondin.throttler.ThrottlingHandler;
 
 public final class BlondinServer {

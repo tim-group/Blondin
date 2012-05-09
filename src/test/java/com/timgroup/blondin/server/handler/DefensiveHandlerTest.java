@@ -1,4 +1,4 @@
-package com.timgroup.blondin.server;
+package com.timgroup.blondin.server.handler;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,6 +16,7 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
 import com.timgroup.blondin.diagnostics.Monitor;
+import com.timgroup.blondin.server.handler.DefensiveHandler;
 
 public final class DefensiveHandlerTest {
 
