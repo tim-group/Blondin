@@ -89,8 +89,9 @@ public final class AppInfoHandler implements Container {
         }
 
         @Override
-        public void reject(int status, String message) throws IOException {
-            response.setCode(status);
+        public void reject(int statusCode, String message) throws IOException {
+            response.setCode(statusCode);
+            response.setText(Status.getDescription(statusCode));
             response.getOutputStream().write(message.getBytes(Charset.forName("utf-8")));
         }
 

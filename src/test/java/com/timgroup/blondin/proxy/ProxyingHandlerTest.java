@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.Status;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.AddressParser;
 
@@ -123,7 +124,7 @@ public final class ProxyingHandlerTest {
         context.checking(new Expectations() {{
             allowing(request).getAddress(); will(returnValue(new AddressParser("/some/path/to/a/resource.txt")));
             
-            oneOf(response).setCode(HttpURLConnection.HTTP_NO_CONTENT);
+            oneOf(response).setCode(Status.NO_CONTENT.getCode());
             
             ignoring(request);
             ignoring(response);

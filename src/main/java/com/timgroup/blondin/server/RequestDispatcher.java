@@ -1,11 +1,11 @@
 package com.timgroup.blondin.server;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.List;
 
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.Status;
 import org.simpleframework.http.core.Container;
 
 import com.google.common.base.Predicate;
@@ -27,8 +27,8 @@ public final class RequestDispatcher implements Container {
         @Override public void handle(Request request, Response response) {
             try {
                 monitor.logWarning(RequestDispatcher.class, "Received unexpected request for " + request);
-                response.setCode(HttpURLConnection.HTTP_NOT_FOUND);
-                response.setText("Not Found");
+                response.setCode(Status.NOT_FOUND.getCode());
+                response.setText(Status.NOT_FOUND.getDescription());
                 response.close();
             } catch (IOException e) {
                 monitor.logWarning(RequestDispatcher.class, "Unable to respond with 404", e);
