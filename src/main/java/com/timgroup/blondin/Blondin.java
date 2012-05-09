@@ -12,8 +12,7 @@ import com.timgroup.blondin.server.BlondinServer;
 public final class Blondin {
 
     private static final Supplier<BlondinConfiguration> USAGE_SUPPLIER = new Supplier<BlondinConfiguration>() {
-        @Override
-        public BlondinConfiguration get() {
+        @Override public BlondinConfiguration get() {
             throw new IllegalArgumentException("Usage: Blondin [port] configfile.properties");
         }
     };
