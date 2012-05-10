@@ -52,8 +52,6 @@ public final class ProxyingHandler implements Container {
             response.setText(conn.getResponseMessage());
 
             transferResponseHeaders(response, conn);
-            response.commit();
-            
             defensivelyTransferContent(response, conn);
             conn.disconnect();
         }
