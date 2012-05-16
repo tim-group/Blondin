@@ -29,6 +29,7 @@ public final class Blondin {
         }
         catch (IOException e) {
             monitor.logError(Blondin.class, "Failed to start Blondin server", e);
+            System.exit(1);
             throw new IllegalStateException(e);
         }
         
