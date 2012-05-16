@@ -76,6 +76,7 @@ public final class BlondinServer {
         catch (IOException e) {
             monitor.logWarning(BlondinServer.class, "Failed to stop Blondin server", e);
         }
+        monitor.stop();
         status = BlondinServerStatus.STOPPED;
     }
 

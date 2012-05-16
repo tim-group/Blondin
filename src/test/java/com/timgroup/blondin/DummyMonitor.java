@@ -24,4 +24,8 @@ public final class DummyMonitor implements Monitor {
     public void plot(String aspect, Integer value) {
     }
 
+    @Override
+    public void stop() {
+    }
+
 }

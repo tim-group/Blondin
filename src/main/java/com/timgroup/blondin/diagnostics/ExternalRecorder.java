@@ -11,6 +11,7 @@ import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
 public final class ExternalRecorder implements Monitor {
 
     private GraphiteRecorder recorder = null;
+    private ScheduledExecutorService executor = null;
 
     public ExternalRecorder(BlondingDiagnosticsConfiguration configuration) {
         if (configuration.loggingEnabled()) {
@@ -59,8 +60,15 @@ public final class ExternalRecorder implements Monitor {
     }
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
-        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor  = Executors.newScheduledThreadPool(1);
         recorder = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
-        executor.scheduleWithFixedDelay(recorder, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
+        executor .scheduleWithFixedDelay(recorder, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
+    }
+
+    @Override
+    public void stop() {
+        if (null != executor) {
+            executor.shutdown();
+        }
     }
 }
