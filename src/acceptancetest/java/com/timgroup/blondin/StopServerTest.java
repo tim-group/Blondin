@@ -30,9 +30,21 @@ public final class StopServerTest extends BlondinAcceptanceTestBase {
         Sockets.waitForNoSocket("localhost", blondinPort());
         assertThat(Sockets.isSocketOpen("localhost", blondinPort()), is(false));
         
-        int threads = Integer.MAX_VALUE;
-        while (threads > 3) {
-            threads = Thread.currentThread().getThreadGroup().activeCount();
+        while(!tidiedUp()) {
+            Thread.sleep(50L);
         }
+    }
+
+    private boolean tidiedUp() {
+        final ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+        final Thread[] list = new Thread[threadGroup.activeCount()];
+        int threadCount = threadGroup.enumerate(list);
+        for (int i = 0; i < threadCount; i++) {
+            final String threadName = list[i].getName();
+            if (threadName.startsWith("ActionDistributor")) {
+                return false;
+            }
+        }
+        return true;
     }
 }
