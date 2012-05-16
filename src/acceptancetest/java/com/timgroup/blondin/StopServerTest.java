@@ -41,7 +41,7 @@ public final class StopServerTest extends BlondinAcceptanceTestBase {
         int threadCount = threadGroup.enumerate(list);
         for (int i = 0; i < threadCount; i++) {
             final String threadName = list[i].getName();
-            if (threadName.startsWith("ActionDistributor")) {
+            if (threadName.startsWith("ActionDistributor") || threadName.startsWith("Metrics-")) {
                 return false;
             }
         }

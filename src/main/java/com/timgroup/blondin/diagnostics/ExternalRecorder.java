@@ -2,6 +2,7 @@ package com.timgroup.blondin.diagnostics;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.FileHandler;
 
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,14 @@ public final class ExternalRecorder implements Monitor {
     }
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
-        executor  = Executors.newScheduledThreadPool(1);
+        executor  = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+            final ThreadFactory delegate = Executors.defaultThreadFactory();
+            @Override public Thread newThread(Runnable r) {
+                Thread result = delegate.newThread(r);
+                result.setName("Metrics-"+result.getName());
+                return result;
+            }
+        });
         recorder = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
         executor .scheduleWithFixedDelay(recorder, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
     }
