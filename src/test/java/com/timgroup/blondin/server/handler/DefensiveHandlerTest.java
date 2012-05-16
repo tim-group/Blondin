@@ -28,7 +28,7 @@ public final class DefensiveHandlerTest {
     private final Container handler = new DefensiveHandler(monitor, decoratedHandler);
 
     @Test public void 
-    delegates_to_decorated_handler() throws IOException {
+    delegates_to_decorated_handler() {
         context.checking(new Expectations() {{
             oneOf(decoratedHandler).handle(with(sameInstance(request)), with(sameInstance(response)));
             ignoring(response);
@@ -79,7 +79,7 @@ public final class DefensiveHandlerTest {
     }
 
     @Test public void 
-    logs_exceptions_thrown_by_decorated_handler() throws IOException {
+    logs_exceptions_thrown_by_decorated_handler() {
         context.checking(new Expectations() {{
             RuntimeException exception = new RuntimeException("A problem occurred in the decorated handler");
             oneOf(decoratedHandler).handle(with(any(Request.class)), with(any(Response.class))); 

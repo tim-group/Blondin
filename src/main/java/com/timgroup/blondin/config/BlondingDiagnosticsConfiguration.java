@@ -23,9 +23,9 @@ public final class BlondingDiagnosticsConfiguration {
         this.graphitePeriodTimeUnit = parseTimeUnit(graphitePeriodTimeUnit);
     }
 
-    private TimeUnit parseTimeUnit(String graphitePeriodTimeUnit) {
+    private TimeUnit parseTimeUnit(String timeUnit) {
         try {
-            return TimeUnit.valueOf(graphitePeriodTimeUnit);
+            return TimeUnit.valueOf(timeUnit);
         }
         catch (Exception e) {
             return TimeUnit.MINUTES;

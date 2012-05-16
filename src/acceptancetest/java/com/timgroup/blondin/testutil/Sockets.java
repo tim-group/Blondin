@@ -5,15 +5,15 @@ import java.net.Socket;
 
 public class Sockets {
 
-    public static void waitForSocket(String host, int port) throws IOException {
+    public static void waitForSocket(String host, int port) {
         Sockets.waitForSocket(host, port, true);
     }
 
-    public static void waitForNoSocket(String host, int port) throws IOException {
+    public static void waitForNoSocket(String host, int port) {
         Sockets.waitForSocket(host, port, false);
     }
 
-    public static void waitForSocket(String host, int port, boolean desiredState) throws IOException {
+    public static void waitForSocket(String host, int port, boolean desiredState) {
         long startTime = System.currentTimeMillis();
         boolean currentState = !desiredState;
         while(currentState != desiredState) {

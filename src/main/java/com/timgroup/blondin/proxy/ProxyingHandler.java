@@ -76,7 +76,7 @@ public final class ProxyingHandler implements Container {
         }
     }
 
-    private void defensivelyTransferContent(Response response, final HttpURLConnection conn) throws IOException {
+    private void defensivelyTransferContent(Response response, final HttpURLConnection conn) {
         try {
             final InputStream inputStream = conn.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST ? conn.getErrorStream() : conn.getInputStream();
             ByteStreams.copy(inputStream, response.getOutputStream());

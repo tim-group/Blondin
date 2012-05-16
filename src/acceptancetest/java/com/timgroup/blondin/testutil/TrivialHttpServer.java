@@ -56,7 +56,7 @@ public final class TrivialHttpServer {
             @Override public void handle(final HttpExchange exchange) throws IOException {
                 requestsReceived.incrementAndGet();
                 new Thread(new Runnable() { @Override public void run() {
-                fulfilRequest(port, server, content, code, exchange, blockable); } }).start();
+                fulfilRequest(content, code, exchange, blockable); } }).start();
             }
         });
         return this;
@@ -75,7 +75,7 @@ public final class TrivialHttpServer {
         return new TrivialHttpServer(port);
     }
 
-    private void fulfilRequest(final int port, final HttpServer server, String content, int code, final HttpExchange exchange, boolean blockable) {
+    private void fulfilRequest(String content, int code, final HttpExchange exchange, boolean blockable) {
         try {
             fulfilling.incrementAndGet();
             lastRequestedQuery = exchange.getRequestURI().getQuery();

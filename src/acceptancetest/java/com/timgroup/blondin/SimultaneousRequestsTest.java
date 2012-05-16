@@ -1,7 +1,9 @@
 package com.timgroup.blondin;
 
 
-import java.io.IOException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -13,9 +15,6 @@ import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
 import com.timgroup.blondin.testutil.TrivialHttpClient;
 import com.timgroup.blondin.testutil.TrivialHttpClient.TrivialResponse;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
 
@@ -65,7 +64,7 @@ public final class SimultaneousRequestsTest extends BlondinAcceptanceTestBase {
         assertThat(server.totalRequestsReceived(), is(18));
     }
 
-    private Future<TrivialResponse> issueBackgroundRequests(int count, String url) throws IOException {
+    private Future<TrivialResponse> issueBackgroundRequests(int count, String url) {
         for (int i = 0; i < count - 1; i++) {
             TrivialHttpClient.getFromInBackground(url);
         }

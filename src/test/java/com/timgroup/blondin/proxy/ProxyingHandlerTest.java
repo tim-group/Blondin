@@ -217,10 +217,10 @@ public final class ProxyingHandlerTest {
     handles_a_resource_not_found_with_content() throws Exception {
         server.createContext("/some/path/to/a/resource.txt", new HttpHandler() {
             @Override public void handle(HttpExchange exchange) throws IOException {
-                byte[] response = "myContent".getBytes();
+                byte[] responseContent = "myContent".getBytes();
                 exchange.getResponseHeaders().add("Content-Type", "text/html");
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length);
-                exchange.getResponseBody().write(response);
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, responseContent.length);
+                exchange.getResponseBody().write(responseContent);
                 exchange.close();
             }
         });

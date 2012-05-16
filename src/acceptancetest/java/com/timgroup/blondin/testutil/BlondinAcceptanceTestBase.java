@@ -55,6 +55,7 @@ public class BlondinAcceptanceTestBase {
         Sockets.waitForSocket("localhost", blondinPort);
     }
 
+    @SuppressWarnings("unused")
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception { }
 
     @After

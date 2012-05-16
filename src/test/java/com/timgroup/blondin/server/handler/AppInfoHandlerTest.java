@@ -40,6 +40,7 @@ public final class AppInfoHandlerTest {
     
     private final AtomicBoolean outputStreamClosed = new AtomicBoolean(false);
     private final OutputStream responseContent = new ByteArrayOutputStream() {
+        @Override
         public void close() throws java.io.IOException { outputStreamClosed.set(true); super.close(); };
     };
 

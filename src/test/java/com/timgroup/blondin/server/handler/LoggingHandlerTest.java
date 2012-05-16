@@ -1,6 +1,6 @@
 package com.timgroup.blondin.server.handler;
 
-import java.io.IOException;
+import static org.hamcrest.Matchers.sameInstance;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -11,9 +11,6 @@ import org.simpleframework.http.core.Container;
 import org.simpleframework.http.parse.PathParser;
 
 import com.timgroup.blondin.diagnostics.Monitor;
-import com.timgroup.blondin.server.handler.LoggingHandler;
-
-import static org.hamcrest.Matchers.sameInstance;
 
 public final class LoggingHandlerTest {
 
@@ -25,7 +22,7 @@ public final class LoggingHandlerTest {
     private final Container handler = new LoggingHandler(monitor, decoratedHandler);
 
     @Test public void 
-    delegates_to_decorated_handler() throws IOException {
+    delegates_to_decorated_handler() {
         context.checking(new Expectations() {{
             oneOf(decoratedHandler).handle(with(sameInstance(request)), with(sameInstance(response)));
             
@@ -38,7 +35,7 @@ public final class LoggingHandlerTest {
     }
 
     @Test public void 
-    logs_each_incoming_request() throws IOException {
+    logs_each_incoming_request() {
         context.checking(new Expectations() {{
             allowing(request).getPath(); will(returnValue(new PathParser("/a/b/c")));
             oneOf(monitor).logInfo(LoggingHandler.class, "/a/b/c");
@@ -51,7 +48,7 @@ public final class LoggingHandlerTest {
     }
 
     @Test public void 
-    delegates_to_decorated_handler_even_if_logging_fails() throws IOException {
+    delegates_to_decorated_handler_even_if_logging_fails() {
         context.checking(new Expectations() {{
             allowing(monitor).logInfo(with(any(Class.class)), with(any(String.class)));
                 will(throwException(new IllegalStateException()));

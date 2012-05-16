@@ -40,7 +40,7 @@ public final class TrivialHttpClient {
         }
     }
     
-    public static Future<TrivialResponse> getFromInBackground(final String urlString) throws IOException {
+    public static Future<TrivialResponse> getFromInBackground(final String urlString) {
         final CallableGetRequest request = new CallableGetRequest(urlString);
         final FutureTask<TrivialResponse> future = new FutureTask<TrivialResponse>(request) {
             @Override

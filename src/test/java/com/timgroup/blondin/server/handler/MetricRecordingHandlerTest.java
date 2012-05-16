@@ -1,6 +1,6 @@
 package com.timgroup.blondin.server.handler;
 
-import java.io.IOException;
+import static org.hamcrest.Matchers.sameInstance;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -10,9 +10,6 @@ import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
 import com.timgroup.blondin.diagnostics.Monitor;
-import com.timgroup.blondin.server.handler.MetricRecordingHandler;
-
-import static org.hamcrest.Matchers.sameInstance;
 
 public final class MetricRecordingHandlerTest {
 
@@ -24,7 +21,7 @@ public final class MetricRecordingHandlerTest {
     private final Container handler = new MetricRecordingHandler(monitor, decoratedHandler);
 
     @Test public void 
-    delegates_to_decorated_handler() throws IOException {
+    delegates_to_decorated_handler() {
         context.checking(new Expectations() {{
             oneOf(decoratedHandler).handle(with(sameInstance(request)), with(sameInstance(response)));
             ignoring(monitor);
@@ -35,7 +32,7 @@ public final class MetricRecordingHandlerTest {
     }
 
     @Test public void 
-    plots_each_incoming_request() throws IOException {
+    plots_each_incoming_request() {
         context.checking(new Expectations() {{
             oneOf(monitor).plot("connections.received", 1);
             ignoring(decoratedHandler);
