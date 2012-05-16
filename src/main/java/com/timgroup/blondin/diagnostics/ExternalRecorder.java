@@ -4,6 +4,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +55,9 @@ public final class ExternalRecorder implements Monitor {
     private void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
         final String logFileName = diagnostics.logDirectory() + "/blondin.log";
         try {
-            java.util.logging.Logger.getLogger("").addHandler(new FileHandler(logFileName));
+            final Logger logger = java.util.logging.Logger.getLogger("");
+            logger.setLevel(Level.WARNING);
+            logger.addHandler(new FileHandler(logFileName));
         } catch (Exception e) {
             System.err.println("Unable to configure logging to " + logFileName);
             e.printStackTrace();
