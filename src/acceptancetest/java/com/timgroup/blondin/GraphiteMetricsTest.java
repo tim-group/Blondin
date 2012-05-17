@@ -50,7 +50,7 @@ public final class GraphiteMetricsTest extends BlondinAcceptanceTestBase {
         graphite.waitForNextConnection();
         
         assertThat(graphite.messagesReceived().size(), is(greaterThan(0)));
-        assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(startsWith("blondin.connections.received 1")));
+        assertThat(graphite.messagesReceived(), Matchers.<String>hasItem(startsWith("blondin.requests.normal 1")));
     }
 
 }

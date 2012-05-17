@@ -43,7 +43,7 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
         assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
         
         final String hostName = InetAddress.getLocalHost().getHostName().replace('.', '_');
-        assertThat(statsd.messagesReceived(), Matchers.contains("blondin." + hostName + "." + blondinPort() + ".connections.received:1|c"));
+        assertThat(statsd.messagesReceived(), Matchers.contains("blondin." + hostName + "." + blondinPort() + ".requests.normal:1|c"));
     }
 
 }
