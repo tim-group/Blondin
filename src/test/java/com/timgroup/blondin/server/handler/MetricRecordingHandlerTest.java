@@ -18,7 +18,7 @@ public final class MetricRecordingHandlerTest {
     private final Response response = context.mock(Response.class);
     private final Monitor monitor = context.mock(Monitor.class);
     private final Container decoratedHandler = context.mock(Container.class);
-    private final Container handler = new MetricRecordingHandler(monitor, decoratedHandler);
+    private final Container handler = new MetricRecordingHandler(monitor, "banana.split", decoratedHandler);
 
     @Test public void 
     delegates_to_decorated_handler() {
@@ -34,7 +34,7 @@ public final class MetricRecordingHandlerTest {
     @Test public void 
     plots_each_incoming_request() {
         context.checking(new Expectations() {{
-            oneOf(monitor).plot("connections.received", 1);
+            oneOf(monitor).plot("banana.split", 1);
             ignoring(decoratedHandler);
         }});
         

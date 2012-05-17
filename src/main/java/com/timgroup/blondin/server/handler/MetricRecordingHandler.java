@@ -8,17 +8,19 @@ import com.timgroup.blondin.diagnostics.Monitor;
 
 public final class MetricRecordingHandler implements Container {
 
-    private final Container delegate;
     private final Monitor monitor;
+    private final String label;
+    private final Container delegate;
 
-    public MetricRecordingHandler(Monitor monitor, Container delegate) {
+    public MetricRecordingHandler(Monitor monitor, String label, Container delegate) {
         this.monitor = monitor;
+        this.label = label;
         this.delegate = delegate;
     }
 
     @Override
     public void handle(Request req, Response resp) {
-        monitor.plot("connections.received", 1);
+        monitor.plot(label, 1);
         delegate.handle(req, resp);
     }
 
