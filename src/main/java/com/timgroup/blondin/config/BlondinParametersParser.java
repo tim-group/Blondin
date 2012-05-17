@@ -39,7 +39,9 @@ public final class BlondinParametersParser {
                                                                                              prop.getProperty("graphite.host", "").toString(),
                                                                                              parseInt(prop.getProperty("graphite.port", "0")),
                                                                                              parseInt(prop.getProperty("graphite.period", "0")),
-                                                                                             prop.getProperty("graphite.periodunit", "").toString())));
+                                                                                             prop.getProperty("graphite.periodunit", "").toString(),
+                                                                                             prop.getProperty("statsd.host", "").toString(),
+                                                                                             parseInt(prop.getProperty("statsd.port", "0")))));
         } catch (Exception e) {
             return Optional.absent();
         }

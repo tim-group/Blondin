@@ -9,11 +9,13 @@ import java.util.logging.Logger;
 
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
 
 public final class ExternalRecorder implements Monitor {
 
-    private GraphiteRecorder recorder = null;
+    private GraphiteRecorder graphite = null;
+    private StatsdRecorder statsd = null;
     private ScheduledExecutorService executor = null;
 
     public ExternalRecorder(BlondingDiagnosticsConfiguration configuration) {
@@ -47,8 +49,11 @@ public final class ExternalRecorder implements Monitor {
 
     @Override
     public void plot(String aspect, Integer value) {
-        if (null != recorder) {
-            recorder.record(aspect, value);
+        if (null != graphite) {
+            graphite.record(aspect, value);
+        }
+        if (null != statsd) {
+            statsd.record(aspect, value);
         }
     }
 
@@ -65,6 +70,11 @@ public final class ExternalRecorder implements Monitor {
     }
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
+        if (!Strings.isNullOrEmpty(diagnostics.statsdHost())) {
+            statsd = new StatsdRecorder(this, diagnostics.statsdHost(), diagnostics.statsdPort());
+            return;
+        }
+        
         executor  = Executors.newScheduledThreadPool(1, new ThreadFactory() {
             final ThreadFactory delegate = Executors.defaultThreadFactory();
             @Override public Thread newThread(Runnable r) {
@@ -73,8 +83,8 @@ public final class ExternalRecorder implements Monitor {
                 return result;
             }
         });
-        recorder = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
-        executor .scheduleWithFixedDelay(recorder, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
+        graphite = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
+        executor .scheduleWithFixedDelay(graphite, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
     }
 
     @Override
