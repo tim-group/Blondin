@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -22,10 +23,22 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
     private final int statsdPort = generatePort();
     private final DummyStatsdServer statsd = new DummyStatsdServer(statsdPort);
 
+    private String prefix;
+
     @Override
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception {
         properties.setProperty("statsd.host", "localhost");
         properties.setProperty("statsd.port", String.valueOf(statsdPort));
+        
+        final int expensiveUrlsPort = generatePort();
+        properties.setProperty("expensiveResourcesUrl", "http://localhost:" + expensiveUrlsPort + "/my/expensive/resources");
+        TrivialHttpServer.on(expensiveUrlsPort).serving("/my/expensive/resources", "/low");
+    }
+
+    @Before
+    public void determinePrefix() throws Exception {
+        final String hostName = InetAddress.getLocalHost().getHostName().replace('.', '_');
+        prefix = "blondin." + hostName + "." + blondinPort() + ".";
     }
 
     @After
@@ -34,16 +47,25 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
     }
 
     @Test(timeout=5000L) public void
-    gathers_metrics_for_incoming_connections() throws Exception {
+    gathers_metrics_for_incoming_normal_requests() throws Exception {
         TrivialHttpServer.on(targetPort()).serving("/hi", "1");
         TrivialHttpClient.getFrom(blondinUrl() + "/hi");
         
         statsd.waitForFirstConnection();
         
         assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
+        assertThat(statsd.messagesReceived(), Matchers.contains(prefix + "requests.normal:1|c"));
+    }
+
+    @Test(timeout=5000L) public void
+    gathers_metrics_for_incoming_expensive_requests() throws Exception {
+        TrivialHttpServer.on(targetPort()).serving("/low", "1");
+        TrivialHttpClient.getFrom(blondinUrl() + "/low");
         
-        final String hostName = InetAddress.getLocalHost().getHostName().replace('.', '_');
-        assertThat(statsd.messagesReceived(), Matchers.contains("blondin." + hostName + "." + blondinPort() + ".requests.normal:1|c"));
+        statsd.waitForFirstConnection();
+        
+        assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
+        assertThat(statsd.messagesReceived(), Matchers.contains(prefix + "requests.expensive:1|c"));
     }
 
 }
