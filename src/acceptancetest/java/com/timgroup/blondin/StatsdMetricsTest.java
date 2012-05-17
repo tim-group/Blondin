@@ -1,5 +1,6 @@
 package com.timgroup.blondin;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Properties;
 
@@ -15,7 +16,6 @@ import com.timgroup.blondin.testutil.TrivialHttpServer;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
 
 public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
 
@@ -41,7 +41,9 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
         statsd.waitForFirstConnection();
         
         assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
-        assertThat(statsd.messagesReceived(), Matchers.<String>hasItem(startsWith("blondin.connections.received:1|c")));
+        
+        final String hostName = InetAddress.getLocalHost().getHostName().replace('.', '_');
+        assertThat(statsd.messagesReceived(), Matchers.contains("blondin." + hostName + "." + blondinPort() + ".connections.received:1|c"));
     }
 
 }

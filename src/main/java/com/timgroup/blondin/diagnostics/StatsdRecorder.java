@@ -12,9 +12,11 @@ public final class StatsdRecorder {
     private final Monitor monitor;
     private final DatagramSocket clientSocket;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final String prefix;
 
-    public StatsdRecorder(Monitor monitor, String host, int port) {
+    public StatsdRecorder(Monitor monitor, String prefix, String host, int port) {
         this.monitor = monitor;
+        this.prefix = prefix;
         
         DatagramSocket socket = null;
         try {
@@ -60,6 +62,6 @@ public final class StatsdRecorder {
     }
 
     public void record(String aspect, int value) {
-        send(String.format("blondin.%s:%d|c", aspect, value));
+        send(String.format("%s.%s:%d|c", prefix, aspect, value));
     }
 }

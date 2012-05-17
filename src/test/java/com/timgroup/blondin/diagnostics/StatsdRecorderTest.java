@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.contains;
 
 public final class StatsdRecorderTest {
 
-    private final StatsdRecorder recorder = new StatsdRecorder(new DummyMonitor(), "localhost", 19254);
+    private final StatsdRecorder recorder = new StatsdRecorder(new DummyMonitor(), "my.prefix", "localhost", 19254);
 
     @After
     public void stop() {
@@ -41,7 +41,7 @@ public final class StatsdRecorderTest {
         recorder.record("blah", 12);
         while (messagesReceived.isEmpty()) { Thread.sleep(50L); }
         
-        assertThat(messagesReceived, contains("blondin.blah:12|c"));
+        assertThat(messagesReceived, contains("my.prefix.blah:12|c"));
     }
 
 }

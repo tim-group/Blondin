@@ -71,7 +71,7 @@ public final class ExternalRecorder implements Monitor {
 
     private void turnOnMetrics(final BlondingDiagnosticsConfiguration diagnostics) {
         if (!Strings.isNullOrEmpty(diagnostics.statsdHost())) {
-            statsd = new StatsdRecorder(this, diagnostics.statsdHost(), diagnostics.statsdPort());
+            statsd = new StatsdRecorder(this, diagnostics.identifier(), diagnostics.statsdHost(), diagnostics.statsdPort());
             return;
         }
         
