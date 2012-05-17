@@ -28,6 +28,11 @@ Configuration is achieved with the use of a properties file:
     graphite.period=1
     graphite.periodunit=MINUTES
 
+    # StatsD Metrics
+    statsd.host=metrics
+    statsd.port=2013
+
+
 Blondin utilises a handful of special HTTP requests to allow remote control:
 
     GET   /status
