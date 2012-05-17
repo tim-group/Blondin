@@ -6,8 +6,9 @@ import com.google.common.base.Strings;
 
 public final class BlondingDiagnosticsConfiguration {
 
-    public static final BlondingDiagnosticsConfiguration NO_OP = new BlondingDiagnosticsConfiguration(null, null, 1, 1, null, null, 1);
+    public static final BlondingDiagnosticsConfiguration NO_OP = new BlondingDiagnosticsConfiguration(null, null, 1, 1, null, null, 1, "");
     
+    private final String identifier;
     private final String logDirectory;
 
     private final String graphiteHost;
@@ -18,7 +19,8 @@ public final class BlondingDiagnosticsConfiguration {
     private final String statsdHost;
     private final int statsdPort;
 
-    public BlondingDiagnosticsConfiguration(String logDirectory, String graphiteHost, int graphitePort, int graphitePeriod, String graphitePeriodTimeUnit, String statsdHost, int statsdPort) {
+    public BlondingDiagnosticsConfiguration(String logDirectory, String graphiteHost, int graphitePort, int graphitePeriod, String graphitePeriodTimeUnit, String statsdHost, int statsdPort, String identifier) {
+        this.identifier = identifier;
         this.logDirectory = logDirectory;
         this.graphiteHost = graphiteHost;
         this.graphitePort = graphitePort;
@@ -35,6 +37,10 @@ public final class BlondingDiagnosticsConfiguration {
         catch (Exception e) {
             return TimeUnit.MINUTES;
         }
+    }
+
+    public String identifier() {
+        return identifier;
     }
 
     public String logDirectory() {

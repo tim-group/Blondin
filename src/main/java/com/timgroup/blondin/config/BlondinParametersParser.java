@@ -3,6 +3,7 @@ package com.timgroup.blondin.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.Properties;
 
@@ -30,7 +31,12 @@ public final class BlondinParametersParser {
         try {
             final Properties prop = new Properties();
             prop.load(new FileInputStream(propertiesFilename));
-            return Optional.of(new BlondinConfiguration(parseInt(prop.getProperty("port", defaultPortString)),
+            
+            final int port = parseInt(prop.getProperty("port", defaultPortString));
+            final String hostName = InetAddress.getLocalHost().getHostName().replace('.', '_');
+            final String identifier = String.format("blondin.%s.%d", hostName, port); 
+            
+            return Optional.of(new BlondinConfiguration(port,
                                                         prop.getProperty("targetHost").toString(),
                                                         parseInt(prop.getProperty("targetPort")),
                                                         parseUrl(prop.getProperty("expensiveResourcesUrl")),
@@ -41,7 +47,8 @@ public final class BlondinParametersParser {
                                                                                              parseInt(prop.getProperty("graphite.period", "0")),
                                                                                              prop.getProperty("graphite.periodunit", "").toString(),
                                                                                              prop.getProperty("statsd.host", "").toString(),
-                                                                                             parseInt(prop.getProperty("statsd.port", "0")))));
+                                                                                             parseInt(prop.getProperty("statsd.port", "0")),
+                                                                                             identifier)));
         } catch (Exception e) {
             return Optional.absent();
         }

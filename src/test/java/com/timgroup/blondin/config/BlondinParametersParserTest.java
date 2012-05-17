@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -69,6 +70,15 @@ public final class BlondinParametersParserTest {
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {"123", configFile.getAbsolutePath()});
         assertThat(result.isPresent(), is(true));
         assertThat(result.get().blondinPort(), is(1));
+    }
+    
+    @Test public void
+    identifies_server_by_port_and_host() throws Exception {
+        final File configFile = setupConfigFile("1", "sausage", "2", null, "5");
+        final Optional<BlondinConfiguration> result = parser.parse(new String[] {"123", configFile.getAbsolutePath()});
+        
+        final String hostName = InetAddress.getLocalHost().getHostName().replace('.', '_');
+        assertThat(result.get().diagnostics().identifier(), is("blondin." + hostName + ".1"));
     }
 
     @Test public void
