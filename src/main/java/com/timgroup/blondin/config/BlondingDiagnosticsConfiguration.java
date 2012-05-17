@@ -6,7 +6,7 @@ import com.google.common.base.Strings;
 
 public final class BlondingDiagnosticsConfiguration {
 
-    public static final BlondingDiagnosticsConfiguration NO_OP = new BlondingDiagnosticsConfiguration(null, null, 1, 1, null, null, 1, "");
+    public static final BlondingDiagnosticsConfiguration NO_OP = new BlondingDiagnosticsConfiguration("", null, null, 1, null, 1, 1, null);
     
     private final String identifier;
     private final String logDirectory;
@@ -19,7 +19,7 @@ public final class BlondingDiagnosticsConfiguration {
     private final String statsdHost;
     private final int statsdPort;
 
-    public BlondingDiagnosticsConfiguration(String logDirectory, String graphiteHost, int graphitePort, int graphitePeriod, String graphitePeriodTimeUnit, String statsdHost, int statsdPort, String identifier) {
+    public BlondingDiagnosticsConfiguration(String identifier, String logDirectory, String statsdHost, int statsdPort, String graphiteHost, int graphitePort, int graphitePeriod, String graphitePeriodTimeUnit) {
         this.identifier = identifier;
         this.logDirectory = logDirectory;
         this.graphiteHost = graphiteHost;

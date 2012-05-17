@@ -41,14 +41,14 @@ public final class BlondinParametersParser {
                                                         parseInt(prop.getProperty("targetPort")),
                                                         parseUrl(prop.getProperty("expensiveResourcesUrl")),
                                                         parseInt(prop.getProperty("throttleSize", DEFAULT_THROTTLE_BANDWIDTH)),
-                                                        new BlondingDiagnosticsConfiguration(prop.getProperty("logDirectory", "").toString(),
+                                                        new BlondingDiagnosticsConfiguration(identifier,
+                                                                                             prop.getProperty("logDirectory", "").toString(),
+                                                                                             prop.getProperty("statsd.host", "").toString(),
+                                                                                             parseInt(prop.getProperty("statsd.port", "0")),
                                                                                              prop.getProperty("graphite.host", "").toString(),
                                                                                              parseInt(prop.getProperty("graphite.port", "0")),
                                                                                              parseInt(prop.getProperty("graphite.period", "0")),
-                                                                                             prop.getProperty("graphite.periodunit", "").toString(),
-                                                                                             prop.getProperty("statsd.host", "").toString(),
-                                                                                             parseInt(prop.getProperty("statsd.port", "0")),
-                                                                                             identifier)));
+                                                                                             prop.getProperty("graphite.periodunit", "").toString())));
         } catch (Exception e) {
             return Optional.absent();
         }
