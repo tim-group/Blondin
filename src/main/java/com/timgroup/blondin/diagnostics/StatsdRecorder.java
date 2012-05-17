@@ -5,14 +5,23 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public final class StatsdRecorder {
 
     private final Monitor monitor;
-    private final DatagramSocket clientSocket;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final String prefix;
+    private final DatagramSocket clientSocket;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+        final ThreadFactory delegate = Executors.defaultThreadFactory();
+        @Override public Thread newThread(Runnable r) {
+            Thread result = delegate.newThread(r);
+            result.setName("Metrics-"+result.getName());
+            return result;
+        }
+    });
 
     public StatsdRecorder(Monitor monitor, String prefix, String host, int port) {
         this.monitor = monitor;

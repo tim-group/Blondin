@@ -21,10 +21,13 @@ public final class StopServerTest extends BlondinAcceptanceTestBase {
         properties.setProperty("graphite.port", String.valueOf(generatePort()));
         properties.setProperty("graphite.period", "1");
         properties.setProperty("graphite.periodunit", "MILLISECONDS");
+        properties.setProperty("statsd.host", "localhost");
+        properties.setProperty("statsd.port", String.valueOf(generatePort()));
     }
     
     @Test(timeout=10000L) public void
     responds_to_a_stop_request() throws Exception {
+        TrivialHttpClient.getFrom(blondinUrl() + "/some/resource/or/other");
         TrivialHttpClient.post(blondinUrl() + "/stop");
         
         Sockets.waitForNoSocket("localhost", blondinPort());

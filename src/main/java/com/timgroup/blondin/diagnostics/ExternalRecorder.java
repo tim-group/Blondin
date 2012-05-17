@@ -92,5 +92,8 @@ public final class ExternalRecorder implements Monitor {
         if (null != executor) {
             executor.shutdown();
         }
+        if (null != statsd) {
+            statsd.stop();
+        }
     }
 }
