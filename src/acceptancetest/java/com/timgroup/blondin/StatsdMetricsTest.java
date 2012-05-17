@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Properties;
 
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +14,7 @@ import com.timgroup.blondin.testutil.TrivialHttpClient;
 import com.timgroup.blondin.testutil.TrivialHttpServer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
@@ -54,7 +54,7 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
         statsd.waitForFirstConnection();
         
         assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
-        assertThat(statsd.messagesReceived(), Matchers.contains(prefix + "requests.normal:1|c"));
+        assertThat(statsd.messagesReceived(), contains(prefix + "requests.normal:1|c"));
     }
 
     @Test(timeout=5000L) public void
@@ -65,7 +65,7 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
         statsd.waitForFirstConnection();
         
         assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
-        assertThat(statsd.messagesReceived(), Matchers.contains(prefix + "requests.expensive:1|c"));
+        assertThat(statsd.messagesReceived(), contains(prefix + "requests.expensive:1|c"));
     }
 
 }
