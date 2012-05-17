@@ -41,7 +41,7 @@ public final class StatsdRecorderTest {
         recorder.record("blah", 12);
         while (messagesReceived.isEmpty()) { Thread.sleep(50L); }
         
-        assertThat(messagesReceived, contains("blah:12|c"));
+        assertThat(messagesReceived, contains("blondin.blah:12|c"));
     }
 
 }

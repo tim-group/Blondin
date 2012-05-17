@@ -60,6 +60,6 @@ public final class StatsdRecorder {
     }
 
     public void record(String aspect, int value) {
-        send(String.format("%s:%d|c", aspect, value));
+        send(String.format("blondin.%s:%d|c", aspect, value));
     }
 }

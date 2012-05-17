@@ -35,8 +35,8 @@ public final class DummyStatsdServer {
         try {
             final DatagramPacket packet = new DatagramPacket(new byte[256], 256);
             server.receive(packet);
-            connectionsRecorded.incrementAndGet();
             messagesReceived.add(new String(packet.getData()).trim());
+            connectionsRecorded.incrementAndGet();
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -48,15 +48,6 @@ public final class DummyStatsdServer {
 
     public void waitForFirstConnection() {
         while (!connected()) {
-            try {
-                Thread.sleep(50L);
-            } catch (InterruptedException e) { }
-        }
-    }
-
-    public void waitForNextConnection() {
-        int target = connectionsRecorded.get() + 1;
-        while (connectionsRecorded.get() <= target) {
             try {
                 Thread.sleep(50L);
             } catch (InterruptedException e) { }

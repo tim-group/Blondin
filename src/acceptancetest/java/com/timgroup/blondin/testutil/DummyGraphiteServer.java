@@ -66,7 +66,7 @@ public final class DummyGraphiteServer {
 
     public void waitForNextConnection() {
         int target = connectionsRecorded.get() + 1;
-        while (connectionsRecorded.get() <= target) {
+        while (connectionsRecorded.get() < target) {
             try {
                 Thread.sleep(50L);
             } catch (InterruptedException e) { }

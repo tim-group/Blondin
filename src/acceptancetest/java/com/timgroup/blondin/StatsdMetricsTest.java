@@ -5,7 +5,6 @@ import java.util.Properties;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.timgroup.blondin.testutil.BlondinAcceptanceTestBase;
@@ -34,16 +33,15 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
         statsd.shutdown();
     }
 
-    @Ignore("pending implementation")
-    @Test(timeout=5000) public void
+    @Test(timeout=5000L) public void
     gathers_metrics_for_incoming_connections() throws Exception {
         TrivialHttpServer.on(targetPort()).serving("/hi", "1");
         TrivialHttpClient.getFrom(blondinUrl() + "/hi");
         
-        statsd.waitForNextConnection();
+        statsd.waitForFirstConnection();
         
         assertThat(statsd.messagesReceived().size(), is(greaterThan(0)));
-        assertThat(statsd.messagesReceived(), Matchers.<String>hasItem(startsWith("stats_counts.blondin.connections.received:1|c")));
+        assertThat(statsd.messagesReceived(), Matchers.<String>hasItem(startsWith("blondin.connections.received:1|c")));
     }
 
 }
