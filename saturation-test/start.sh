@@ -17,8 +17,8 @@ server_pid=$!
 java -jar $BUILD_DIR/Blondin-main*.jar $BUILD_DIR/blondin.properties &
 blondin_pid=$!
 
-while ! nc -vz localhost 8081; do sleep 1; done
-while ! nc -vz localhost 8082; do sleep 1; done
+while ! nc -z localhost 8081; do sleep 1; done
+while ! nc -z localhost 8082; do sleep 1; done
 
 java -jar jruby-complete*.jar test.rb
 test_exit_code=$?

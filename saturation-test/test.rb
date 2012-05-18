@@ -5,6 +5,7 @@ def request(path)
   http.read_timeout = 500
   response = http.get(path)
 
+  print '.'
   if response.code != '200'
     puts "Response was #{response.code}"
     exit 1
@@ -15,6 +16,8 @@ thread_number = 100
 request_number = 10
 
 threads = []
+
+print 'Testing'
 
 thread_number.times do |thread_id|
   threads << Thread.new do
@@ -29,3 +32,5 @@ thread_number.times do |thread_id|
 end
 
 threads.each { |thread| thread.join }
+
+puts "Passed"
