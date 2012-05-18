@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "/slow" > slowresources.txt
+
 echo "port=8082
 targetPort=8081
 targetHost=localhost
