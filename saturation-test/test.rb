@@ -1,6 +1,16 @@
 require "net/http"
 
-uri = URI('http://localhost:8082')
+def request(path)
+  http = Net::HTTP.new("localhost", 8082)
+  http.read_timeout = 500
+  response = http.get(path)
+
+  puts "Thread: #{response.body} (status: #{response.code})"
+  if response.code != '200'
+    puts "Response was #{response.code}"
+    exit 1
+  end
+end
 
 thread_number = 100
 request_number = 10
@@ -9,11 +19,13 @@ threads = []
 
 thread_number.times do |thread_id|
   threads << Thread.new do
-    request_number.times do |request_id|
-      response = Net::HTTP.get_response(uri)
-      raise "Response was #{response.code}" if response.code != '200'
-      puts "Thread #{thread_id} (#{request_id}): #{response.body} (status: #{response.code})"
-    end
+    request("/slow") 
+  end
+end
+
+thread_number.times do |thread_id|
+  threads << Thread.new do
+    request_number.times { request("/fast") }
   end
 end
 
