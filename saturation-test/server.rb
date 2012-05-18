@@ -26,7 +26,7 @@ class Server < WEBrick::HTTPServlet::AbstractServlet
   
 end
 
-webrickServer = WEBrick::HTTPServer.new(:Port => 8081)
+webrickServer = WEBrick::HTTPServer.new(:Port => 8081, :AccessLog => [])
 webrickServer.mount '/', Server
 trap 'INT' do webrickServer.shutdown end
 webrickServer.start

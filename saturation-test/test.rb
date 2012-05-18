@@ -5,7 +5,6 @@ def request(path)
   http.read_timeout = 500
   response = http.get(path)
 
-  puts "Thread: #{response.body} (status: #{response.code})"
   if response.code != '200'
     puts "Response was #{response.code}"
     exit 1
