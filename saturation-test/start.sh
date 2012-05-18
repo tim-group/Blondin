@@ -1,16 +1,18 @@
 #!/bin/bash
 
-echo "/slow" > slowresources.txt
+BUILD_DIR="../build"
+
+echo "/slow" > $BUILD_DIR/slowresources.txt
 
 echo "port=8082
 targetPort=8081
 targetHost=localhost
-expensiveResourcesUrl=file://`pwd`/slowresources.txt" > blondin.properties
+expensiveResourcesUrl=file://`pwd`/$BUILD_DIR/slowresources.txt" > $BUILD_DIR/blondin.properties
 
 java -jar jruby-complete*.jar server.rb &
 server_pid=$!
 
-java -jar ../build/Blondin-main*.jar blondin.properties &
+java -jar $BUILD_DIR/Blondin-main*.jar $BUILD_DIR/blondin.properties &
 blondin_pid=$!
 
 while ! nc -vz localhost 8081; do sleep 1; done
