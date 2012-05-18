@@ -1,6 +1,7 @@
 require "webrick"
 
 MAX_ALLOWED_SLOW_REQUESTS = ARGV.shift.to_i
+BIG_CONTENT = Array.new(100000, 'a').join
 
 class Server < WEBrick::HTTPServlet::AbstractServlet
 
@@ -15,12 +16,12 @@ class Server < WEBrick::HTTPServlet::AbstractServlet
       end
 
       sleep 1
-      response.body = "Slow with concurrently #{@@slow_requests} requests"
+      response.body = BIG_CONTENT
       @@mutex.synchronize { @@slow_requests -= 1 }
       return
     end
 
-    response.body = 'Fast'
+    response.body = BIG_CONTENT
     sleep 0.5
   end
   
