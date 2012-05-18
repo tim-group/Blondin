@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo "port=8082
+targetPort=8081
+targetHost=localhost
+expensiveResourcesUrl=file://`pwd`/slowresources.txt" > blondin.properties
+
 java -jar jruby-complete*.jar server.rb &
 server_pid=$!
 
