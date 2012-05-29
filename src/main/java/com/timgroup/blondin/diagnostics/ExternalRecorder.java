@@ -20,11 +20,11 @@ public final class ExternalRecorder implements Monitor {
     private ScheduledExecutorService executor = null;
 
     public ExternalRecorder(BlondingDiagnosticsConfiguration configuration) {
-    	Logger globalLogger = Logger.getLogger("");
-    	for (Handler handler : globalLogger.getHandlers()) {
-    	    globalLogger.removeHandler(handler);
-    	}
-    	
+        Logger globalLogger = Logger.getLogger("");
+        for (Handler handler : globalLogger.getHandlers()) {
+            globalLogger.removeHandler(handler);
+        }
+        
         if (configuration.loggingEnabled()) {
             turnOnLogging(configuration);
         }
