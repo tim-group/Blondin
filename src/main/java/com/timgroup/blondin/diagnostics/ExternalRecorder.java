@@ -1,11 +1,17 @@
 package com.timgroup.blondin.diagnostics;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -66,9 +72,12 @@ public final class ExternalRecorder implements Monitor {
     private void turnOnLogging(BlondingDiagnosticsConfiguration diagnostics) {
         final String logFileName = diagnostics.logDirectory() + "/blondin.log";
         try {
+            final FileHandler handler = new FileHandler(logFileName);
+            handler.setFormatter(new LogMessageFormatter());
+            
             final Logger logger = java.util.logging.Logger.getLogger("");
             logger.setLevel(Level.WARNING);
-            logger.addHandler(new FileHandler(logFileName));
+            logger.addHandler(handler);
         } catch (Exception e) {
             System.err.println("Unable to configure logging to " + logFileName);
             e.printStackTrace();
@@ -100,6 +109,37 @@ public final class ExternalRecorder implements Monitor {
         }
         if (null != statsd) {
             statsd.stop();
+        }
+    }
+    
+    private static final class LogMessageFormatter extends Formatter {
+        private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
+        private Date dat = new Date();
+
+        @Override
+        public synchronized String format(LogRecord record) {
+            final StringBuffer sb = new StringBuffer();
+            dat.setTime(record.getMillis());
+            format.format(dat);
+            sb.append(format.format(dat));
+            sb.append(" ");
+            sb.append(record.getLevel().getLocalizedName());
+            sb.append(" ");
+            sb.append(record.getLoggerName());
+            sb.append(": ");
+            sb.append(formatMessage(record));
+            if (record.getThrown() != null) {
+                sb.append(" ");
+                try {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    record.getThrown().printStackTrace(pw);
+                    pw.close();
+                    sb.append(sw.toString());
+                } catch (Exception ex) {
+                }
+            }
+            return sb.toString();
         }
     }
 }
