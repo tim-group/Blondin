@@ -90,7 +90,7 @@ public final class ExternalRecorder implements Monitor {
             }
         });
         graphite = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
-        executor .scheduleWithFixedDelay(graphite, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
+        executor.scheduleWithFixedDelay(graphite, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
     }
 
     @Override
