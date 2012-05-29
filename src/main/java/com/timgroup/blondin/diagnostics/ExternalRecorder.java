@@ -139,6 +139,7 @@ public final class ExternalRecorder implements Monitor {
                 } catch (Exception ex) {
                 }
             }
+            sb.append("\n");
             return sb.toString();
         }
     }
