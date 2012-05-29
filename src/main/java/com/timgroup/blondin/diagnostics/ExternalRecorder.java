@@ -128,6 +128,7 @@ public final class ExternalRecorder implements Monitor {
             sb.append(record.getLoggerName());
             sb.append(": ");
             sb.append(formatMessage(record));
+            sb.append("\n");
             if (record.getThrown() != null) {
                 sb.append(" ");
                 try {
@@ -139,7 +140,6 @@ public final class ExternalRecorder implements Monitor {
                 } catch (Exception ex) {
                 }
             }
-            sb.append("\n");
             return sb.toString();
         }
     }
