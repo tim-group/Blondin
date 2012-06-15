@@ -22,12 +22,6 @@ Configuration is achieved with the use of a properties file:
     # Logging
     logDirectory=/var/log/blondin
 
-    # Graphite Metrics
-    graphite.host=metrics
-    graphite.port=2013
-    graphite.period=1
-    graphite.periodunit=MINUTES
-
     # StatsD Metrics
     statsd.host=metrics
     statsd.port=2013
@@ -35,7 +29,10 @@ Configuration is achieved with the use of a properties file:
 
 Blondin utilises a handful of special HTTP requests to allow remote control:
 
-    GET   /status
+    GET   /info/version
+    GET   /info/stoppable
+    GET   /info/health
+    GET   /info/status
     POST  /stop
     POST  /suspend
 

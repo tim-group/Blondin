@@ -1,22 +1,21 @@
 package com.timgroup.blondin.config;
 
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.base.Optional;
-
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 public final class BlondinParametersParserTest {
 
@@ -128,15 +127,13 @@ public final class BlondinParametersParserTest {
     @Test public void
     reads_diagnostics_configuration_from_properties_file() {
         final File configFile = setupConfigFile("1", "sausage", "2", "http://foo/bar", "1");
-        augmentConfigFileWithDiagnostics(configFile, "/my/log/dir", "my.graphite.host", "3", "12", "SECONDS");
+        augmentConfigFileWithDiagnostics(configFile, "/my/log/dir", "my.statsd.host", "3");
         
         final Optional<BlondinConfiguration> result = parser.parse(new String[] {configFile.getAbsolutePath()});
         assertThat(result.isPresent(), is(true));
         assertThat(result.get().diagnostics().logDirectory(), is("/my/log/dir"));
-        assertThat(result.get().diagnostics().graphiteHost(), is("my.graphite.host"));
-        assertThat(result.get().diagnostics().graphitePort(), is(3));
-        assertThat(result.get().diagnostics().graphitePeriod(), is(12));
-        assertThat(result.get().diagnostics().graphitePeriodTimeUnit(), is(TimeUnit.SECONDS));
+        assertThat(result.get().diagnostics().statsdHost(), is("my.statsd.host"));
+        assertThat(result.get().diagnostics().statsdPort(), is(3));
     }
 
     private File setupConfigFile(String blondinPort, String targetHost, String targetPort, String expensiveResourcesUrl, String throttleSize) {
@@ -160,16 +157,14 @@ public final class BlondinParametersParserTest {
         return configFile;
     }
 
-    private void augmentConfigFileWithDiagnostics(File configFile, String logDir, String graphiteHost, String graphitePort, String graphitePeriod, String graphitePeriodUnit) {
+    private void augmentConfigFileWithDiagnostics(File configFile, String logDir, String statsdHost, String statsdPort) {
         try {
             final Properties prop = new Properties();
             prop.load(new FileInputStream(configFile));
             
             if (null != logDir) { prop.setProperty("logDirectory", logDir); }
-            if (null != graphiteHost) { prop.setProperty("graphite.host", graphiteHost); }
-            if (null != graphitePort) { prop.setProperty("graphite.port", graphitePort); }
-            if (null != graphitePeriod) { prop.setProperty("graphite.period", graphitePeriod); }
-            if (null != graphitePeriod) { prop.setProperty("graphite.periodunit", graphitePeriodUnit); }
+            if (null != statsdHost) { prop.setProperty("statsd.host", statsdHost); }
+            if (null != statsdPort) { prop.setProperty("statsd.port", statsdPort); }
             prop.store(new FileOutputStream(configFile), null);
         } catch (Exception e) {
             throw new IllegalStateException(e);

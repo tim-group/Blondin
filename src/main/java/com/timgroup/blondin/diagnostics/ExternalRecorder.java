@@ -4,9 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -21,9 +18,7 @@ import com.timgroup.blondin.config.BlondingDiagnosticsConfiguration;
 
 public final class ExternalRecorder implements Monitor {
 
-    private GraphiteRecorder graphite = null;
     private StatsdRecorder statsd = null;
-    private ScheduledExecutorService executor = null;
 
     public ExternalRecorder(BlondingDiagnosticsConfiguration configuration) {
         Logger globalLogger = Logger.getLogger("");
@@ -61,9 +56,6 @@ public final class ExternalRecorder implements Monitor {
 
     @Override
     public void plot(String aspect, Integer value) {
-        if (null != graphite) {
-            graphite.record(aspect, value);
-        }
         if (null != statsd) {
             statsd.record(aspect, value);
         }
@@ -89,29 +81,15 @@ public final class ExternalRecorder implements Monitor {
             statsd = new StatsdRecorder(this, diagnostics.identifier(), diagnostics.statsdHost(), diagnostics.statsdPort());
             return;
         }
-        
-        executor  = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-            final ThreadFactory delegate = Executors.defaultThreadFactory();
-            @Override public Thread newThread(Runnable r) {
-                Thread result = delegate.newThread(r);
-                result.setName("Metrics-"+result.getName());
-                return result;
-            }
-        });
-        graphite = new GraphiteRecorder(this, diagnostics.graphiteHost(), diagnostics.graphitePort());
-        executor.scheduleWithFixedDelay(graphite, diagnostics.graphitePeriod(), diagnostics.graphitePeriod(), diagnostics.graphitePeriodTimeUnit());
     }
 
     @Override
     public void stop() {
-        if (null != executor) {
-            executor.shutdown();
-        }
         if (null != statsd) {
             statsd.stop();
         }
     }
-    
+
     private static final class LogMessageFormatter extends Formatter {
         private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
         private Date dat = new Date();

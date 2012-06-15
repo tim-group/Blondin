@@ -42,7 +42,7 @@ public final class StatsdMetricsTest extends BlondinAcceptanceTestBase {
     }
 
     @After
-    public void shutdownGraphiteServer() {
+    public void shutdownStatsDServer() {
         statsd.shutdown();
     }
 

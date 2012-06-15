@@ -17,10 +17,6 @@ public final class StopServerTest extends BlondinAcceptanceTestBase {
 
     @Override
     protected void beforeBlondinStartsUpWith(Properties properties, List<String> expensiveResources) throws Exception {
-        properties.setProperty("graphite.host", "localhost");
-        properties.setProperty("graphite.port", String.valueOf(generatePort()));
-        properties.setProperty("graphite.period", "1");
-        properties.setProperty("graphite.periodunit", "MILLISECONDS");
         properties.setProperty("statsd.host", "localhost");
         properties.setProperty("statsd.port", String.valueOf(generatePort()));
     }
