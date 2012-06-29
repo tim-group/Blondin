@@ -27,14 +27,12 @@ Configuration is achieved with the use of a properties file:
     statsd.port=2013
 
 
-Blondin utilises a handful of special HTTP requests to allow remote control:
+Blondin utilises a handful of special HTTP requests to allow status inquiry:
 
     GET   /info/version
     GET   /info/stoppable
     GET   /info/health
     GET   /info/status
-    POST  /stop
-    POST  /suspend
 
 Colophon
 ========
