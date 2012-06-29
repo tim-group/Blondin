@@ -24,8 +24,8 @@ public final class StopServerTest extends BlondinAcceptanceTestBase {
     @Test(timeout=10000L) public void
     responds_to_a_stop_request() throws Exception {
         TrivialHttpClient.getFrom(blondinUrl() + "/some/resource/or/other");
-        TrivialHttpClient.post(blondinUrl() + "/stop");
-        
+
+        stopBlondin();
         Sockets.waitForNoSocket("localhost", blondinPort());
         assertThat(Sockets.isSocketOpen("localhost", blondinPort()), is(false));
         

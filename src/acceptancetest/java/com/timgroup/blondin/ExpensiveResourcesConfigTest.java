@@ -24,7 +24,7 @@ public final class ExpensiveResourcesConfigTest extends BlondinAcceptanceTestBas
     
     @Test public void
     retrieves_list_of_expensive_resources_via_get_request() throws Exception {
-        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/status");
+        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/info/status");
         
         assertThat(response.content, containsString("/my/{catchy}/res1"));
         assertThat(response.content, containsString("/my/res2"));

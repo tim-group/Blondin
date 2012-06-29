@@ -26,16 +26,4 @@ public final class StatusPageTest extends BlondinAcceptanceTestBase {
         assertThat(response.content, startsWith("<?xml version=\"1.0\" ?>"));
         assertThat(response.content, containsString("Version" + expectedVersionString));
     }
-    
-    @Test public void
-    serves_obsolete_status_page() throws Exception {
-        final String currentVersion = AppInfoHandler.class.getPackage().getImplementationVersion();
-        final String expectedVersionString = (null == currentVersion) ? "" : ": <value>" + currentVersion + "</value>";
-        
-        final TrivialResponse response = TrivialHttpClient.getFrom(blondinUrl() + "/status");
-        
-        assertThat(response.code, is(200));
-        assertThat(response.content, startsWith("<?xml version=\"1.0\" ?>"));
-        assertThat(response.content, containsString("Version" + expectedVersionString));
-    }
 }
