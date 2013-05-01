@@ -64,6 +64,15 @@ public final class ExpensiveResourceListLoaderTest {
         assertThat(loader.apply("/$/anything/("), is(true));
     }
 
+    @Test public void
+    matches_resources_with_optional_path() throws Exception {
+        Files.write("/hello/{optional/}world", expensiveListFile, UTF_8);
+        final ExpensiveResourceListLoader loader = new ExpensiveResourceListLoader(new DummyMonitor(), urlFor(expensiveListFile));
+
+        assertThat(loader.apply("/hello/sad/world"), is(true));
+        assertThat(loader.apply("/hello/world"), is(true));
+    }
+
     private URL urlFor(File file) throws MalformedURLException {
         return file.toURI().toURL();
     }
