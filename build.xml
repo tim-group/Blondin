@@ -29,6 +29,7 @@
                     <attribute name="Implementation-Version" value="@{moduleversion}"/>
                     <attribute name="Built-By" value="${user.name}"/>
                     <attribute name="Built-Date" value="${build.timestamp}"/>
+                    <attribute name="X-Java-Version" value="8"/>
                 </manifest>
             </jar>
         </sequential>
